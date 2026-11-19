@@ -1373,9 +1373,20 @@ def products_json():
 def write_sitemap(pages_meta, news_posts):
     urls = []
     for loc, meta in sorted(pages_meta.items()):
-        urls.append(f"  <url><loc>{esc(loc)}</loc><lastmod>{meta['lastmod']}</lastmod></url>")
+        entry = f"  <url><loc>{esc(loc)}</loc><lastmod>{meta['lastmod']}</lastmod>"
+        if "/mobiles/" in loc:
+            slug = loc.rstrip("/").rsplit("/", 1)[-1]
+            img_file = SITE / "images" / "products" / f"{slug}.jpg"
+            img = (f"{BASE_URL}/images/products/{slug}.jpg" if img_file.exists()
+                   else f"{BASE_URL}/images/placeholder.jpg")
+            m = next((x for x in MODELS if x.slug == slug), None)
+            entry += (f"<image:image><image:loc>{esc(img)}</image:loc>"
+                      + (f"<image:title>{esc(m.name_ar)}</image:title>" if m else "")
+                      + "</image:image>")
+        entry += "</url>"
+        urls.append(entry)
     (SITE / "sitemap.xml").write_text(
-        '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n'
         + "\n".join(urls) + "\n</urlset>\n", encoding="utf-8")
     news_urls = []
     for p in news_posts:
