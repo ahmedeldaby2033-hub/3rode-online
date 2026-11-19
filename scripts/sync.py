@@ -191,7 +191,15 @@ def download_images(limit_per_run=20):
                 orig = SITE / "images" / "originals" / f"{m.slug}.jpg"
                 orig.parent.mkdir(parents=True, exist_ok=True)
                 im.convert("RGB").save(orig, quality=92)
-                WM.apply_to_product(im, "A").save(target, quality=92)
+                wm = WM.apply_to_product(im, "A")
+                # cap at 600px (display size) + q82, matching the optimized set
+                w, h = wm.size
+                mx = max(w, h)
+                if mx > 600:
+                    sc = 600 / mx
+                    wm = wm.resize((max(1, int(w * sc)), max(1, int(h * sc))),
+                                   Image.LANCZOS)
+                wm.save(target, quality=82, optimize=True)
                 status[m.slug] = {"local": True, "working_url": url,
                                   "note": "downloaded + watermarked A"}
                 LOG["image_downloads"].append(m.slug)
