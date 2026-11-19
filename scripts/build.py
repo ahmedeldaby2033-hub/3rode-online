@@ -317,6 +317,9 @@ class Model:
         self.last_update = max(
             (parse_sheet_date(c(r, "تاريخ آخر تحديث")) for r in self.offers),
             default=TODAY)
+        self.year = max(
+            (int(num(c(r, "سنة الإصدار"), 0) or 0) for r in self.offers),
+            default=0)
         self.slug = None
         self.history = []       # [(date_iso, price)]
         self.history_days = 0
@@ -377,7 +380,7 @@ def resolve_model_image(model):
     if st and not st.get("local"):
         if model.slug not in DEAD_IMAGES:
             DEAD_IMAGES.append(model.slug)
-        return None, "/images/placeholder.jpg", True
+        return None, "/images/placeholder.jpg?v=2", True
     return None, model.image_remote, False
 def build_history():
     """Join سجل الأسعار rows to models via product URL -> brand."""
@@ -590,7 +593,7 @@ def abs_image(model):
         return BASE_URL + local
     if remote and remote.startswith("/"):
         return BASE_URL + remote
-    return remote or (BASE_URL + "/images/placeholder.jpg")
+    return remote or (BASE_URL + "/images/placeholder.jpg?v=2")
 
 
 # ------------------------------------------------------------------- cards
@@ -604,11 +607,11 @@ def card_html(m):
               if m.rating else "")
     g5 = " • يدعم 5G" if m.g5 else ""
     search_text = f"{m.name_en} {m.name_ar} {m.brand} {m.model}".lower()
-    return f"""<article class="pcard" data-slug="{m.slug}" data-brand="{esc(m.brand)}" data-price="{m.cheapest_price:g}" data-discount="{m.discount}" data-rating="{m.rating or 0}" data-ram="{esc(m.ram)}" data-storage="{esc(m.storage)}" data-g5="{1 if m.g5 else 0}" data-instock="{1 if m.in_stock else 0}" data-updated="{m.last_update}" data-search="{esc(search_text)}">
+    return f"""<article class="pcard" data-slug="{m.slug}" data-brand="{esc(m.brand)}" data-price="{m.cheapest_price:g}" data-discount="{m.discount}" data-rating="{m.rating or 0}" data-ram="{esc(m.ram)}" data-storage="{esc(m.storage)}" data-g5="{1 if m.g5 else 0}" data-instock="{1 if m.in_stock else 0}" data-updated="{m.last_update}" data-year="{m.year}" data-search="{esc(search_text)}">
 <a href="/mobiles/{m.slug}/"><img src="{esc(img)}" alt="هاتف {esc(m.name_ar)} {esc(m.storage)} / {esc(m.ram)}" loading="lazy" decoding="async" width="500" height="500"></a>
 <div class="pcard-body">
 <h3><a href="/mobiles/{m.slug}/">{esc(m.name_ar)}</a></h3>
-<div class="brand-line">{esc(m.brand)} {esc(m.model)} • {esc(m.storage)} / {esc(m.ram)}{g5}</div>
+<div class="brand-line">{esc(m.brand)} {esc(m.model)} • {esc(m.storage)} / {esc(m.ram)}{g5}{(" • " + str(m.year)) if m.year else ""}</div>
 <div class="price-row"><span class="price">{fmt_price(m.cheapest_price)} جنيه</span>{old}{disc}</div>
 <div class="brand-line">{rating} • أرخص سعر في جوميا</div>
 <div class="actions"><a class="btn-mini btn-prices" href="/mobiles/{m.slug}/">عرض الأسعار</a><button class="btn-mini btn-compare" type="button" data-compare="{m.slug}">قارن</button><button class="btn-mini btn-fav" type="button" data-fav="{m.slug}">♡ مفضلة</button></div>
@@ -647,7 +650,9 @@ def build_index():
     brand_cards = "".join(
         f'<a class="chip" href="/brand/{BRAND_SLUGS[b]}/">{esc(b)} ({sum(1 for m in MODELS if m.brand == b)})</a>'
         for b in BRANDS)
-    cards = "".join(card_html(m) for m in MODELS)
+    newest_first = sorted(MODELS, key=lambda m: (-(m.year or 0), m.cheapest_price))
+    latest = newest_first[:12]
+    cards = "".join(card_html(m) for m in newest_first)
     hero_cls = ("hero-search hero-compact"
                 if HOME_LAYOUT in ("compact", "luxury", "minimal")
                 else "hero-search")
@@ -668,7 +673,7 @@ def build_index():
 <label class="check"><input type="checkbox" id="filter-5g"> يدعم 5G فقط</label>
 <label class="check"><input type="checkbox" id="filter-instock"> المتوفر فقط</label>
 <label class="check"><input type="checkbox" id="filter-favonly"> مفضلتي فقط</label>
-<select id="sort-by" aria-label="ترتيب النتائج"><option value="cheapest">الأرخص أولاً</option><option value="discount">الأكبر خصماً</option><option value="rating">الأعلى تقييماً</option><option value="latest">الأحدث تحديثاً</option></select>
+<select id="sort-by" aria-label="ترتيب النتائج"><option value="newest" selected>الأحدث (سنة الإصدار)</option><option value="cheapest">الأرخص أولاً</option><option value="discount">الأكبر خصماً</option><option value="rating">الأعلى تقييماً</option><option value="latest">الأحدث تحديثاً</option></select>
 </div>"""
     count_html = f'<div class="muted" id="results-count">عرض {len(MODELS)} هاتفاً</div>'
     chips_html = f'<div class="chips" style="margin:10px 0">{brand_chips}</div>'
@@ -683,15 +688,19 @@ def build_index():
                    if drops_models else drops_sec)
     cheapest_grid = f'<div class="section-head"><h2>💰 أرخص الهواتف</h2></div>\n<div class="grid">{"".join(card_html(m) for m in cheapest)}</div>'
     cheapest_row = f'<div class="section-head"><h2>💰 أرخص الهواتف</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in cheapest)}</div>'
-    all_grid = f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="grid" id="models-grid">{cards}</div>'
-    all_row = f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="row-scroll" id="models-grid">{cards}</div>'
+    latest_grid = f'<div class="section-head"><h2>🆕 أحدث الهواتف</h2></div>\n<div class="grid">{"".join(card_html(m) for m in latest)}</div>'
+    latest_row = f'<div class="section-head"><h2>🆕 أحدث الهواتف</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in latest)}</div>'
+    latest_feat = f'<div class="section-head"><h2>🆕 أحدث الهواتف</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in latest)}</div>'
+    latest_list = f'<div class="section-head"><h2>🆕 أحدث الهواتف</h2></div>\n<div class="cards-list">{"".join(card_html(m) for m in latest)}</div>'
+    all_grid = latest_grid + f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="grid" id="models-grid">{cards}</div>'
+    all_row = latest_row + f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="row-scroll" id="models-grid">{cards}</div>'
     brands_html = f'<div class="section-head" id="brands"><h2>تسوق حسب الماركة</h2></div>\n<div class="chips">{brand_cards}</div>'
     brands_tiles = f'<div class="section-head" id="brands"><h2>تسوق حسب الماركة</h2></div>\n<div class="brand-tiles">{brand_cards}</div>'
     biggest_list = f'<div class="section-head"><h2>🔥 أكبر التخفيضات الآن</h2></div>\n<div class="cards-list">{"".join(card_html(m) for m in biggest)}</div>'
     cheapest_list = f'<div class="section-head"><h2>💰 أرخص الهواتف</h2></div>\n<div class="cards-list">{"".join(card_html(m) for m in cheapest)}</div>'
     cheapest_feat = f'<div class="section-head"><h2>💰 أرخص الهواتف</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in cheapest)}</div>'
-    all_list = f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="cards-list" id="models-grid">{cards}</div>'
-    all_feat = f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="grid grid-featured" id="models-grid">{cards}</div>'
+    all_list = latest_list + f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="cards-list" id="models-grid">{cards}</div>'
+    all_feat = latest_feat + f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="grid grid-featured" id="models-grid">{cards}</div>'
     drops_row = (f'<div class="section-head"><h2>📉 أحدث انخفاضات الأسعار</h2></div>\n'
                  f'<div class="row-scroll">{"".join(card_html(m) for m in drops_models)}</div>'
                  if drops_models else drops_sec)
@@ -1326,7 +1335,7 @@ def build_search():
       }).slice(0, 20);
       out.innerHTML = list.length
         ? '<div class="grid">' + list.map(function (p) {
-            return '<article class="pcard"><a href="/mobiles/' + p.slug + '/"><img src="' + (p.image || '/images/placeholder.jpg') + '" alt="هاتف ' + p.name + '" loading="lazy" width="500" height="500"></a><div class="pcard-body"><h3><a href="/mobiles/' + p.slug + '/">' + p.name + '</a></h3>' +
+            return '<article class="pcard"><a href="/mobiles/' + p.slug + '/"><img src="' + (p.image || '/images/placeholder.jpg?v=2') + '" alt="هاتف ' + p.name + '" loading="lazy" width="500" height="500"></a><div class="pcard-body"><h3><a href="/mobiles/' + p.slug + '/">' + p.name + '</a></h3>' +
               '<div class="price-row"><span class="price">' + p.price.toLocaleString('en-US') + ' جنيه</span></div>' +
               '<div class="brand-line">' + p.brand + ' • ' + p.storage + ' / ' + p.ram + '</div>' +
               '<div class="actions"><a class="btn-mini" href="/mobiles/' + p.slug + '/">عرض السعر</a></div></div></article>';
@@ -1351,7 +1360,7 @@ def products_json():
         out.append({
             "slug": m.slug, "name": m.name_ar, "name_en": m.name_en,
             "brand": m.brand, "model": m.model, "storage": m.storage,
-            "ram": m.ram, "price": m.cheapest_price,
+            "ram": m.ram, "year": m.year, "price": m.cheapest_price,
             "old_price": m.old_price, "discount": m.discount,
             "rating": m.rating, "rating_count": m.rating_count,
             "g5": m.g5, "in_stock": m.in_stock,
@@ -1378,7 +1387,7 @@ def write_sitemap(pages_meta, news_posts):
             slug = loc.rstrip("/").rsplit("/", 1)[-1]
             img_file = SITE / "images" / "products" / f"{slug}.jpg"
             img = (f"{BASE_URL}/images/products/{slug}.jpg" if img_file.exists()
-                   else f"{BASE_URL}/images/placeholder.jpg")
+                   else f"{BASE_URL}/images/placeholder.jpg?v=2")
             m = next((x for x in MODELS if x.slug == slug), None)
             entry += (f"<image:image><image:loc>{esc(img)}</image:loc>"
                       + (f"<image:title>{esc(m.name_ar)}</image:title>" if m else "")
