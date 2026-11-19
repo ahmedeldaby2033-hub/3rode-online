@@ -608,7 +608,7 @@ def header_html():
 <a class="brand" href="/"><img src="/assets/logo.png" alt="{esc(SITE_NAME)} {DOMAIN}" width="162" height="56"></a>
 <button id="nav-toggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav">{icon("menu")} القائمة</button>
 <nav class="main-nav" id="main-nav">
-<a href="/">الرئيسية</a><a href="/coupons/">الكوبونات</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/brands/">الماركات</a><a href="/about/">من نحن</a>
+<a href="/">الرئيسية</a><a href="/deals/">أفضل العروض</a><a href="/coupons/">الكوبونات</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/brands/">الماركات</a><a href="/about/">من نحن</a>
 </nav>
 <button id="theme-toggle" class="theme-toggle" type="button">{icon("moon")} الوضع الليلي</button>
 <button id="pwa-install" class="theme-toggle" type="button" style="display:none">{icon("download")} ثبّت التطبيق</button>
@@ -620,7 +620,7 @@ def footer_html():
 <div class="cols">
 <div><h3>{esc(SITE_NAME)}</h3><p>مقارنة أسعار الهواتف في مصر.</p>
 <p class="muted">آخر تحديث للأسعار من الشيت: {SHEET_UPDATED_DATE} — تُحدَّث كل ساعة.</p></div>
-<div><h3>روابط سريعة</h3><a href="/coupons/">الكوبونات</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/budget/">البحث بالميزانية</a><a href="/compare/">قارن بين الهواتف</a><a href="/about/">من نحن</a><a href="/contact/">اتصل بنا</a></div>
+<div><h3>روابط سريعة</h3><a href="/coupons/">الكوبونات</a><a href="/deals/">أفضل العروض</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/budget/">البحث بالميزانية</a><a href="/compare/">قارن بين الهواتف</a><a href="/about/">من نحن</a><a href="/contact/">اتصل بنا</a></div>
 <div><h3>سياسات الموقع</h3><a href="/privacy/">سياسة الخصوصية</a><a href="/terms/">شروط الاستخدام</a><a href="/affiliate-disclosure/">إفصاح التسويق بالعمولة</a><a href="/cookies/">سياسة ملفات تعريف الارتباط</a></div>
 <div><h3>تواصل معنا</h3><a href="mailto:{EMAIL}">{EMAIL}</a></div>
 </div>
@@ -750,6 +750,10 @@ def build_index():
 <input type="search" name="q" id="hero-q" placeholder="ابحث عن هاتف…" aria-label="ابحث عن هاتف">
 <button class="btn" type="submit">بحث</button>
 </form>
+<div class="hero-deals">
+<a class="hero-deal-btn hero-deal-amazon" href="https://www.amazon.eg/deals?tag=amazon0c2aca6-21" target="_blank" rel="sponsored noopener">انقر للحصول على أفضل عروض أمازون مصر 2026</a>
+<a class="hero-deal-btn hero-deal-jumia" href="https://jforce.jumia.com.eg/s/C4i51XK" target="_blank" rel="sponsored noopener">انقر للحصول على أفضل عروض جوميا مصر 2026</a>
+</div>
 <a class="request-banner" href="/#request-form">أخبرنا بطلبك في رسالة — يصلك أفضل خصم؟ <strong>اضغط هنا</strong></a>
 </div></section>"""
     toolbar_html = f"""<div class="toolbar" id="filters">
@@ -763,6 +767,8 @@ def build_index():
 <label class="check"><input type="checkbox" id="filter-favonly"> مفضلتي فقط</label>
 <select id="sort-by" aria-label="ترتيب النتائج"><option value="newest" selected>الأحدث (سنة الإصدار)</option><option value="cheapest">الأرخص أولاً</option><option value="discount">الأكبر خصماً</option><option value="rating">الأعلى تقييماً</option><option value="latest">الأحدث تحديثاً</option></select>
 </div>"""
+    # الرئيسية بلا شريط فلاتر (نُقلت الفلاتر إلى صفحة «أفضل العروض»)
+    toolbar_html = ""
     count_html = f'<div class="muted" id="results-count">عرض {len(MODELS)} هاتفاً</div>'
     chips_html = f'<div class="chips" style="margin:10px 0">{brand_chips}</div>'
     biggest_grid = f'<div class="section-head"><h2>{sec_icon("percent", "warm")} أكبر التخفيضات الآن</h2></div>\n<div class="grid">{"".join(card_html(m) for m in biggest)}</div>'
@@ -1234,6 +1240,84 @@ def build_brands_index():
         f"ماركات الهواتف في مصر — {SITE_NAME}",
         f"تصفح كل ماركات الهواتف في مصر ({len(BRANDS)} ماركة): سامسونج وآيفون وشاومي وأوبو وغيرها، وقارن أسعارها في جوميا مصر وأمازون مصر ونون مصر.",
         f"{BASE_URL}/brands/", body, json_ld=ld)
+
+# ------------------------------------------------------------------- deals
+DEALS_RESET_SCRIPT = """<script>
+(function () {
+  var btn = document.getElementById('deals-reset');
+  if (!btn) return;
+  btn.addEventListener('click', function () {
+    ['filter-q', 'filter-brand', 'filter-ram', 'filter-storage', 'filter-maxprice'].forEach(function (id) {
+      var e = document.getElementById(id);
+      if (e) { e.value = ''; e.dispatchEvent(new Event('input')); }
+    });
+    ['filter-5g', 'filter-instock', 'filter-favonly'].forEach(function (id) {
+      var e = document.getElementById(id);
+      if (e) { e.checked = false; e.dispatchEvent(new Event('change')); }
+    });
+    var s = document.getElementById('sort-by');
+    if (s) { s.value = 'discount'; s.dispatchEvent(new Event('change')); }
+  });
+})();
+</script>"""
+
+
+def build_deals_page():
+    """Dedicated /deals/ page («أفضل العروض»): ALL products as cards with a
+    professional filter panel. Reuses the homepage toolbar element IDs so
+    assets/app.js applyFilters() works unchanged (no JS changes needed)."""
+    brands_opts = "".join(
+        f'<option value="{esc(b)}">{esc(b)} ({sum(1 for m in MODELS if m.brand == b)})</option>'
+        for b in BRANDS)
+    rams = sorted({m.ram for m in MODELS})
+    storages = sorted({m.storage for m in MODELS})
+    ram_opts = "".join(f'<option value="{esc(r)}">{esc(r)}</option>' for r in rams)
+    st_opts = "".join(f'<option value="{esc(s)}">{esc(s)}</option>' for s in storages)
+    # best deals first: biggest discount, then cheapest
+    deals = sorted(MODELS, key=lambda m: (-m.discount, m.cheapest_price))
+    cards = "".join(card_html(m) for m in deals)
+    filters_html = f"""<section class="deals-filters" aria-label="تصفية العروض">
+<div class="deals-filters-head"><h2>صفِّ العروض حسب احتياجك</h2>
+<button class="deals-reset" type="button" id="deals-reset">مسح الفلاتر ✕</button></div>
+<div class="deals-filters-grid">
+<div class="field field-search"><label for="filter-q">ابحث بالاسم أو الموديل</label>
+<input type="search" id="filter-q" placeholder="مثال: Galaxy A56 أو Redmi Note…" aria-label="بحث سريع"></div>
+<div class="field"><label for="filter-brand">الماركة</label>
+<select id="filter-brand" aria-label="الماركة"><option value="">كل الماركات</option>{brands_opts}</select></div>
+<div class="field"><label for="filter-ram">الرام</label>
+<select id="filter-ram" aria-label="الرام"><option value="">كل الرامات</option>{ram_opts}</select></div>
+<div class="field"><label for="filter-storage">التخزين</label>
+<select id="filter-storage" aria-label="التخزين"><option value="">كل التخزين</option>{st_opts}</select></div>
+<div class="field"><label for="filter-maxprice">حد أقصى للسعر (جنيه)</label>
+<input type="number" id="filter-maxprice" placeholder="مثال: 15000" min="0" aria-label="حد أقصى للسعر"></div>
+<div class="field"><label for="sort-by">ترتيب النتائج</label>
+<select id="sort-by" aria-label="ترتيب النتائج"><option value="newest">الأحدث (سنة الإصدار)</option><option value="cheapest">الأرخص أولاً</option><option value="discount" selected>الأكبر خصماً</option><option value="rating">الأعلى تقييماً</option><option value="latest">الأحدث تحديثاً</option></select></div>
+</div>
+<div class="deals-filters-checks">
+<label class="check"><input type="checkbox" id="filter-5g"> يدعم 5G فقط</label>
+<label class="check"><input type="checkbox" id="filter-instock"> المتوفر فقط</label>
+<label class="check"><input type="checkbox" id="filter-favonly"> مفضلتي فقط</label>
+<span class="muted" id="results-count">عرض {len(MODELS)} هاتفاً</span></div>
+</section>"""
+    body = f"""<p class="muted"><a href="/">الرئيسية</a> › أفضل العروض</p>
+<h1>أفضل العروض 2026</h1>
+<p>أقوى عروض وتخفيضات الهواتف في مصر لعام 2026 — قارن أسعار {len(MODELS)} هاتفاً في جوميا مصر وأمازون مصر ونون مصر، وصفِّ النتائج بالمارة والرام والتخزين والسعر ودعم 5G لتصل إلى أفضل صفقة بأسرع وقت.</p>
+{filters_html}
+<div class="grid" id="models-grid">{cards}</div>
+{DEALS_RESET_SCRIPT}"""
+    top = deals[:10]
+    ld = {"@context": "https://schema.org", "@type": "ItemList",
+          "name": f"أفضل عروض الهواتف في مصر 2026 — {SITE_NAME}",
+          "itemListElement": [{"@type": "ListItem", "position": i + 1,
+                               "url": f"{BASE_URL}/mobiles/{m.slug}/",
+                               "name": m.name_ar}
+                              for i, m in enumerate(top)]}
+    return page_shell(
+        f"أفضل العروض 2026 — {SITE_NAME}",
+        f"أفضل عروض الهواتف في مصر 2026: قارن أسعار {len(MODELS)} هاتفاً في جوميا مصر وأمازون مصر ونون مصر، وصفِّ النتائج حسب الماركة والرام والتخزين والسعر ودعم 5G.",
+        f"{BASE_URL}/deals/", body, json_ld=ld,
+        og_image=abs_image(top[0]) if top else None)
+
 
 # ----------------------------------------------------------------- coupons
 def build_coupons():
@@ -1753,6 +1837,7 @@ def main():
     for b in BRANDS:
         emit(f"brand/{BRAND_SLUGS[b]}/index.html", build_brand(b))
     emit("brands/index.html", build_brands_index())
+    emit("deals/index.html", build_deals_page())
     emit("coupons/index.html", build_coupons())
     guides = load_json(DATA / "guides.json")["guides"]
     emit("guides/index.html", build_guides_index(guides))
