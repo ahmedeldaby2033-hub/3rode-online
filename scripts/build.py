@@ -128,7 +128,6 @@ SITE_NAME = SETTINGS["site_name"]
 DOMAIN = SETTINGS.get("domain") or SETTINGS.get("site_domain", "3rode.online")
 BASE_URL = (SETTINGS.get("base_url") or f"https://{DOMAIN}").rstrip("/")
 EMAIL = SETTINGS["contact_email"]
-SLOGAN = SETTINGS.get("slogan") or SETTINGS.get("site_slogan", "")
 
 
 def _ads_slot(name):
@@ -502,8 +501,9 @@ def head_html(title, desc, canonical, og_image=None, noindex=False,
 
 def header_html():
     return f"""<header class="site-header"><div class="container wide">
-<a class="brand" href="/"><img src="/assets/logo.png" alt="{esc(SITE_NAME)} {DOMAIN}" width="160" height="55"><span><span class="brand-name">{esc(SITE_NAME)}</span><br><span class="brand-tag">{esc(SLOGAN)}</span></span></a>
-<nav class="main-nav">
+<a class="brand" href="/"><img src="/assets/logo.png" alt="{esc(SITE_NAME)} {DOMAIN}" width="160" height="55"><span class="brand-name">{esc(SITE_NAME)}</span></a>
+<button id="nav-toggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav">☰ القائمة</button>
+<nav class="main-nav" id="main-nav">
 <a href="/">الرئيسية</a><a href="/coupons/">الكوبونات</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/#brands">الماركات</a><a href="/about/">من نحن</a>
 </nav>
 <button id="theme-toggle" class="theme-toggle" type="button">🌙 الوضع الليلي</button>
@@ -514,7 +514,7 @@ def header_html():
 def footer_html():
     return f"""<footer class="site-footer"><div class="container wide">
 <div class="cols">
-<div><h3>{esc(SITE_NAME)}</h3><p>{esc(SLOGAN)}<br>مقارنة أسعار الهواتف في مصر.</p>
+<div><h3>{esc(SITE_NAME)}</h3><p>مقارنة أسعار الهواتف في مصر.</p>
 <p class="muted">آخر تحديث للأسعار من الشيت: {SHEET_UPDATED_DATE} — تُحدَّث كل ساعة.</p></div>
 <div><h3>روابط سريعة</h3><a href="/coupons/">الكوبونات</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/budget/">البحث بالميزانية</a><a href="/compare/">قارن بين الهواتف</a><a href="/about/">من نحن</a><a href="/contact/">اتصل بنا</a></div>
 <div><h3>سياسات الموقع</h3><a href="/privacy/">سياسة الخصوصية</a><a href="/terms/">شروط الاستخدام</a><a href="/affiliate-disclosure/">إفصاح التسويق بالعمولة</a><a href="/cookies/">سياسة ملفات تعريف الارتباط</a></div>
@@ -546,7 +546,7 @@ def page_shell(title, desc, canonical, body, noindex=False, json_ld=None,
 def org_ld():
     return {"@context": "https://schema.org", "@type": "Organization",
             "name": SITE_NAME, "url": BASE_URL + "/",
-            "slogan": SLOGAN, "email": EMAIL,
+            "email": EMAIL,
             "logo": BASE_URL + "/assets/logo.png"}
 
 
@@ -633,7 +633,7 @@ def build_index():
         for b in BRANDS)
     cards = "".join(card_html(m) for m in MODELS)
     hero = f"""<section class="hero-search"><div class="container wide">
-<h1>{esc(SITE_NAME)} — {esc(SLOGAN)}</h1>
+<h1>{esc(SITE_NAME)}</h1>
 <p>قارن أسعار الهواتف في جوميا مصر وأمازون مصر ونون مصر، وتابع انخفاض الأسعار أولاً بأول.</p>
 <form class="search-box" action="/search/" method="get" role="search">
 <input type="search" name="q" id="hero-q" placeholder="ابحث عن هاتف… مثال: OPPO A6" aria-label="ابحث عن هاتف">
@@ -683,7 +683,7 @@ def build_index():
 <p style="text-align:center"><button class="btn btn-blue" id="pwa-install2" type="button" onclick="document.getElementById('pwa-install').click()">📲 ثبّت الموقع كتطبيق على هاتفك</button></p>"""
     return page_shell(
         f"{SITE_NAME} | قارن أسعار الهواتف في مصر — جوميا وأمازون ونون",
-        f"قارن أسعار {len(MODELS)} موديل هاتف في جوميا مصر وأمازون مصر ونون مصر، وتابع أكبر التخفيضات وأحدث انخفاضات الأسعار. {SLOGAN}.",
+        f"قارن أسعار {len(MODELS)} موديل هاتف في جوميا مصر وأمازون مصر ونون مصر، وتابع أكبر التخفيضات وأحدث انخفاضات الأسعار.",
         BASE_URL + "/", body, hero=hero,
         json_ld=[org_ld(), {"@context": "https://schema.org", "@type": "WebSite",
                              "name": SITE_NAME, "url": BASE_URL + "/",
@@ -1126,10 +1126,20 @@ def build_compare():
       ['التقييم', function (p) { return p.rating ? ('★ ' + p.rating + ' (' + p.rating_count + ')') : '—'; }]];
     var h = '<div style="overflow-x:auto"><table class="offers"><thead><tr><th>المواصفة</th>' +
       items.map(function (p) { return '<th><a href="/mobiles/' + p.slug + '/">' + p.name + '</a></th>'; }).join('') + '</tr></thead><tbody>';
+    h += '<tr><td><strong>الصورة</strong></td>' + items.map(function (p) {
+      return '<td>' + (p.image ? '<a href="/mobiles/' + p.slug + '/"><img src="' + p.image + '" alt="' + p.name.replace(/"/g, '') + '" loading="lazy" style="max-width:130px;height:auto;display:block;margin:0 auto"></a>' : '—') + '</td>';
+    }).join('') + '</tr>';
     rows.forEach(function (row) {
       h += '<tr><td><strong>' + row[0] + '</strong></td>' +
         items.map(function (p) { return '<td>' + row[1](p) + '</td>'; }).join('') + '</tr>';
     });
+    h += '<tr><td><strong>الشراء</strong></td>' + items.map(function (p) {
+      return '<td><div class="compare-buy">' +
+        '<a class="btn-buy btn-jumia" href="' + p.jumia_url + '" target="_blank" rel="sponsored noopener" data-store="jumia" data-model="' + p.slug + '" data-event="buy-click">اشترِ من جوميا</a>' +
+        '<a class="btn-buy btn-amazon" href="' + p.amazon_url + '" target="_blank" rel="sponsored noopener" data-store="amazon" data-model="' + p.slug + '" data-event="buy-click">اشترِ من أمازون</a>' +
+        '<a class="btn-buy btn-noon" href="' + p.noon_url + '" target="_blank" rel="sponsored noopener" data-store="noon" data-model="' + p.slug + '" data-event="buy-click">اشترِ من نون</a>' +
+        '</div></td>';
+    }).join('') + '</tr>';
     h += '</tbody></table></div><p>' + items.map(function (p) {
       return '<a class="btn" href="/mobiles/' + p.slug + '/" style="margin:4px">عرض ' + p.name + '</a>';
     }).join('') + '</p>';
@@ -1229,6 +1239,9 @@ def products_json():
             "rear_camera": norm(c(r0, "الكاميرا الخلفية")),
             "front_camera": norm(c(r0, "الكاميرا الأمامية")),
             "image": _img_local or _img_remote,
+            "jumia_url": jumia_url(norm(c(r0, "رابط المنتج")), norm(c(r0, "رابط الأفلييت"))),
+            "amazon_url": amazon_url(m.display, m.slug),
+            "noon_url": noon_url(m.display),
             "url": f"/mobiles/{m.slug}/",
         })
     return out
@@ -1263,7 +1276,7 @@ def write_sitemap(pages_meta, news_posts):
 
 def write_manifest():
     (SITE / "manifest.json").write_text(json.dumps({
-        "name": SITE_NAME + " — " + SLOGAN, "short_name": "عروضي",
+        "name": SITE_NAME, "short_name": "عروضي",
         "description": "قارن أسعار الهواتف في جوميا مصر وأمازون مصر ونون مصر.",
         "start_url": "/", "scope": "/", "display": "standalone",
         "dir": "rtl", "lang": "ar",

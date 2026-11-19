@@ -17,6 +17,14 @@
     setTimeout(function () { t.classList.remove('show'); }, 2600);
   }
 
+  /* ---------- mobile nav toggle ---------- */
+  var navToggle = $('#nav-toggle'), mainNav = $('#main-nav');
+  if (navToggle && mainNav) navToggle.addEventListener('click', function () {
+    var open = mainNav.classList.toggle('open');
+    navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    navToggle.textContent = open ? '✕ إغلاق' : '☰ القائمة';
+  });
+
   /* ---------- dark mode ---------- */
   var themeBtn = $('#theme-toggle');
   var savedTheme = null;

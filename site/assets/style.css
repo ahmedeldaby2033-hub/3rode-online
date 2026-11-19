@@ -50,7 +50,6 @@ a:hover { text-decoration: underline; }
 .brand:hover { text-decoration: none; }
 .brand img { height: 46px; width: auto; display: block; }
 .brand-name { font-size: 1.35rem; font-weight: 800; line-height: 1.2; }
-.brand-tag { font-size: .8rem; color: var(--orange-light); font-weight: 700; }
 .main-nav { margin-inline-start: auto; display: flex; gap: 4px; flex-wrap: wrap; }
 .main-nav a {
   color: #dbe7f5;
@@ -63,6 +62,18 @@ a:hover { text-decoration: underline; }
   background: rgba(255, 255, 255, .12);
   color: #fff;
   text-decoration: none;
+}
+.nav-toggle {
+  display: none;
+  background: rgba(255, 255, 255, .12);
+  color: #fff;
+  border: 0;
+  border-radius: 8px;
+  padding: 7px 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-family: inherit;
+  font-size: .95rem;
 }
 
 /* ---------- content ---------- */
@@ -369,8 +380,26 @@ html[data-theme="dark"] .install-result { color: #fff; }
 }
 
 @media (max-width: 640px) {
-  .brand img { height: 38px; }
-  .brand-name { font-size: 1.1rem; }
+  .site-header { padding: 8px 0; }
+  .site-header .container { flex-wrap: nowrap; gap: 10px; }
+  .brand img { height: 34px; }
+  .brand-name { font-size: 1.05rem; }
+  .nav-toggle { display: inline-block; margin-inline-start: auto; }
+  .main-nav {
+    display: none;
+    order: 4;
+    width: 100%;
+    flex-direction: column;
+    gap: 0;
+    margin-inline-start: 0;
+  }
+  .main-nav.open { display: flex; }
+  .main-nav a { padding: 10px 12px; border-top: 1px solid rgba(255, 255, 255, .1); }
+  .theme-toggle { padding: 6px 9px; font-size: .85rem; white-space: nowrap; }
   .card { padding: 20px 18px; }
   .page-hero h1 { font-size: 1.35rem; }
 }
+
+/* compare page: compact stacked buy buttons */
+.compare-buy { display: flex; flex-direction: column; gap: 6px; }
+.compare-buy .btn-buy { padding: 9px 10px; font-size: .9rem; margin: 0; }

@@ -16,7 +16,7 @@ main{max-width:1100px;margin:0 auto;padding:20px}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:16px}
 .card h2{margin:0 0 12px;font-size:18px}
 label{display:block;font-weight:600;margin:10px 0 4px}
-input[type=text],input[type=url],input[type=number],input[type=date],select,textarea{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font:inherit}
+input[type=text],input[type=password],input[type=url],input[type=number],input[type=date],select,textarea{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font:inherit}
 textarea{min-height:90px}
 [dir=ltr]{direction:ltr;text-align:left}
 button{cursor:pointer;border:0;border-radius:8px;padding:10px 16px;font:inherit;font-weight:600}
@@ -49,7 +49,7 @@ section.tab.active{display:block}
 <body>
 <header>
   <h1>لوحة تحكم — عروض أونلاين <span style="font-weight:400">3rode.online</span></h1>
-  <span><a href="https://3rode.online/" target="_blank" rel="noopener">عرض الموقع ↗</a> &nbsp;·&nbsp; <a href="https://docs.google.com/spreadsheets/d/1VeOXP8ly-W0dwT0QQK9kqf9z_834zok9ekIqGjfPNdE" target="_blank" rel="noopener">فتح الشيت ↗</a></span>
+  <span><a href="https://3rode.online/" target="_blank" rel="noopener">عرض الموقع ↗</a> &nbsp;·&nbsp; <a href="https://docs.google.com/spreadsheets/d/1VeOXP8ly-W0dwT0QQK9kqf9z_834zok9ekIqGjfPNdE" target="_blank" rel="noopener">فتح الشيت ↗</a> &nbsp;·&nbsp; <button class="btn-ghost" id="logout-btn" style="display:none" onclick="logout()">تسجيل الخروج</button></span>
 </header>
 <main>
 
@@ -65,9 +65,15 @@ window.SETTINGS = { amazon_associates_tag: "amazon0c2aca6-21", jumia_tracking_pa
 
 <div class="card" id="login-card">
   <h2>تسجيل الدخول</h2>
-  <p class="hint">أدخل رمز المدير ADMIN_TOKEN (المحفوظ في إعدادات مشروع Apps Script). يُحفظ في هذه الجلسة فقط، ولا يُرسل إلا إلى تطبيق Apps Script الخاص بك.</p>
+  <p class="hint">بيانات الدخول الافتراضية: اسم المستخدم <b>admin</b> وكلمة المرور <b>admin</b> — غيّر كلمة المرور من تبويب «الإعدادات والإعلانات» بعد الدخول. رمز Apps Script اختياري هنا، ويُفعّل ربط الشيت فقط بعد نشر Apps Script.</p>
   <div class="row">
-    <div><label for="token-input">رمز المدير</label>
+    <div><label for="login-user">اسم المستخدم</label>
+    <input type="text" id="login-user" dir="ltr" value="admin" autocomplete="username"></div>
+    <div><label for="login-pass">كلمة المرور</label>
+    <input type="password" id="login-pass" dir="ltr" autocomplete="current-password"></div>
+  </div>
+  <div class="row">
+    <div><label for="token-input">رمز المدير ADMIN_TOKEN (اختياري)</label>
     <input type="text" id="token-input" dir="ltr" placeholder="ADMIN_TOKEN" autocomplete="off"></div>
     <div><label>&nbsp;</label><button class="btn" onclick="login()">دخول</button></div>
   </div>
@@ -256,6 +262,18 @@ window.SETTINGS = { amazon_associates_tag: "amazon0c2aca6-21", jumia_tracking_pa
       <p class="hint">ألصق كود كل موضع؛ أوقف موضعاً بإفراغ خانته دون حذف الكود من أي مكان آخر. كل موضع بارتفاع ثابت في الموقع لحماية CLS.</p>
       <div id="ads-form">—</div>
     </div>
+    <div class="card"><h2>تغيير كلمة مرور لوحة التحكم</h2>
+      <div class="row">
+        <div><label for="pw-current">كلمة المرور الحالية</label><input type="password" id="pw-current" dir="ltr" autocomplete="current-password"></div>
+        <div><label for="pw-new">كلمة المرور الجديدة</label><input type="password" id="pw-new" dir="ltr" autocomplete="new-password"></div>
+      </div>
+      <div class="row">
+        <div><label for="pw-confirm">تأكيد كلمة المرور الجديدة</label><input type="password" id="pw-confirm" dir="ltr" autocomplete="new-password"></div>
+        <div><label>&nbsp;</label><button class="btn" onclick="changePassword()">تغيير كلمة المرور</button></div>
+      </div>
+      <p id="pw-msg"></p>
+      <p class="hint">تُحفظ كلمة المرور مشفّرة (SHA-256) في هذا المتصفح فقط. هذه البوابة حماية خفيفة للوحة على موقع ثابت — للحماية الكاملة فعّل المصادقة الأساسية (Basic Auth) على مسار /admin/ من Coolify.</p>
+    </div>
   </section>
 
   <section class="tab" id="tab-guides">
@@ -320,28 +338,83 @@ async function api(action, body){
   return data;
 }
 
-async function login(){
-  token = document.getElementById("token-input").value.trim();
-  if(!token){document.getElementById("login-msg").textContent="اكتب الرمز أولاً.";return;}
-  sessionStorage.setItem("admin_token", token);
+/* ---- admin login: username/password (default admin/admin) ----
+   The password is stored as a SHA-256 hash in this browser only
+   (localStorage key ro3de_admin_pass_hash). First run seeds the
+   default password "admin" — change it from the Settings tab.
+   This is a light gate on a static site, not server-side auth:
+   for full protection enable Basic Auth on /admin/ in Coolify. */
+var ADMIN_USER = "admin";
+async function hashPass(s){
   try{
-    var s = await api("settings");
-    window.SETTINGS = {
-      amazon_associates_tag: s.settings.amazon_associates_tag || "amazon0c2aca6-21",
-      jumia_tracking_params: {
-        utm_source: "JFORCE", utm_medium: "JF_Affiliate", utm_campaign: "JF_Affiliate_EG",
-        adj_label: "casid*cf5c450e-259d-49d2-889e-95c558384bcd^type*jforce"
-      },
-      jumia_jforce_link: s.settings.jumia_jforce_link || "",
-      settings: s.settings
-    };
-    document.getElementById("login-card").style.display="none";
-    document.getElementById("admin").style.display="block";
-    renderSettingsForm(s.settings);
-    loadOverview(); loadProducts();
-    toast("تم تسجيل الدخول");
-  }catch(err){
-    document.getElementById("login-msg").innerHTML = '<span class="error">'+err.message+"</span>";
+    var buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("ro3de-admin::" + s));
+    return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2, "0"); }).join("");
+  }catch(e){
+    var h = 0; for(var i = 0; i < s.length; i++){ h = ((h << 5) - h + s.charCodeAt(i)) | 0; }
+    return "fallback-" + h;
+  }
+}
+function storedPassHash(){ return localStorage.getItem("ro3de_admin_pass_hash") || ""; }
+async function ensureDefaultPass(){
+  if(!storedPassHash()) localStorage.setItem("ro3de_admin_pass_hash", await hashPass("admin"));
+}
+function enterAdmin(){
+  document.getElementById("login-card").style.display = "none";
+  document.getElementById("admin").style.display = "block";
+  document.getElementById("logout-btn").style.display = "";
+}
+function logout(){
+  sessionStorage.removeItem("ro3de_admin_session");
+  sessionStorage.removeItem("admin_token");
+  location.reload();
+}
+async function changePassword(){
+  var cur = document.getElementById("pw-current").value;
+  var nw = document.getElementById("pw-new").value;
+  var cf = document.getElementById("pw-confirm").value;
+  var msg = document.getElementById("pw-msg");
+  if(await hashPass(cur) !== storedPassHash()){ msg.innerHTML = '<span class="error">كلمة المرور الحالية غير صحيحة.</span>'; return; }
+  if(nw.length < 6){ msg.innerHTML = '<span class="error">كلمة المرور الجديدة قصيرة — 6 أحرف على الأقل.</span>'; return; }
+  if(nw !== cf){ msg.innerHTML = '<span class="error">تأكيد كلمة المرور لا يطابق الجديدة.</span>'; return; }
+  localStorage.setItem("ro3de_admin_pass_hash", await hashPass(nw));
+  document.getElementById("pw-current").value = "";
+  document.getElementById("pw-new").value = "";
+  document.getElementById("pw-confirm").value = "";
+  msg.innerHTML = '<span class="ok">تم تغيير كلمة المرور بنجاح.</span>';
+}
+async function loadBackend(){
+  var s = await api("settings");
+  window.SETTINGS = {
+    amazon_associates_tag: s.settings.amazon_associates_tag || "amazon0c2aca6-21",
+    jumia_tracking_params: {
+      utm_source: "JFORCE", utm_medium: "JF_Affiliate", utm_campaign: "JF_Affiliate_EG",
+      adj_label: "casid*cf5c450e-259d-49d2-889e-95c558384bcd^type*jforce"
+    },
+    jumia_jforce_link: s.settings.jumia_jforce_link || "",
+    settings: s.settings
+  };
+  renderSettingsForm(s.settings);
+  loadOverview(); loadProducts();
+}
+async function login(){
+  var user = document.getElementById("login-user").value.trim();
+  var pass = document.getElementById("login-pass").value;
+  var msg = document.getElementById("login-msg");
+  await ensureDefaultPass();
+  if(user !== ADMIN_USER || await hashPass(pass) !== storedPassHash()){
+    msg.innerHTML = '<span class="error">اسم المستخدم أو كلمة المرور غير صحيحة.</span>';
+    return;
+  }
+  token = document.getElementById("token-input").value.trim();
+  if(token) sessionStorage.setItem("admin_token", token);
+  sessionStorage.setItem("ro3de_admin_session", "1");
+  enterAdmin();
+  toast("تم تسجيل الدخول");
+  try{ await loadBackend(); }
+  catch(err){
+    document.getElementById("overview-stats").innerHTML =
+      "لوحة التحكم تعمل دون اتصال بالشيت حالياً — انشر Apps Script وألصق رابطه أعلى الملف لتفعيل المزامنة والإعدادات.";
+    document.getElementById("settings-form").innerHTML = "غير متاحة قبل ربط Apps Script.";
   }
 }
 
@@ -608,6 +681,15 @@ document.getElementById('amazon-url').addEventListener('input', function (e) {
 });
 
 if(token){document.getElementById("token-input").value=token;}
+// restore session: the username/password login lasts for the browser session
+if(sessionStorage.getItem("ro3de_admin_session") === "1"){
+  enterAdmin();
+  loadBackend().catch(function(){
+    document.getElementById("overview-stats").innerHTML =
+      "لوحة التحكم تعمل دون اتصال بالشيت حالياً — انشر Apps Script وألصق رابطه أعلى الملف لتفعيل المزامنة والإعدادات.";
+    document.getElementById("settings-form").innerHTML = "غير متاحة قبل ربط Apps Script.";
+  });
+}
 </script>
 </body>
 </html>
