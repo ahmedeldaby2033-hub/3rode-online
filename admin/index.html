@@ -1030,8 +1030,13 @@ function renderSettingsForm(settings){
     "<p class='hint'>المتاجر المعروضة أعلى صفحة «الماركات» — الاسم، ورابط الشعار (صورة)، ورابط المتجر. تُحفظ مع الإعدادات وتظهر بعد المزامنة التالية.</p>" +
     "<div id='stores-editor'></div>" +
     "<p><button type='button' class='btn-green' onclick='addStoreRow()'>+ إضافة متجر</button></p>" +
-    "<input type='hidden' id='set-stores_json' value=''>";
+    "<input type='hidden' id='set-stores_json' value=''>" +
+    "<h3 style='margin-top:22px'>ترتيب الماركات (حسب الشهرة)</h3>" +
+    "<p class='hint'>ترتيب ظهور الماركات في الرئيسية وصفحة «الماركات» وقوائم الفلاتر — استخدم الأسهم لنقل ماركة لأعلى أو لأسفل، ثم احفظ الإعدادات. الماركات الجديدة التي تُضاف في الشيت تظهر في النهاية تلقائياً.</p>" +
+    "<div id='brand-order-editor'></div>" +
+    "<input type='hidden' id='set-brand_order_json' value=''>";
   renderStoresEditor(parseStores(settings.stores_json));
+  renderBrandOrderEditor(parseBrandOrder(settings.brand_order_json, settings.brands_json));
   var ads = ["adsense_client","ads_top","ads_in_list","ads_in_product","ads_bottom"];
   document.getElementById("ads-form").innerHTML = ads.map(function(k){
     return "<label for='set-"+k+"'>"+k+"</label><textarea id='set-"+k+"' dir='ltr'>"+esc(settings[k]||"")+"</textarea>";
@@ -1088,8 +1093,57 @@ function syncStoresJson(){
   var hidden = document.getElementById("set-stores_json");
   if(hidden) hidden.value = JSON.stringify(out);
 }
+/* ---------------- brand order (ترتيب الماركات) ---------------- */
+var DEFAULT_BRAND_ORDER = ["Apple","Samsung","Xiaomi","XIAOMI","OPPO","realme","vivo","Redmi","Honor","Huawei","Infinix","Tecno","Nokia","Motorola","itel","Itel","ZTE","Micromax","Generic","Girasole","Hope","I Pro","Pluzz","Sary","Shitel","Sunelan","TAG-PHONE"];
+function parseBrandOrder(raw, brandsRaw){
+  var saved = [];
+  try{ var v = JSON.parse(raw||""); if(Array.isArray(v)) saved = v.filter(function(x){return typeof x === "string" && x;}); }catch(e){}
+  var all = [];
+  try{ var b = JSON.parse(brandsRaw||""); if(Array.isArray(b)) all = b.filter(function(x){return typeof x === "string" && x;}); }catch(e){}
+  if(!all.length) all = saved.length ? saved.slice() : DEFAULT_BRAND_ORDER.slice();
+  if(!saved.length) saved = DEFAULT_BRAND_ORDER.filter(function(x){ return all.indexOf(x) >= 0; });
+  var seen = {};
+  var out = [];
+  saved.forEach(function(x){ if(all.indexOf(x) >= 0 && !seen[x]){ seen[x] = true; out.push(x); } });
+  all.slice().sort(function(a,b){ var al=a.toLowerCase(), bl=b.toLowerCase(); return al < bl ? -1 : (al > bl ? 1 : 0); }).forEach(function(x){ if(!seen[x]){ seen[x] = true; out.push(x); } });
+  return out;
+}
+function renderBrandOrderEditor(brands){
+  var box = document.getElementById("brand-order-editor");
+  if(!box) return;
+  box.innerHTML = (brands||[]).map(function(b, i){
+    return "<div class='brand-row' style='display:flex;align-items:center;gap:8px;border:1px solid var(--border,#ddd);border-radius:10px;padding:8px 10px;margin-bottom:6px'>" +
+      "<span style='font-weight:700;min-width:22px;text-align:center'>" + (i+1) + "</span>" +
+      "<span class='brand-name' style='flex:1'>" + esc(b) + "</span>" +
+      "<button type='button' class='btn-ghost' onclick='moveBrandRow(this,-1)'" + (i===0 ? " disabled" : "") + ">↑</button>" +
+      "<button type='button' class='btn-ghost' onclick='moveBrandRow(this,1)'" + (i===(brands.length-1) ? " disabled" : "") + ">↓</button></div>";
+  }).join("");
+  syncBrandOrderJson();
+}
+function moveBrandRow(btn, dir){
+  var row = btn.closest(".brand-row");
+  if(!row) return;
+  var box = document.getElementById("brand-order-editor");
+  if(dir < 0 && row.previousElementSibling) box.insertBefore(row, row.previousElementSibling);
+  else if(dir > 0 && row.nextElementSibling) box.insertBefore(row.nextElementSibling, row);
+  else return;
+  renderBrandOrderEditor(readBrandOrder());
+}
+function readBrandOrder(){
+  var out = [];
+  document.querySelectorAll("#brand-order-editor .brand-row").forEach(function(row){
+    var name = row.querySelector(".brand-name");
+    if(name) out.push(name.textContent);
+  });
+  return out;
+}
+function syncBrandOrderJson(){
+  var hidden = document.getElementById("set-brand_order_json");
+  if(hidden) hidden.value = JSON.stringify(readBrandOrder());
+}
 async function saveSettings(){
   syncStoresJson();
+  syncBrandOrderJson();
   var values = {};
   document.querySelectorAll("#settings-form input, #settings-form select, #ads-form textarea").forEach(function(el){
     if(!el.id || el.id.indexOf("set-") !== 0) return;

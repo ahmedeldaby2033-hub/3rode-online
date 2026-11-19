@@ -93,6 +93,8 @@ _ICON_PATHS = {
     "menu": '<line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/>',
     # dark mode toggle
     "moon": '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+    # light mode toggle (sun)
+    "sun": '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
     # install app
     "download": '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>',
     # cheapest store badge
@@ -396,7 +398,25 @@ def build_models():
 
 MODELS = build_models()
 MODEL_BY_SLUG = {m.slug: m for m in MODELS}
-BRANDS = sorted({m.brand for m in MODELS}, key=str.lower)
+def order_brands(brands):
+    """Order brands by the admin-set brand_order in settings.json (fame
+    order, editable from the admin panel). Brands NOT in brand_order
+    (e.g. newly added in the Sheet) come last, alphabetically. Matching
+    is exact first, then case-insensitive, so 'Xiaomi'/'XIAOMI' stay
+    adjacent even if only one is listed."""
+    order = [b for b in (SETTINGS.get("brand_order") or [])
+             if isinstance(b, str)]
+    rank = {}
+    for i, b in enumerate(order):
+        rank.setdefault(b, i)
+        rank.setdefault(b.lower(), i)
+    n = len(order)
+    return sorted(brands,
+                  key=lambda b: (rank.get(b, rank.get(b.lower(), n)),
+                                 b.lower(), b))
+
+
+BRANDS = order_brands({m.brand for m in MODELS})
 BRAND_SLUGS = {b: slugify(b) for b in BRANDS}
 
 
@@ -610,7 +630,7 @@ def header_html():
 <nav class="main-nav" id="main-nav">
 <a href="/">الرئيسية</a><a href="/deals/">أفضل العروض</a><a href="/coupons/">الكوبونات</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/brands/">الماركات</a><a href="/about/">من نحن</a>
 </nav>
-<button id="theme-toggle" class="theme-toggle" type="button">{icon("moon")} الوضع الليلي</button>
+<button id="theme-toggle" class="theme-toggle" type="button">{icon("sun")} الوضع النهاري</button>
 <button id="pwa-install" class="theme-toggle" type="button" style="display:none">{icon("download")} ثبّت التطبيق</button>
 </div></header>"""
 
@@ -642,7 +662,7 @@ def page_shell(title, desc, canonical, body, noindex=False, json_ld=None,
               + json.dumps(json_ld, ensure_ascii=False) + '\n</script>')
     hero_html = hero or ""
     body_tag = '<body class="' + body_class + '">' if body_class else "<body>"
-    return ("<!DOCTYPE html>\n<html lang=\"ar\" dir=\"rtl\">\n<head>\n"
+    return ("<!DOCTYPE html>\n<html lang=\"ar\" dir=\"rtl\" data-theme=\"dark\">\n<head>\n"
             + head_html(title, desc, canonical, og_image, noindex)
             + "\n" + ld + "\n</head>\n" + body_tag + "\n"
             + header_html() + "\n" + hero_html + "\n<main class=\"container wide\">\n"
@@ -772,7 +792,7 @@ def build_index():
     # الرئيسية بلا شريط فلاتر (نُقلت الفلاتر إلى صفحة «أفضل العروض»)
     toolbar_html = ""
     count_html = f'<div class="muted" id="results-count">عرض {len(MODELS)} هاتفاً</div>'
-    chips_html = f'<div class="chips" style="margin:10px 0">{brand_chips}</div>'
+    chips_html = ""  # أزرار الماركات أعلى «أحدث المنتجات» أُزيلت بناءً على طلب المستخدم
     biggest_grid = f'<div class="section-head"><h2>{sec_icon("percent", "warm")} أكبر التخفيضات الآن</h2></div>\n<div class="grid">{"".join(card_html(m) for m in biggest)}</div>'
     biggest_row = f'<div class="section-head"><h2>{sec_icon("percent", "warm")} أكبر التخفيضات الآن</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in biggest)}</div>'
     biggest_feat = f'<div class="section-head"><h2>{sec_icon("percent", "warm")} أكبر التخفيضات الآن</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in biggest)}</div>'
@@ -1275,8 +1295,8 @@ def build_deals_page():
     storages = sorted({m.storage for m in MODELS})
     ram_opts = "".join(f'<option value="{esc(r)}">{esc(r)}</option>' for r in rams)
     st_opts = "".join(f'<option value="{esc(s)}">{esc(s)}</option>' for s in storages)
-    # best deals first: biggest discount, then cheapest
-    deals = sorted(MODELS, key=lambda m: (-m.discount, m.cheapest_price))
+    # best deals first: newest (release year), then cheapest
+    deals = sorted(MODELS, key=lambda m: (-(m.year or 0), m.cheapest_price))
     cards = "".join(card_html(m) for m in deals)
     filters_html = f"""<section class="deals-filters" aria-label="تصفية العروض">
 <div class="deals-filters-head"><h2>صفِّ العروض حسب احتياجك</h2>
@@ -1293,7 +1313,7 @@ def build_deals_page():
 <div class="field"><label for="filter-maxprice">حد أقصى للسعر (جنيه)</label>
 <input type="number" id="filter-maxprice" placeholder="مثال: 15000" min="0" aria-label="حد أقصى للسعر"></div>
 <div class="field"><label for="sort-by">ترتيب النتائج</label>
-<select id="sort-by" aria-label="ترتيب النتائج"><option value="newest">الأحدث (سنة الإصدار)</option><option value="cheapest">الأرخص أولاً</option><option value="discount" selected>الأكبر خصماً</option><option value="rating">الأعلى تقييماً</option><option value="latest">الأحدث تحديثاً</option></select></div>
+<select id="sort-by" aria-label="ترتيب النتائج"><option value="newest" selected>الأحدث (سنة الإصدار)</option><option value="cheapest">الأرخص أولاً</option><option value="discount">الأكبر خصماً</option><option value="rating">الأعلى تقييماً</option><option value="latest">الأحدث تحديثاً</option></select></div>
 </div>
 <div class="deals-filters-checks">
 <label class="check"><input type="checkbox" id="filter-5g"> يدعم 5G فقط</label>
@@ -1392,9 +1412,11 @@ def build_coupons():
             exp_html = (f'<p class="coupon-expiry">ينتهي في: '
                         f'<span class="countdown" data-countdown="{esc(exp)}">'
                         f'{esc(exp)}</span></p>' if exp else "")
-            copy_html = (f'<button class="coupon-copy-btn" type="button" '
-                         f'data-copy-code="{esc(cp.get("code", ""))}">'
-                         f'نسخ الكود</button>')
+            # زر واحد موحّد: ينسخ الكود ثم يحوّل إلى المتجر
+            copy_html = (f'<button class="coupon-go-btn {shop_cls}" type="button" '
+                         f'data-copy-code="{esc(cp.get("code", ""))}" '
+                         f'data-redirect="{esc(redirect)}">'
+                         f'انسخ الكود وانتقل إلى {esc(name)}</button>')
         logo_html = (f'<img src="{esc(logo)}" alt="{esc(name)}" '
                      f'loading="lazy" decoding="async">' if logo else
                      f'<span class="coupon-logo-fallback">{esc(name[:1])}</span>')
@@ -1408,12 +1430,11 @@ def build_coupons():
 </div>
 {example}{desc_html}
 <div class="coupon-code-row">
-<span class="coupon-code" dir="ltr">{esc(cp.get('code', ''))}</span>
-{copy_html}
+<span class="coupon-code coupon-code-click" dir="ltr" title="اضغط للنسخ والانتقال إلى المتجر" data-copy-code="{esc(cp.get('code', ''))}" data-redirect="{esc(redirect)}">{esc(cp.get('code', ''))}</span>
 </div>
 {exp_html}
-<a class="btn coupon-shop-btn {shop_cls}" href="{esc(redirect)}" target="_blank" rel="sponsored noopener">تسوّق الآن في {esc(name)}</a>
-<p class="muted">الكوبون خاص بالمتجر، وليس بموقعنا. انسخ الكود ثم استخدمه عند الشراء في موقع المتجر.</p>
+{copy_html}
+<p class="muted">الكوبون خاص بالمتجر، وليس بموقعنا. الضغط على الكود أو الزر ينسخ الكود ثم يحوّلك إلى موقع المتجر لاستخدامه عند الشراء.</p>
 </article>"""
         ld_items.append({"@type": "ListItem", "position": pos,
                          "name": cp.get("title", ""),

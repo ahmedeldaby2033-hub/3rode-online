@@ -431,15 +431,26 @@ html[data-theme="dark"] .coupon-value { background: #3a2a12; color: #ffb74d; }
   text-align: center; min-width: 0; overflow-wrap: anywhere;
 }
 html[data-theme="dark"] .coupon-code { color: #ffb347; background: #2a2113; }
-.coupon-copy-btn {
-  flex: none; border: 0; border-radius: 8px; cursor: pointer;
-  background: linear-gradient(180deg, #3b82f6, #1d4ed8); color: #fff;
-  font-family: inherit; font-weight: 800; font-size: .95rem; padding: 10px 16px;
+.coupon-code-click { cursor: pointer; }
+.coupon-code-click:hover { border-color: var(--orange); }
+/* زر موحّد: ينسخ الكود ثم يحوّل إلى المتجر (بدل زرّين منفصلين) */
+.coupon-go-btn {
+  display: block; width: 100%; border: 0; border-radius: 10px; cursor: pointer;
+  background: linear-gradient(180deg, #3b82f6, #1d4ed8); color: #fff !important;
+  font-family: inherit; font-weight: 800; font-size: 1rem; padding: 13px 16px;
   box-shadow: 0 2px 8px rgba(29, 78, 216, .30);
   transition: filter .15s ease, transform .15s ease;
 }
-.coupon-copy-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
-.coupon-copy-btn:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; transform: none; }
+.coupon-go-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.coupon-go-btn:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; transform: none; }
+.coupon-go-btn.shop-jumia { background: linear-gradient(180deg, #f68b1e, #e07b00); box-shadow: 0 2px 8px rgba(234, 88, 12, .35); }
+.coupon-go-btn.shop-amazon { background: linear-gradient(180deg, #232f3e, #131921); box-shadow: 0 2px 8px rgba(0, 0, 0, .35); }
+.coupon-go-btn.shop-noon { background: linear-gradient(180deg, #ffe14d, #f5c518); color: #222 !important; box-shadow: 0 2px 8px rgba(245, 197, 24, .35); }
+/* لون الخط أبيض دائماً على أزرار الكوبونات حتى في الوضع الليلي */
+html[data-theme="dark"] .coupon-go-btn { color: #fff !important; }
+html[data-theme="dark"] .coupon-go-btn.shop-noon { color: #222 !important; }
+html[data-theme="dark"] .coupon-shop-btn { color: #fff !important; }
+html[data-theme="dark"] .coupon-shop-btn.shop-noon { color: #222 !important; }
 .coupon-expiry { margin: 0; font-size: .92rem; color: var(--muted); }
 .coupon-expired-note { margin: 0; font-weight: 800; color: var(--red); }
 .coupon-shop-btn { margin-top: 2px; }
