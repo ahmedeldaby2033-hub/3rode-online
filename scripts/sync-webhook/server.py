@@ -134,6 +134,21 @@ def write_export(job, tabs, settings):
             json.dump(cur, open(sp, "w", encoding="utf-8"),
                       ensure_ascii=False, indent=2)
             log(job, f"تخطيط الصفحة الرئيسية: {hl}")
+    # Adopt the brand order chosen in the admin panel.
+    _bo_raw = str(((settings or {}).get("brand_order_json", "") or "").strip())
+    if _bo_raw:
+        try:
+            _bo = json.loads(_bo_raw)
+            if isinstance(_bo, list) and all(isinstance(b, str) for b in _bo):
+                sp = os.path.join(WORKDIR, "settings.json")
+                cur = json.load(open(sp, encoding="utf-8"))
+                if cur.get("brand_order") != _bo:
+                    cur["brand_order"] = _bo
+                    json.dump(cur, open(sp, "w", encoding="utf-8"),
+                              ensure_ascii=False, indent=2)
+                    log(job, f"ترتيب الماركات: {len(_bo)} ماركة")
+        except Exception:
+            pass
     log(job, f"كُتبت بيانات الشيت ({len(written)} تبويبات)")
     return written
 

@@ -57,7 +57,10 @@ var SETTINGS_DEFAULTS = [
   ['onesignal_app_id', ''],
   ['telegram_bot', ''],
   ['telegram_channel', ''],
-  ['stores_json', '[{"name":"جوميا مصر","logo":"/assets/store-logos/jumia.png","url":"https://jforce.jumia.com.eg/s/C4i51XK"},{"name":"أمازون مصر","logo":"/assets/store-logos/amazon.svg","url":"https://www.amazon.eg/?tag=amazon0c2aca6-21"},{"name":"نون مصر","logo":"/assets/store-logos/noon.svg","url":"https://www.noon.com/egypt-en/"}]']
+  ['stores_json', '[{"name":"جوميا مصر","logo":"/assets/store-logos/jumia.png","url":"https://jforce.jumia.com.eg/s/C4i51XK"},{"name":"أمازون مصر","logo":"/assets/store-logos/amazon.svg","url":"https://www.amazon.eg/?tag=amazon0c2aca6-21"},{"name":"نون مصر","logo":"/assets/store-logos/noon.svg","url":"https://www.noon.com/egypt-en/"}]'],
+  // Fame order of the 27 brands (editable from the admin panel's
+  // "ترتيب الماركات" editor; sync adopts it into settings.json brand_order).
+  ['brand_order_json', '["Apple","Samsung","Xiaomi","XIAOMI","OPPO","realme","vivo","Redmi","Honor","Huawei","Infinix","Tecno","Nokia","Motorola","itel","Itel","ZTE","Micromax","Generic","Girasole","Hope","I Pro","Pluzz","Sary","Shitel","Sunelan","TAG-PHONE"]']
 ];
 
 /* ------------------------------------------------------------ helpers */
@@ -121,6 +124,18 @@ function getSettings() {
   var out = {};
   ss().getSheetByName(SHEET_SETTINGS).getDataRange().getValues()
     .forEach(function (r) { if (r[0]) out[r[0]] = r[1]; });
+  // Unique brands from the products sheet (column C) so the admin's
+  // brand-order editor always lists the Sheet's current brands.
+  try {
+    var vals = ss().getSheetByName(SHEET_PRODUCTS).getDataRange().getValues();
+    var seen = {};
+    var list = [];
+    vals.slice(1).forEach(function (r) {
+      var b = (r[2] || '').toString().trim();
+      if (b && !seen[b]) { seen[b] = true; list.push(b); }
+    });
+    out.brands_json = JSON.stringify(list);
+  } catch (err) { out.brands_json = '[]'; }
   return out;
 }
 

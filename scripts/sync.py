@@ -130,6 +130,27 @@ def refresh_from_sheet():
                                 "Sheet settings")
                     except Exception:
                         pass
+                # Adopt the brand order chosen in the admin panel
+                # (Sheet tab "الإعدادات" -> settings.json -> build.py).
+                _brands_raw = str((payload.get("settings") or {}).get(
+                    "brand_order_json", "") or "").strip()
+                if _brands_raw:
+                    try:
+                        _brands = json.loads(_brands_raw)
+                        if (isinstance(_brands, list)
+                                and all(isinstance(b, str)
+                                        for b in _brands)
+                                and SETTINGS.get("brand_order") != _brands):
+                            SETTINGS["brand_order"] = _brands
+                            (BASE / "settings.json").write_text(
+                                json.dumps(SETTINGS, ensure_ascii=False,
+                                           indent=2),
+                                encoding="utf-8")
+                            log("brand-order",
+                                f"adopted {len(_brands)} brands from "
+                                "Sheet settings")
+                    except Exception:
+                        pass
             except Exception as e:  # noqa: BLE001
                 LOG["errors"].append(f"apps script export: {e}")
     log("refresh-sheet", "refreshed" if refreshed else "kept existing exports")

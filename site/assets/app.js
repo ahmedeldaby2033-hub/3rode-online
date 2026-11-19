@@ -25,16 +25,23 @@
     navToggle.textContent = open ? '✕ إغلاق' : '☰ القائمة';
   });
 
-  /* ---------- dark mode ---------- */
+  /* ---------- dark mode (الافتراضي: ليلي) ---------- */
   var themeBtn = $('#theme-toggle');
   var savedTheme = null;
   try { savedTheme = localStorage.getItem('r3de-theme'); } catch (e) {}
   if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+  // تسمية زر التبديل حسب الوضع الحالي عند تحميل الصفحة
+  function syncThemeLabel() {
+    if (!themeBtn) return;
+    var cur = document.documentElement.getAttribute('data-theme') || 'dark';
+    themeBtn.textContent = cur === 'dark' ? '☀️ الوضع النهاري' : '🌙 الوضع الليلي';
+  }
+  syncThemeLabel();
   if (themeBtn) themeBtn.addEventListener('click', function () {
     var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
     try { localStorage.setItem('r3de-theme', next); } catch (e) {}
-    themeBtn.textContent = next === 'dark' ? '☀️ الوضع النهاري' : '🌙 الوضع الليلي';
+    syncThemeLabel();
   });
 
   /* ---------- favorites (no registration, localStorage) ---------- */
@@ -202,11 +209,16 @@
     if (!b || b.disabled) return;
     var code = b.getAttribute('data-copy-code') || '';
     if (!code) return;
+    var redirect = b.getAttribute('data-redirect') || '';
     var done = function () {
       toast('تم نسخ الكود: ' + code);
       var old = b.textContent;
-      b.textContent = 'تم النسخ ✓';
+      b.textContent = 'تم النسخ ✓ — جارٍ التحويل…';
       setTimeout(function () { b.textContent = old; }, 2000);
+      // بعد النسخ: التحويل إلى صفحة المتجر في تبويب جديد
+      if (redirect) {
+        setTimeout(function () { window.open(redirect, '_blank', 'noopener'); }, 700);
+      }
     };
     if (navigator.clipboard) {
       navigator.clipboard.writeText(code).then(done, function () { toast('الكود: ' + code); });

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,7 +31,7 @@
 <nav class="main-nav" id="main-nav">
 <a href="/">الرئيسية</a><a href="/deals/">أفضل العروض</a><a href="/coupons/">الكوبونات</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/brands/">الماركات</a><a href="/about/">من نحن</a>
 </nav>
-<button id="theme-toggle" class="theme-toggle" type="button"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span> الوضع الليلي</button>
+<button id="theme-toggle" class="theme-toggle" type="button"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></span> الوضع النهاري</button>
 <button id="pwa-install" class="theme-toggle" type="button" style="display:none"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg></span> ثبّت التطبيق</button>
 </div></header>
 
@@ -46,12 +46,11 @@
 </div>
 <p><span class="example-tag">مثال — يُستبدل بكوبون حقيقي</span></p><p class="coupon-desc">كوبون مثال: انسخ الكود واستخدمه عند إتمام الشراء في جوميا.</p>
 <div class="coupon-code-row">
-<span class="coupon-code" dir="ltr">JUMIA-EXAMPLE</span>
-<button class="coupon-copy-btn" type="button" data-copy-code="JUMIA-EXAMPLE">نسخ الكود</button>
+<span class="coupon-code coupon-code-click" dir="ltr" title="اضغط للنسخ والانتقال إلى المتجر" data-copy-code="JUMIA-EXAMPLE" data-redirect="https://www.jumia.com.eg/ar/?utm_source=JFORCE&amp;utm_medium=JF_Affiliate&amp;utm_campaign=JF_Affiliate_EG&amp;adj_label=casid*cf5c450e-259d-49d2-889e-95c558384bcd%5Etype*jforce">JUMIA-EXAMPLE</span>
 </div>
 <p class="coupon-expiry">ينتهي في: <span class="countdown" data-countdown="2026-12-31">2026-12-31</span></p>
-<a class="btn coupon-shop-btn shop-jumia" href="https://www.jumia.com.eg/ar/?utm_source=JFORCE&amp;utm_medium=JF_Affiliate&amp;utm_campaign=JF_Affiliate_EG&amp;adj_label=casid*cf5c450e-259d-49d2-889e-95c558384bcd%5Etype*jforce" target="_blank" rel="sponsored noopener">تسوّق الآن في جوميا</a>
-<p class="muted">الكوبون خاص بالمتجر، وليس بموقعنا. انسخ الكود ثم استخدمه عند الشراء في موقع المتجر.</p>
+<button class="coupon-go-btn shop-jumia" type="button" data-copy-code="JUMIA-EXAMPLE" data-redirect="https://www.jumia.com.eg/ar/?utm_source=JFORCE&amp;utm_medium=JF_Affiliate&amp;utm_campaign=JF_Affiliate_EG&amp;adj_label=casid*cf5c450e-259d-49d2-889e-95c558384bcd%5Etype*jforce">انسخ الكود وانتقل إلى جوميا</button>
+<p class="muted">الكوبون خاص بالمتجر، وليس بموقعنا. الضغط على الكود أو الزر ينسخ الكود ثم يحوّلك إلى موقع المتجر لاستخدامه عند الشراء.</p>
 </article><article class="coupon-box">
 <div class="coupon-box-head">
 <span class="coupon-logo"><img src="/assets/store-logos/noon.svg" alt="نون" loading="lazy" decoding="async"></span>
@@ -61,12 +60,11 @@
 </div>
 <p><span class="example-tag">مثال — يُستبدل بكوبون حقيقي</span></p><p class="coupon-desc">كوبون مثال: انسخ الكود واستخدمه عند إتمام أول طلب في نون.</p>
 <div class="coupon-code-row">
-<span class="coupon-code" dir="ltr">NOON-EXAMPLE</span>
-<button class="coupon-copy-btn" type="button" data-copy-code="NOON-EXAMPLE">نسخ الكود</button>
+<span class="coupon-code coupon-code-click" dir="ltr" title="اضغط للنسخ والانتقال إلى المتجر" data-copy-code="NOON-EXAMPLE" data-redirect="https://www.noon.com/egypt-en/">NOON-EXAMPLE</span>
 </div>
 <p class="coupon-expiry">ينتهي في: <span class="countdown" data-countdown="2026-12-31">2026-12-31</span></p>
-<a class="btn coupon-shop-btn shop-noon" href="https://www.noon.com/egypt-en/" target="_blank" rel="sponsored noopener">تسوّق الآن في نون</a>
-<p class="muted">الكوبون خاص بالمتجر، وليس بموقعنا. انسخ الكود ثم استخدمه عند الشراء في موقع المتجر.</p>
+<button class="coupon-go-btn shop-noon" type="button" data-copy-code="NOON-EXAMPLE" data-redirect="https://www.noon.com/egypt-en/">انسخ الكود وانتقل إلى نون</button>
+<p class="muted">الكوبون خاص بالمتجر، وليس بموقعنا. الضغط على الكود أو الزر ينسخ الكود ثم يحوّلك إلى موقع المتجر لاستخدامه عند الشراء.</p>
 </article></div>
 </main>
 <footer class="site-footer"><div class="container wide">
