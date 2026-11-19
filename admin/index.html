@@ -138,6 +138,11 @@ window.SETTINGS = { amazon_associates_tag: "amazon0c2aca6-21", jumia_tracking_pa
       <h3>بلاغات أسعار خاطئة</h3><div id="reports-list">—</div>
       <h3>طلبات منتجات غير موجودة</h3><div id="requests-list">—</div>
     </div>
+    <div class="card"><h2>الاتجاهات — آخر 14 يوماً</h2>
+      <canvas id="trend-chart" width="1000" height="240" style="width:100%;height:auto"></canvas>
+      <p class="hint"><span style="color:#0b3d91">■</span> تغييرات الأسعار &nbsp; <span style="color:#ea580c">■</span> نقرات الشراء</p>
+      <div id="trend-table">—</div>
+    </div>
   </section>
 
   <section class="tab" id="tab-products">
@@ -262,6 +267,19 @@ window.SETTINGS = { amazon_associates_tag: "amazon0c2aca6-21", jumia_tracking_pa
       <label for="bulk-value">القيمة الجديدة</label>
       <input type="text" id="bulk-value">
       <p><button class="btn" onclick="bulkEdit()">تطبيق على كل منتجات العلامة</button></p>
+    </div>
+
+    <div class="card"><h2>فحص روابط الأفلييت (العمود AU)</h2>
+      <p class="hint">يقارن كل رابط أفلييت في العمود AU مع رابط المنتج الأصلي في العمود E، ويتأكد من وجود وسوم تتبع JForce. الإصلاح يعيد كتابة الروابط المخالفة من روابط المنتجات الأصلية (نفس قواعد scripts/verify.py).</p>
+      <p><button class="btn" onclick="checkAffiliate()">فحص الروابط الآن</button>
+      <button class="btn-green" id="btn-fix-au" onclick="fixAffiliate()" style="display:none">إصلاح الروابط المخالفة</button></p>
+      <div id="au-check-results">—</div>
+    </div>
+
+    <div class="card"><h2>فحص صور المنتجات</h2>
+      <p class="hint">يفحص روابط الصور في الشيت (العمود AE) وصور الموقع المحلية (من خريطة الموقع). الصور الميتة تظهر في الجدول — صحّح رابطها في الشيت أو من نموذج المنتج.</p>
+      <p><button class="btn" onclick="checkImages()">فحص الصور الآن</button></p>
+      <div id="image-check-results">—</div>
     </div>
   </section>
 
@@ -460,6 +478,7 @@ async function loadBackend(){
     settings: s.settings
   };
   renderSettingsForm(s.settings);
+  await loadHandled();
   loadOverview(); loadProducts();
 }
 async function login(){
@@ -549,6 +568,7 @@ async function loadOverview(){
     document.getElementById("stat-cards").innerHTML = cards.map(function(c){
       return '<div class="stat"><div class="stat-num">'+c[1]+'</div><div class="stat-label">'+c[0]+'</div></div>';
     }).join("");
+    loadTrends();
     var top = Object.keys(clicks.byModel||{}).sort(function(a,b){return clicks.byModel[b]-clicks.byModel[a]}).slice(0,5);
     document.getElementById("overview-stats").innerHTML =
       "نقرات أزرار الشراء (كل الفترة): <b>"+clicks.total+"</b> — جوميا: <b>"+(clicks.byStore["جوميا"]||0)+
@@ -562,21 +582,81 @@ async function loadOverview(){
 }
 async function syncNow(){try{var r=await api("syncNow",{});toast("تم تسجيل طلب المزامنة")}catch(err){toast(err.message)}}
 
+/* ---------------- trends ---------------- */
+async function loadTrends(){
+  var cv = document.getElementById("trend-chart");
+  if(!cv) return;
+  try{
+    var d = await api("dailyStats");
+    var days = (d.days || []).slice(-14);
+    drawTrend(cv, days);
+    document.getElementById("trend-table").innerHTML = "<table><tr><th>اليوم</th><th>تغييرات أسعار</th><th>نقرات</th><th>بلاغات</th><th>طلبات</th></tr>" +
+      days.map(function(x){ return "<tr><td>" + esc(x.date) + "</td><td>" + x.priceChanges + "</td><td>" + x.clicks + "</td><td>" + x.reports + "</td><td>" + x.requests + "</td></tr>"; }).join("") + "</table>";
+  }catch(err){
+    document.getElementById("trend-table").innerHTML = '<span class="hint">الإحصائيات اليومية غير متاحة في نسخة Apps Script الحالية — أعد نشر Code.gs المحدّث من تبويب «الإعداد والربط».</span>';
+  }
+}
+function drawTrend(cv, days){
+  var ctx = cv.getContext("2d");
+  var W = cv.width, H = cv.height;
+  ctx.clearRect(0, 0, W, H);
+  var max = 1;
+  days.forEach(function(x){ max = Math.max(max, x.priceChanges, x.clicks); });
+  var padL = 40, padB = 24, padT = 10;
+  var bw = (W - padL - 10) / days.length;
+  ctx.strokeStyle = "#e4e7ec"; ctx.fillStyle = "#667085"; ctx.font = "12px sans-serif"; ctx.textAlign = "right";
+  for(var g = 0; g <= 4; g++){
+    var v = Math.round(max * g / 4);
+    var y = padT + (H - padB - padT) * (1 - g / 4);
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - 10, y); ctx.stroke();
+    ctx.fillText(String(v), padL - 6, y + 4);
+  }
+  days.forEach(function(x, i){
+    var x0 = padL + i * bw + 4;
+    var w2 = Math.max(4, (bw - 10) / 2);
+    var h1 = (H - padB - padT) * x.priceChanges / max;
+    var h2 = (H - padB - padT) * x.clicks / max;
+    ctx.fillStyle = "#0b3d91";
+    ctx.fillRect(x0, H - padB - h1, w2, h1);
+    ctx.fillStyle = "#ea580c";
+    ctx.fillRect(x0 + w2 + 2, H - padB - h2, w2, h2);
+    ctx.fillStyle = "#667085"; ctx.textAlign = "center";
+    ctx.fillText(x.date.slice(5), x0 + bw / 2 - 2, H - 8);
+  });
+}
+
 /* ---------------- inbox: requests & reports ---------------- */
 var INBOX_DATA = {requests: [], reports: []};
+var BACKEND_HANDLED = null; // shared handled set from the Sheet (null = not loaded)
+async function loadHandled(){
+  try{
+    var d = await api("handled");
+    BACKEND_HANDLED = {};
+    (d.rows || []).forEach(function(r){ BACKEND_HANDLED[r[0] + "|" + r[1] + "|" + r[2]] = 1; });
+  }catch(e){ BACKEND_HANDLED = null; }
+}
 function handledKey(kind, r){ return kind + "|" + (r[0] || "") + "|" + (r[1] || ""); }
 function handledSet(kind){
   try{ return JSON.parse(localStorage.getItem("r3de_handled_" + kind) || "[]"); }catch(e){ return []; }
 }
-function isHandled(kind, r){ return handledSet(kind).indexOf(handledKey(kind, r)) !== -1; }
-function toggleHandled(kind, idx){
+function isHandled(kind, r){
+  var key = handledKey(kind, r);
+  if(BACKEND_HANDLED && BACKEND_HANDLED[key]) return true;
+  return handledSet(kind).indexOf(key) !== -1;
+}
+async function toggleHandled(kind, idx){
   var rows = kind === "req" ? INBOX_DATA.requests : INBOX_DATA.reports;
   var r = rows[idx]; if(!r) return;
   var key = handledKey(kind, r);
   var s = handledSet(kind);
   var i = s.indexOf(key);
-  if(i === -1) s.push(key); else s.splice(i, 1);
+  var done = i === -1;
+  if(done) s.push(key); else s.splice(i, 1);
   try{ localStorage.setItem("r3de_handled_" + kind, JSON.stringify(s)); }catch(e){}
+  try{
+    await api("markHandled", {kind: kind, timestamp: r[0], model: r[1], done: done});
+    if(BACKEND_HANDLED){ if(done) BACKEND_HANDLED[key] = 1; else delete BACKEND_HANDLED[key]; }
+  }catch(e){ /* offline: localStorage only */ }
   renderInbox(); loadOverview();
 }
 async function loadInbox(){
@@ -718,6 +798,99 @@ async function bulkEdit(){
   catch(err){toast(err.message)}
 }
 
+/* ---------------- affiliate-link (AU) check ---------------- */
+async function checkAffiliate(){
+  var out = document.getElementById("au-check-results");
+  out.innerHTML = "جارٍ الفحص…";
+  document.getElementById("btn-fix-au").style.display = "none";
+  try{
+    var d = await api("checkAffiliate");
+    var total = d.total, bad = d.mismatched || [], miss = d.missing || [];
+    var html = "<p>تم فحص <b>" + total + "</b> عرضاً — سليم: <b>" + (total - bad.length - miss.length) + "</b> · مخالف: <b>" + bad.length + "</b> · بلا رابط: <b>" + miss.length + "</b></p>";
+    if(bad.length){
+      html += "<table><tr><th>الصف</th><th>المنتج</th><th>الرابط الحالي</th></tr>" +
+        bad.slice(0, 50).map(function(m){ return "<tr><td>" + m.row + "</td><td>" + esc(m.model) + "</td><td dir='ltr' style='word-break:break-all'>" + esc(m.actual) + "</td></tr>"; }).join("") + "</table>";
+      var btn = document.getElementById("btn-fix-au");
+      btn.style.display = "";
+      btn.textContent = "إصلاح الروابط المخالفة (" + bad.length + ")";
+    }
+    if(miss.length){
+      html += "<p>بلا رابط أفلييت: " + miss.slice(0, 20).map(function(m){ return esc(m.model); }).join("، ") + (miss.length > 20 ? "…" : "") + "</p>";
+    }
+    if(!bad.length && !miss.length) html += "<p class='ok'>كل روابط الأفلييت سليمة ومتطابقة مع منتجاتها.</p>";
+    out.innerHTML = html;
+  }catch(err){ out.innerHTML = '<span class="error">' + esc(err.message) + '</span>'; }
+}
+async function fixAffiliate(){
+  if(!confirm("إعادة كتابة كل روابط الأفلييت المخالفة من روابط المنتجات الأصلية؟")) return;
+  try{ var r = await api("fixAffiliate", {}); toast("تم إصلاح " + r.fixed + " رابطاً"); checkAffiliate(); }
+  catch(err){ toast(err.message); }
+}
+
+/* ---------------- image check ---------------- */
+function testImg(url){
+  return new Promise(function(resolve){
+    var im = new Image();
+    var done = false;
+    var t = setTimeout(function(){ if(!done){ done = true; resolve(false); } }, 8000);
+    im.onload = function(){ if(!done){ done = true; clearTimeout(t); resolve(true); } };
+    im.onerror = function(){ if(!done){ done = true; clearTimeout(t); resolve(false); } };
+    im.src = url;
+  });
+}
+async function checkImages(){
+  var out = document.getElementById("image-check-results");
+  out.innerHTML = "جارٍ تحميل قائمة المنتجات…";
+  var d;
+  try{ d = await api("products"); }catch(err){ out.innerHTML = '<span class="error">' + esc(err.message) + '</span>'; return; }
+  var byUrl = {};
+  (d.rows || []).forEach(function(r){
+    if(!r[30]) return;
+    (byUrl[r[30]] = byUrl[r[30]] || []).push(r[0]);
+  });
+  var urls = Object.keys(byUrl);
+  var deadSrc = [];
+  var done = 0;
+  var batches = [];
+  for(var i = 0; i < urls.length; i += 6) batches.push(urls.slice(i, i + 6));
+  await Promise.all(batches.map(async function(batch){
+    for(var k = 0; k < batch.length; k++){
+      var ok = await testImg(batch[k]);
+      done++;
+      out.innerHTML = "جارٍ فحص صور الشيت… " + done + " / " + urls.length;
+      if(!ok) deadSrc.push(batch[k]);
+    }
+  }));
+  var deadLocal = [];
+  try{
+    var sm = await fetch("/sitemap.xml").then(function(res){ if(!res.ok) throw new Error("no sitemap"); return res.text(); });
+    var doc = new DOMParser().parseFromString(sm, "text/xml");
+    var slugs = [];
+    doc.querySelectorAll("loc").forEach(function(n){ var m = n.textContent.match(/\/mobiles\/([^\/]+)\//); if(m) slugs.push(m[1]); });
+    var localDone = 0;
+    var localBatches = [];
+    for(var j = 0; j < slugs.length; j += 6) localBatches.push(slugs.slice(j, j + 6));
+    await Promise.all(localBatches.map(async function(batch){
+      for(var k2 = 0; k2 < batch.length; k2++){
+        var ok2 = await testImg("/images/products/" + batch[k2] + ".jpg");
+        localDone++;
+        out.innerHTML = "جارٍ فحص صور الموقع… " + localDone + " / " + slugs.length;
+        if(!ok2) deadLocal.push(batch[k2]);
+      }
+    }));
+  }catch(e){ /* sitemap unavailable (e.g. local preview) — source check only */ }
+  var html = "<p>صور الشيت: سليمة <b>" + (urls.length - deadSrc.length) + "</b> من <b>" + urls.length + "</b> · ميتة <b>" + deadSrc.length + "</b> · صور الموقع المحلية الميتة: <b>" + deadLocal.length + "</b></p>";
+  if(deadSrc.length){
+    html += "<h3>روابط صور ميتة في الشيت</h3><table><tr><th>المنتجات</th><th>الرابط</th></tr>" +
+      deadSrc.map(function(u){ return "<tr><td>" + esc(byUrl[u].join("، ")) + "</td><td dir='ltr' style='word-break:break-all'>" + esc(u) + "</td></tr>"; }).join("") + "</table>";
+  }
+  if(deadLocal.length){
+    html += "<h3>صور محلية ميتة على الموقع</h3><p>" + deadLocal.map(esc).join("، ") + "</p>";
+  }
+  if(!deadSrc.length && !deadLocal.length) html += "<p class='ok'>كل الصور سليمة.</p>";
+  out.innerHTML = html;
+}
+
 /* ---------------- coupons ---------------- */
 async function loadCoupons(){
   try{var d=await api("coupons");
@@ -784,8 +957,8 @@ async function saveSettings(){
 async function loadGuides(){
   try{var d=await api("guides");
     document.getElementById("guides-table").innerHTML = d.rows.length>1 ?
-      "<table><tr><th>العنوان</th><th>المعيار</th><th>الحالة</th><th>مراجعة بشرية</th></tr>"+
-      d.rows.slice(1).map(function(r){return "<tr><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td><span class='badge "+(r[5]==="published"?"green":"amber")+"'>"+esc(r[5])+"</span></td><td>"+(r[4]?"نعم":"لا")+"</td></tr>"}).join("")+"</table>" : "لا توجد أدلة.";
+      "<table><tr><th>العنوان</th><th>المعيار</th><th>الحالة</th><th>مراجعة بشرية</th><th></th></tr>"+
+      d.rows.slice(1).map(function(r){return "<tr><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td><span class='badge "+(r[5]==="published"?"green":"amber")+"'>"+esc(r[5])+"</span></td><td>"+(r[4]?"نعم":"لا")+"</td><td><button class='btn-ghost' onclick='fillGuide("+JSON.stringify(r)+")'>تعديل</button> <button class='btn-danger' onclick='deleteGuide("+JSON.stringify(r[0])+")'>حذف</button></td></tr>"}).join("")+"</table>" : "لا توجد أدلة.";
   }catch(err){document.getElementById("guides-table").innerHTML='<span class="error">'+err.message+"</span>"}
 }
 async function saveGuide(){
@@ -797,11 +970,22 @@ async function saveGuide(){
   try{await api("saveGuide",{guide:g}); toast("تم حفظ الدليل"); loadGuides();}
   catch(err){toast(err.message)}
 }
+function fillGuide(r){
+  document.getElementById("gd-slug").value=r[0]; document.getElementById("gd-title").value=r[1];
+  document.getElementById("gd-criterion").value=r[2]; document.getElementById("gd-desc").value=r[3];
+  document.getElementById("gd-review").value=r[4]; document.getElementById("gd-status").value=r[5]||"draft";
+  window.scrollTo(0, document.getElementById("gd-slug").offsetTop);
+}
+async function deleteGuide(slug){
+  if(!confirm("حذف هذا الدليل؟"))return;
+  try{await api("deleteGuide",{slug:slug}); toast("تم الحذف"); loadGuides();}
+  catch(err){toast(err.message)}
+}
 async function loadNews(){
   try{var d=await api("news");
     document.getElementById("news-table").innerHTML = d.rows.length>1 ?
-      "<table><tr><th>العنوان</th><th>التاريخ</th><th>مثال؟</th></tr>"+
-      d.rows.slice(1).map(function(r){return "<tr><td>"+esc(r[1])+"</td><td>"+esc(r[6])+"</td><td>"+(r[7]?"نعم":"لا")+"</td></tr>"}).join("")+"</table>" : "لا توجد أخبار.";
+      "<table><tr><th>العنوان</th><th>التاريخ</th><th>مثال؟</th><th></th></tr>"+
+      d.rows.slice(1).map(function(r){return "<tr><td>"+esc(r[1])+"</td><td>"+esc(r[6])+"</td><td>"+(r[7]?"نعم":"لا")+"</td><td><button class='btn-ghost' onclick='fillNews("+JSON.stringify(r)+")'>تعديل</button> <button class='btn-danger' onclick='deleteNews("+JSON.stringify(r[0])+")'>حذف</button></td></tr>"}).join("")+"</table>" : "لا توجد أخبار.";
   }catch(err){document.getElementById("news-table").innerHTML='<span class="error">'+err.message+"</span>"}
 }
 async function saveNews(){
@@ -810,6 +994,17 @@ async function saveNews(){
     model_slug:document.getElementById("nw-model").value, author:"فريق عروض أونلاين",
     date_published:document.getElementById("nw-date").value, is_example:false};
   try{await api("saveNews",{news:n}); toast("تم حفظ الخبر"); loadNews();}
+  catch(err){toast(err.message)}
+}
+function fillNews(r){
+  document.getElementById("nw-slug").value=r[0]; document.getElementById("nw-title").value=r[1];
+  document.getElementById("nw-desc").value=r[2]; document.getElementById("nw-body").value=r[3];
+  document.getElementById("nw-model").value=r[4]; document.getElementById("nw-date").value=r[6];
+  window.scrollTo(0, document.getElementById("nw-slug").offsetTop);
+}
+async function deleteNews(slug){
+  if(!confirm("حذف هذا الخبر؟"))return;
+  try{await api("deleteNews",{slug:slug}); toast("تم الحذف"); loadNews();}
   catch(err){toast(err.message)}
 }
 

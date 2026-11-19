@@ -33,6 +33,7 @@ var SHEET_REPORTS = 'البلاغات';
 var SHEET_REQUESTS = 'الطلبات';
 var SHEET_GUIDES = 'الأدلة';
 var SHEET_NEWS = 'الأخبار';
+var SHEET_HANDLED = 'المعالجة';
 
 var SETTINGS_DEFAULTS = [
   ['site_name', 'عروض أونلاين'],
@@ -85,6 +86,7 @@ function setupTabs() {
   sheet(SHEET_REQUESTS, ['timestamp', 'model', 'budget', 'email']);
   sheet(SHEET_GUIDES, ['slug', 'title', 'criterion', 'description', 'human_review', 'status', 'author', 'date']);
   sheet(SHEET_NEWS, ['slug', 'title', 'description', 'body', 'model_slug', 'author', 'date_published', 'is_example']);
+  sheet(SHEET_HANDLED, ['kind', 'timestamp', 'model']);
   return { ok: true };
 }
 
@@ -156,6 +158,47 @@ function appendPriceHistory(row, oldPrice, newPrice) {
   ]);
 }
 
+/* ---- affiliate-link (AU) alignment: same rules as scripts/verify.py -- */
+var JFORCE_PARAMS = 'utm_source=JFORCE&utm_medium=JF_Affiliate&utm_campaign=JF_Affiliate_EG&adj_label=' +
+  encodeURIComponent('casid*cf5c450e-259d-49d2-889e-95c558384bcd^type*jforce');
+var TRACKING_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'adj_label', 'subid', 'sub_id'];
+
+function normalizeJumiaUrl(u) {
+  u = String(u || '').trim();
+  if (!u) return '';
+  u = u.replace(/^https?:\/\/(www\.)?jumia\.com\.eg\//i, 'https://www.jumia.com.eg/ar/');
+  if (u.indexOf('https://www.jumia.com.eg/') === 0 && u.indexOf('/ar/') === -1) {
+    u = u.replace('https://www.jumia.com.eg/', 'https://www.jumia.com.eg/ar/');
+  }
+  return u;
+}
+
+function stripTracking(u) {
+  var parts = String(u || '').split('?');
+  if (parts.length < 2) return u;
+  var q = parts[1].split('&').filter(function (kv) {
+    return TRACKING_KEYS.indexOf(kv.split('=')[0]) === -1;
+  });
+  return q.length ? parts[0] + '?' + q.join('&') : parts[0];
+}
+
+function buildTrackingUrl(u) {
+  var base = normalizeJumiaUrl(u);
+  if (!base) return '';
+  var clean = stripTracking(base);
+  return clean + (clean.indexOf('?') === -1 ? '?' : '&') + JFORCE_PARAMS;
+}
+
+function dayKey(v) {
+  if (!v) return '';
+  if (typeof v === 'string') {
+    var m = v.match(/(\d{2})-(\d{2})-(\d{4})/);
+    if (m) return m[3] + '-' + m[2] + '-' + m[1];
+    return v.slice(0, 10);
+  }
+  return Utilities.formatDate(new Date(v), 'Africa/Cairo', 'yyyy-MM-dd');
+}
+
 /* ------------------------------------------------------------ doGet */
 function doGet(e) {
   var action = (e.parameter && e.parameter.action) || '';
@@ -214,6 +257,56 @@ function doGet(e) {
     }
     if (action === 'news') {
       return jsonOut({ ok: true, rows: sheet(SHEET_NEWS).getDataRange().getValues() });
+    }
+    if (action === 'checkAffiliate') {
+      // compare column AU (index 46) with the product URL in column E (index 4)
+      var pv = ss().getSheetByName(SHEET_PRODUCTS).getDataRange().getValues();
+      var mismatched = [], missing = [];
+      for (var ci = 1; ci < pv.length; ci++) {
+        var erow = pv[ci];
+        var eurl = erow[4];
+        if (!eurl || String(eurl).indexOf('jumia.com.eg') === -1) continue;
+        var expected = buildTrackingUrl(eurl);
+        var au = erow[46];
+        if (!au) { missing.push({ row: ci + 1, model: erow[0], url: eurl }); continue; }
+        var auPath = stripTracking(normalizeJumiaUrl(au));
+        var ePath = stripTracking(expected);
+        var hasTracking = String(au).indexOf('utm_source=JFORCE') !== -1;
+        if (auPath !== ePath || !hasTracking) {
+          mismatched.push({ row: ci + 1, model: erow[0], expected: expected, actual: au });
+        }
+      }
+      return jsonOut({ ok: true, total: pv.length - 1, mismatched: mismatched, missing: missing });
+    }
+    if (action === 'handled') {
+      return jsonOut({ ok: true, rows: sheet(SHEET_HANDLED).getDataRange().getValues().slice(1) });
+    }
+    if (action === 'dailyStats') {
+      var days = {};
+      function countTab(name, key) {
+        sheet(name).getDataRange().getValues().slice(1).forEach(function (r) {
+          var k = dayKey(r[0]);
+          if (!k) return;
+          days[k] = days[k] || {};
+          days[k][key] = (days[k][key] || 0) + 1;
+        });
+      }
+      countTab(SHEET_HISTORY, 'priceChanges');
+      countTab(SHEET_CLICKS, 'clicks');
+      countTab(SHEET_REPORTS, 'reports');
+      countTab(SHEET_REQUESTS, 'requests');
+      var out = [];
+      var now = new Date();
+      for (var dd = 29; dd >= 0; dd--) {
+        var dt = new Date(now.getTime() - dd * 86400000);
+        var k = Utilities.formatDate(dt, 'Africa/Cairo', 'yyyy-MM-dd');
+        out.push({ date: k,
+          priceChanges: (days[k] && days[k].priceChanges) || 0,
+          clicks: (days[k] && days[k].clicks) || 0,
+          reports: (days[k] && days[k].reports) || 0,
+          requests: (days[k] && days[k].requests) || 0 });
+      }
+      return jsonOut({ ok: true, days: out });
     }
     if (action === 'setup') return jsonOut(setupTabs());
     return jsonOut({ ok: false, error: 'unknown action: ' + action });
@@ -352,6 +445,51 @@ function doPost(e) {
       if (action === 'syncNow') {
         sheet(SHEET_SYNCLOG).appendRow([new Date(), 'sync-requested', 'requested from admin panel']);
         return jsonOut({ ok: true, note: 'سيتم التقاط التحديث في المزامنة التالية (كل ساعة) أو بتشغيل scripts/sync.py يدوياً' });
+      }
+      if (action === 'deleteGuide') {
+        s = sheet(SHEET_GUIDES);
+        var gr = s.getDataRange().getValues();
+        for (i = 1; i < gr.length; i++) {
+          if (gr[i][0] === body.slug) { s.deleteRow(i + 1); return jsonOut({ ok: true }); }
+        }
+        return jsonOut({ ok: false, error: 'guide not found' });
+      }
+      if (action === 'deleteNews') {
+        s = sheet(SHEET_NEWS);
+        var nr2 = s.getDataRange().getValues();
+        for (i = 1; i < nr2.length; i++) {
+          if (nr2[i][0] === body.slug) { s.deleteRow(i + 1); return jsonOut({ ok: true }); }
+        }
+        return jsonOut({ ok: false, error: 'news not found' });
+      }
+      if (action === 'fixAffiliate') {
+        // rewrite every mismatched/missing AU link from its column-E product URL
+        s = ss().getSheetByName(SHEET_PRODUCTS);
+        var fv = s.getDataRange().getValues();
+        var fixed = 0;
+        for (i = 1; i < fv.length; i++) {
+          var fe = fv[i][4];
+          if (!fe || String(fe).indexOf('jumia.com.eg') === -1) continue;
+          var fexp = buildTrackingUrl(fe);
+          if (fv[i][46] !== fexp) { s.getRange(i + 1, 47).setValue(fexp); fixed++; }
+        }
+        return jsonOut({ ok: true, fixed: fixed });
+      }
+      if (action === 'markHandled') {
+        // shared handled state for requests/reports (visible on all devices)
+        var h = sheet(SHEET_HANDLED);
+        var hr = h.getDataRange().getValues();
+        var ts = new Date(body.timestamp || 0).getTime();
+        for (i = 1; i < hr.length; i++) {
+          if (hr[i][0] === (body.kind || '') &&
+              new Date(hr[i][1]).getTime() === ts &&
+              hr[i][2] === (body.model || '')) {
+            if (!body.done) h.deleteRow(i + 1);
+            return jsonOut({ ok: true, done: !!body.done });
+          }
+        }
+        if (body.done) h.appendRow([body.kind || '', new Date(body.timestamp || 0), body.model || '']);
+        return jsonOut({ ok: true, done: !!body.done });
       }
       if (action === 'setupWeeklyTrigger') {
         return jsonOut(setupWeeklyTrigger());
