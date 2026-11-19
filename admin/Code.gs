@@ -224,7 +224,7 @@ function doGet(e) {
       var brand = e.parameter.brand || '';
       var rows = values.slice(1).filter(function (r) {
         if (brand && r[2] !== brand) return false;
-        if (q && (String(r[0]) + ' ' + r[3]).toLowerCase().indexOf(q) === -1) return false;
+        if (q && (String(r[0]) + ' ' + r[3] + ' ' + r[4]).toLowerCase().indexOf(q) === -1) return false;
         return true;
       });
       return jsonOut({ ok: true, headers: values[0], rows: rows.slice(0, 200), total: rows.length });

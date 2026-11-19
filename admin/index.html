@@ -402,10 +402,14 @@ function getAppsScriptUrl(){
   if(s) return s;
   return (typeof APPS_SCRIPT_URL !== "undefined") ? APPS_SCRIPT_URL : "";
 }
-async function api(action, body){
+async function api(action, body, params){
   var base = getAppsScriptUrl();
   if(!base || base.indexOf("PASTE_YOUR")===0){throw new Error("لم يتم ربط Apps Script بعد — افتح تبويب «الإعداد والربط» والصق رابط تطبيق الويب (ينتهي بـ /exec) ثم اضغط «حفظ واختبار الاتصال»")}
   var url = base + "?action=" + encodeURIComponent(action) + "&token=" + encodeURIComponent(token);
+  if(params){
+    var qs = new URLSearchParams(params).toString();
+    if(qs) url += "&" + qs;
+  }
   var opts = {method: body ? "POST" : "GET", redirect: "follow"};
   if(body){opts.headers = {"Content-Type":"text/plain;charset=utf-8"}; opts.body = JSON.stringify(body);}
   var res = await fetch(url, opts);
@@ -708,10 +712,9 @@ async function loadProducts(){
   try{
     var q = document.getElementById("prod-search").value;
     var brand = document.getElementById("prod-brand").value;
-    var d = await api("products&q="+encodeURIComponent(q)+"&brand="+encodeURIComponent(brand));
+    var d = await api("products", null, {q: q, brand: brand});
     HEADERS = d.headers;
     LAST_PRODUCTS = d.rows || [];
-    var brands = [...new Set(HEADERS ? [] : [])];
     var sel = document.getElementById("prod-brand");
     if(sel.options.length<=1){
       var all = await api("products");
@@ -734,8 +737,14 @@ function newProduct(){
   window.scrollTo(0, document.getElementById("product-form-card").offsetTop);
 }
 async function editProduct(url){
-  var d = await api("products&q="+encodeURIComponent(url));
-  var r = d.rows.find(function(x){return x[4]===url});
+  // the row is usually already loaded in the table (LAST_PRODUCTS) — use it
+  // first, so editing works even with an older deployed Code.gs whose
+  // products filter matches name+model only (not the URL).
+  var r = (LAST_PRODUCTS || []).find(function(x){return x[4]===url});
+  if(!r){
+    var d = await api("products", null, {q: url});
+    r = (d.rows || []).find(function(x){return x[4]===url});
+  }
   if(!r){toast("المنتج غير موجود");return;}
   newProduct();
   document.getElementById("product-form-title").textContent="تعديل منتج";
