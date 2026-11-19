@@ -136,6 +136,17 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
       <p id="setup-msg"></p>
       <p class="hint">يُحفظ الرابط والرمز في هذا المتصفح فقط (localStorage) — لا يُرفعان مع ملفات الموقع ولا يراهما أي زائر. إن غيّرت المتصفح أو الجهاز أعد لصقهما هنا.</p>
     </div>
+    <div class="card"><h2>خدمة المزامنة الفورية — زر «مزامنة الآن»</h2>
+      <p class="hint">عند الضغط على «مزامنة الآن» ترسل اللوحة أحدث بيانات الشيت إلى خدمة المزامنة على الخادم، فتبني الموقع كاملاً وترفعه وتعيد نشره فوراً. الإعداد الكامل في <a href="https://github.com/ahmedeldaby2033-hub/3rode-online/blob/main/docs/sync-webhook.md" target="_blank" rel="noopener">docs/sync-webhook.md</a>. بدون هذه البيانات يكتفي الزر بتسجيل طلب في سجل المزامنة.</p>
+      <div class="row">
+        <div><label for="webhook-url">رابط خدمة المزامنة</label>
+        <input type="url" id="webhook-url" dir="ltr" placeholder="https://sync.3rde.online"></div>
+        <div><label for="webhook-token">رمز خدمة المزامنة SYNC_TOKEN</label>
+        <input type="text" id="webhook-token" dir="ltr" placeholder="SYNC_TOKEN" autocomplete="off"></div>
+      </div>
+      <p><button class="btn-green" onclick="saveWebhookSettings()">حفظ إعدادات المزامنة</button></p>
+      <p id="webhook-msg"></p>
+    </div>
   </section>
 
   <section class="tab" id="tab-overview">
@@ -144,7 +155,8 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
       <p id="overview-stats">جارٍ التحميل…</p>
       <p><button class="btn" onclick="syncNow()">مزامنة الآن (طلب تحديث)</button>
       <button class="btn-ghost" onclick="loadOverview()">تحديث الأرقام</button></p>
-      <p class="hint">المزامنة الفعلية كل ساعة عبر scripts/sync.py على الاستضافة. زر «مزامنة الآن» يسجّل طلباً في سجل المزامنة ليُلتقط في التشغيل التالي.</p>
+      <p id="sync-status"></p>
+      <p class="hint">زر «مزامنة الآن» يرسل أحدث بيانات الشيت إلى خدمة المزامنة على الخادم، فتحدّث كل المنتجات والواجهة وتنشر الموقع فوراً. إن لم تكن الخدمة مربوطة بعد، يكتفي الزر بتسجيل طلب في سجل المزامنة (انظر تبويب «الإعداد والربط»).</p>
       <h3>بلاغات أسعار خاطئة</h3><div id="reports-list">—</div>
       <h3>طلبات منتجات غير موجودة</h3><div id="requests-list">—</div>
     </div>
@@ -524,6 +536,8 @@ function setupFields(){
   try{
     document.getElementById("setup-url").value = localStorage.getItem("r3de_apps_script_url") || "";
     document.getElementById("setup-token").value = localStorage.getItem("r3de_admin_token") || token || "";
+    document.getElementById("webhook-url").value = localStorage.getItem("r3de_sync_webhook_url") || "";
+    document.getElementById("webhook-token").value = localStorage.getItem("r3de_sync_webhook_token") || "";
   }catch(e){}
 }
 function renderSetupStatus(){
@@ -594,7 +608,53 @@ async function loadOverview(){
       "<table><tr><th>التاريخ</th><th>الموديل</th><th>الميزانية</th><th>تواصل</th></tr>"+requests.rows.slice(0,10).map(function(r){return "<tr><td>"+esc(r[0])+"</td><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td>"+esc(r[3])+"</td></tr>"}).join("")+"</table>" : "لا توجد طلبات.";
   }catch(err){document.getElementById("overview-stats").innerHTML='<span class="error">'+err.message+"</span>"}
 }
-async function syncNow(){try{var r=await api("syncNow",{});toast("تم تسجيل طلب المزامنة")}catch(err){toast(err.message)}}
+/* ---------------- instant sync (webhook) ---------------- */
+function getWebhook(){ try{ return {url:(localStorage.getItem("r3de_sync_webhook_url")||"").trim(), token:(localStorage.getItem("r3de_sync_webhook_token")||"").trim()}; }catch(e){ return {url:"", token:""}; } }
+function saveWebhookSettings(){
+  var url = document.getElementById("webhook-url").value.trim().replace(/\/$/,"");
+  var tk = document.getElementById("webhook-token").value.trim();
+  var msg = document.getElementById("webhook-msg");
+  if(!url || url.indexOf("https://") !== 0){ msg.innerHTML = '<span class="error">الصق رابط خدمة صحيحاً يبدأ بـ https://</span>'; return; }
+  if(!tk){ msg.innerHTML = '<span class="error">الصق رمز خدمة المزامنة SYNC_TOKEN</span>'; return; }
+  try{ localStorage.setItem("r3de_sync_webhook_url", url); localStorage.setItem("r3de_sync_webhook_token", tk); }catch(e){}
+  msg.innerHTML = '<span class="ok">تم حفظ إعدادات المزامنة في هذا المتصفح.</span>';
+}
+async function syncNow(){
+  var st = document.getElementById("sync-status");
+  function say(t){ if(st) st.innerHTML = t; }
+  try{
+    var wh = getWebhook();
+    if(!wh.url || !wh.token){
+      await api("syncNow",{});
+      say("سُجّل طلب المزامنة في سجل المزامنة — اربط خدمة المزامنة من تبويب «الإعداد والربط» ليحدّث الزر الموقع فوراً.");
+      toast("تم تسجيل طلب المزامنة");
+      return;
+    }
+    say("جارٍ جلب أحدث بيانات الشيت…");
+    var ex = await api("export");
+    if(!ex.ok || !ex.tabs) throw new Error("تعذر جلب بيانات الشيت");
+    say("جارٍ إرسال البيانات إلى خدمة المزامنة…");
+    var r = await fetch(wh.url + "/sync", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({token: wh.token, tabs: ex.tabs, settings: ex.settings || {}})});
+    var j = await r.json();
+    if(!j.ok) throw new Error(j.error || "رفضت خدمة المزامنة الطلب");
+    say("بدأ التحديث — جارٍ بناء الموقع ونشره…");
+    var done = null;
+    for(var i = 0; i < 120; i++){
+      await new Promise(function(res){ setTimeout(res, 5000); });
+      var s = await (await fetch(wh.url + "/sync-status?job=" + encodeURIComponent(j.job))).json();
+      if(s.steps && s.steps.length) say("جارٍ التحديث… " + esc(s.steps[s.steps.length-1]));
+      if(s.status === "done"){ done = s.result; break; }
+      if(s.status === "error") throw new Error(s.error || "فشلت المزامنة");
+    }
+    if(!done) throw new Error("انتهت مهلة الانتظار — تحقق من سجل المزامنة في اللوحة");
+    say("تم التحديث ✓ — " + done.models + " موديل / " + done.offers + " عرض / " + done.images_downloaded + " صورة جديدة" + (done.pushed ? " — تم النشر" : " — لا تغييرات جديدة") + (done.deployed ? " — وجارٍ إعادة نشر الموقع الحي" : ""));
+    toast("تمت المزامنة");
+    loadOverview();
+  }catch(err){
+    if(st) st.innerHTML = '<span class="error">' + esc(err.message) + "</span>";
+    toast(err.message);
+  }
+}
 
 /* ---------------- trends ---------------- */
 async function loadTrends(){

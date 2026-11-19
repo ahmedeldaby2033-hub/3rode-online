@@ -710,23 +710,23 @@ def build_index():
 </section>
 <p style="text-align:center"><button class="btn btn-blue" id="pwa-install2" type="button" onclick="document.getElementById('pwa-install').click()">📲 ثبّت الموقع كتطبيق على هاتفك</button></p>"""
     if HOME_LAYOUT == "rows":
-        # قوائم مدمجة: الفلاتر في لوحة قابلة للطي، والأقسام صفوف أفقية
+        # قوائم مدمجة: كل الهواتف أولاً كصف أفقي، والفلاتر في لوحة قابلة للطي
         body = (ad_slot("top")
                 + f'<details class="filters-box" open><summary>الفلاتر والترتيب</summary>{toolbar_html}</details>'
-                + count_html + chips_html + biggest_row + ad_slot("in_list")
-                + drops_sec + cheapest_row + all_row + brands_html
+                + count_html + chips_html + all_row + biggest_row + ad_slot("in_list")
+                + drops_sec + cheapest_row + brands_html
                 + ad_slot("bottom") + request_html)
     elif HOME_LAYOUT == "deals":
-        # العروض أولاً: أكبر التخفيضات والانخفاضات ببطاقات كبيرة في الأعلى
+        # كل الهواتف أولاً ثم العروض ببطاقات كبيرة
         body = (ad_slot("top") + toolbar_html + count_html + chips_html
-                + biggest_feat + ad_slot("in_list") + drops_cards
-                + cheapest_grid + all_grid + brands_html
+                + all_grid + biggest_feat + ad_slot("in_list") + drops_cards
+                + cheapest_grid + brands_html
                 + ad_slot("bottom") + request_html)
     elif HOME_LAYOUT == "store":
-        # متجر: الماركات أولاً كبلاطات كبيرة، ثم العروض
-        body = (ad_slot("top") + toolbar_html + brands_tiles
+        # متجر: كل الهواتف أولاً ثم الماركات كبلاطات كبيرة
+        body = (ad_slot("top") + toolbar_html + all_grid + brands_tiles
                 + biggest_grid + ad_slot("in_list") + drops_cards
-                + cheapest_grid + all_grid
+                + cheapest_grid
                 + ad_slot("bottom") + request_html)
     elif HOME_LAYOUT == "compact":
         # مدمج: بطاقات أفقية مدمجة في كل الأقسام
@@ -734,26 +734,26 @@ def build_index():
                 + all_list + biggest_list + cheapest_list + brands_html
                 + ad_slot("bottom") + request_html)
     elif HOME_LAYOUT == "luxury":
-        # فاخر داكن: بطاقات كبيرة بهيرو مدمج
+        # فاخر داكن: كل الهواتف أولاً ببطاقات كبيرة
         body = (ad_slot("top") + toolbar_html + count_html + chips_html
-                + biggest_feat + ad_slot("in_list") + drops_cards
-                + cheapest_grid + all_grid + brands_html
+                + all_grid + biggest_feat + ad_slot("in_list") + drops_cards
+                + cheapest_grid + brands_html
                 + ad_slot("bottom") + request_html)
     elif HOME_LAYOUT == "forest":
-        # أخضر: الأرخص أولاً
+        # أخضر: كل الهواتف أولاً ثم الأرخص
         body = (ad_slot("top") + toolbar_html + count_html + chips_html
-                + cheapest_grid + biggest_grid + ad_slot("in_list") + drops_sec
-                + all_grid + brands_html + ad_slot("bottom") + request_html)
+                + all_grid + cheapest_grid + biggest_grid + ad_slot("in_list") + drops_sec
+                + brands_html + ad_slot("bottom") + request_html)
     elif HOME_LAYOUT == "royal":
-        # ملكي: أحدث الانخفاضات أولاً كبطاقات
+        # ملكي: كل الهواتف أولاً ثم الانخفاضات كبطاقات
         body = (ad_slot("top") + toolbar_html + count_html + chips_html
-                + drops_cards + biggest_feat + cheapest_grid + all_grid
+                + all_grid + drops_cards + biggest_feat + cheapest_grid
                 + brands_html + ad_slot("bottom") + request_html)
     elif HOME_LAYOUT == "sunset":
-        # غروب: شريط فلاتر ثابت وأكبر التخفيضات ببطاقات كبيرة
+        # غروب: كل الهواتف أولاً وشريط فلاتر ثابت
         body = (ad_slot("top") + toolbar_html + count_html + chips_html
-                + biggest_feat + ad_slot("in_list") + drops_sec
-                + cheapest_grid + all_grid + brands_html
+                + all_grid + biggest_feat + ad_slot("in_list") + drops_sec
+                + cheapest_grid + brands_html
                 + ad_slot("bottom") + request_html)
     elif HOME_LAYOUT == "minimal":
         # بسيط: هيرو مدمج، كل الهواتف أولاً، بدون أقسام إضافية
@@ -761,17 +761,17 @@ def build_index():
                 + all_grid + biggest_grid + brands_html
                 + ad_slot("bottom") + request_html)
     elif HOME_LAYOUT == "showcase":
-        # عرض كبير: كل الأقسام ببطاقات كبيرة والماركات بلاطات
+        # عرض كبير: كل الهواتف أولاً ببطاقات كبيرة
         body = (ad_slot("top") + toolbar_html + count_html + chips_html
-                + biggest_feat + ad_slot("in_list") + drops_cards
-                + cheapest_feat + all_feat + brands_tiles
+                + all_feat + biggest_feat + ad_slot("in_list") + drops_cards
+                + cheapest_feat + brands_tiles
                 + ad_slot("bottom") + request_html)
     elif HOME_LAYOUT == "fullrows":
-        # صفوف كاملة: كل الأقسام صفوف أفقية
+        # صفوف كاملة: كل الهواتف أولاً كصف أفقي
         body = (ad_slot("top")
                 + f'<details class="filters-box" open><summary>الفلاتر والترتيب</summary>{toolbar_html}</details>'
-                + count_html + chips_html + biggest_row + ad_slot("in_list")
-                + drops_row + cheapest_row + all_row + brands_html
+                + count_html + chips_html + all_row + biggest_row + ad_slot("in_list")
+                + drops_row + cheapest_row + brands_html
                 + ad_slot("bottom") + request_html)
     elif HOME_LAYOUT == "quick":
         # سريع: شريط فلاتر ثابت وكل الهواتف أولاً ببطاقات مدمجة
@@ -779,10 +779,10 @@ def build_index():
                 + all_list + biggest_grid + cheapest_grid + brands_html
                 + ad_slot("bottom") + request_html)
     else:
-        # كلاسيكي: الترتيب الحالي كما هو
+        # كلاسيكي: كل الهواتف أولاً ثم باقي الأقسام
         body = (ad_slot("top") + toolbar_html + count_html + chips_html
-                + biggest_grid + ad_slot("in_list") + drops_sec
-                + cheapest_grid + all_grid + brands_html
+                + all_grid + biggest_grid + ad_slot("in_list") + drops_sec
+                + cheapest_grid + brands_html
                 + ad_slot("bottom") + request_html)
     faq_ld = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
         {"@type": "Question", "name": "كيف أقارن أسعار الهواتف في مصر؟",

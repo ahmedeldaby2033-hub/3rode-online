@@ -378,5 +378,559 @@
   "local": true,
   "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/09/iphone18pro.jpg",
   "note": "downloaded + watermarked B"
+ },
+ "girasole-g30": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "pluzz-hero-600s-24mb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "sary-s101-32gb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "micromax-x412-32mb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "nokia-105": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "nokia-106-4mb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "generic-enes": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "girasole-g30-32gb-32mb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "micromax-x415-32mb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "sary-s201": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "i-pro-a7-mini-1gb-1gb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "nokia-5310-16mb-8mb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "nokia-150": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "shitel-trend-16gb-2gb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "generic-tend-16gb-2gb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "honor-choice-t10-64gb-4gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/09/Honor-Choice-T10.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "itel-p40-128gb-8gb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "vivo-y05-64gb-4gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/02/Vivo-Y05.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "infinix-smart-10-64gb-3gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/08/Infinix-Smart-10.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "itel-a200-128gb-3gb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "xiaomi-redmi-a7-pro-64gb-4gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/05/Xiaomi-Redmi-A7-Pro-4G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "tag-phone-specialtagphone-128gb-6gb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "samsung-galaxy-a07-64gb-4gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/09/Samsung-Galaxy-A07-4G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "oppo-a6x-64gb-4gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/12/Oppo-A6x-4G-1.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "hope-k19-64mb-64mb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "realme-note-70-128gb-4gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/10/Realme-Note-70.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "tecno-spark-50-128gb-6gb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "vivo-y11d-128gb-4gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/06/vivo-y11d.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "xiaomi-redmi-15c-128gb-6gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/08/Xiaomi-Redmi-15C-4G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "samsung-galaxy-a07-128gb-4gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/09/Samsung-Galaxy-A07-4G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "infinix-hot-60-5g-128gb-6gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/08/Infinix-Hot-60-5G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "xiaomi-redmi-15-128gb-6gb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "realme-c71-256gb-4gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/06/Realme-C71-1.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "oppo-a6x-128gb-4gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/12/Oppo-A6x-4G-1.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "xiaomi-poco-c85-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/11/Xiaomi-Poco-C85-4G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "xiaomi-15-128gb-6gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/10/Xiaomi-Redmi-15-4G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "realme-c71-128gb-4gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/06/Realme-C71-1.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "samsung-galaxy-a07-128gb-6gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/09/Samsung-Galaxy-A07-4G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "realme-c75x-128gb-6gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/06/Realme-C75x.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "vivo-y11d-128gb-6gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/06/vivo-y11d.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "xiaomi-poco-c85-256gb-8gb-2": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/11/Xiaomi-Poco-C85-4G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "realme-c100x-128gb-6gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/08/Realme-C100x.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "tecno-spark-40-pro-128gb-8gb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "samsung-galaxy-a18-128gb-4gb": {
+  "local": false,
+  "working_url": "https://mobizil.com/wp-content/uploads/2025/10/Samsung-Galaxy-A08-4G-1.jpg",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "huawei-nova-y74-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/07/Huawei-nova-Y74.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "infinix-hot-60i-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/07/Infinix-Hot-60i-1.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "vivo-y31d-128gb-6gb": {
+  "local": false,
+  "working_url": "https://mobizil.com/wp-content/uploads/2026/01/Vivo-Y31d-1.jpg",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "samsung-galaxy-a17-128gb-4gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/w_800+q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/09/Samsung-Galaxy-A17-4G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "tecno-spark-slim-256gb-8gb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "samsung-galaxy-a07-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/09/Samsung-Galaxy-A07-4G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "realme-c100-128gb-6gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/05/Realme-C100-4G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "samsung-galaxy-a17-128gb-6gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/w_800+q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/09/Samsung-Galaxy-A17-4G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "xiaomi-redmi-note-15-128gb-6gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/01/Xiaomi-Redmi-Note-15-4G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "oppo-a6t-128gb-6gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/07/Oppo-A6t-5G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "realme-c100-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/05/Realme-C100-4G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "oppo-a6-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/w_800+q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/02/Oppo-A6-4G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "honor-x8d-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/02/Honor-X8d.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "vivo-y31d-256gb-8gb": {
+  "local": true,
+  "working_url": "https://mobizil.com/wp-content/uploads/2026/02/Vivo-Y31d-4G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "honor-x8d-512gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/02/Honor-X8d.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "honor-x7e-plus-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/07/Honor-X7e-Plus-5G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "honor-600-lite-128gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/03/Honor-600-Lite.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "samsung-galaxy-a18-256gb-8gb": {
+  "local": false,
+  "working_url": "https://mobizil.com/wp-content/uploads/2025/10/Samsung-Galaxy-A08-4G-1.jpg",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "tecno-camon-40-pro-256gb-12gb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "realme-14-256gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/04/Realme-14-5G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "samsung-galaxy-a36-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/03/Samsung-Galaxy-A36.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "samsung-galaxy-a27-256gb-8gb": {
+  "local": true,
+  "working_url": "https://mobizil.com/wp-content/uploads/2026/06/Samsung-Galaxy-A27.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "xiaomi-redmi-note-15-512gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/01/Xiaomi-Redmi-Note-15-5G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "huawei-nova-15-max-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/05/Huawei-nova-15-Max.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "infinix-gt-30-pro-512gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/07/Infinix-GT-30-Pro-2.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "honor-x9d-256gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/09/Honor-X9d.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "samsung-galaxy-a37-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/03/Samsung-Galaxy-A37-5G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "vivo-v70-fe-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/03/Vivo-V70FE.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "xiaomi-redmi-note-17-pro-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/09/Xiaomi-Redmi-Note-17-Pro-5G2.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "vivo-v70fe-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/03/Vivo-V70FE.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "oppo-a6-pro-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/09/oppo-a6-pro-5g-1.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "xiaomi-redmi-note-15-pro-512gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/01/Xiaomi-Redmi-Note-15-Pro-5G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "xiaomi-redmi-note-15-pro-256gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/01/Xiaomi-Redmi-Note-15-Pro-5G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "xiaomi-redmi-note-17-pro-256gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/09/Xiaomi-Redmi-Note-17-Pro-5G2.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "oppo-reno-15f-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/01/Oppo-Reno-15F-2.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "realme-15-pro-256gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/07/Realme-15-Pro.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "realme-15t-256gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/10/Realme-15T-5G-2.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "oppo-reno15-f-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/01/Oppo-Reno-15F-2.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "oppo-reno15-f-256gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/01/Oppo-Reno-15F-2.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "xiaomi-redmi-note-15-pro-plus-256gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/01/Xiaomi-Redmi-Note-15-Pro-Plus-5G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "xiaomi-redmi-turbo-5-256gb-12gb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "xiaomi-redmi-note-17-pro-max-256gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/09/Xiaomi-Redmi-Note-17-Pro-Max.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "oppo-reno-15f-256gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/01/Oppo-Reno-15F-2.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "oppo-reno-15-256gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/01/Oppo-Reno-15-2.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "realme-16-pro-plus-256gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/02/Realme-16-Pro-Plus.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "vivo-v70-256gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/02/Vivo-V70-2.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "oppo-reno-15-512gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/01/Oppo-Reno-15-2.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "xiaomi-17t-512gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/06/Xiaomi-17T.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "vivo-v80-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/10/Vivo-V80-2.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "apple-iphone-13-128gb-4gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2021/09/IPhone-13.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "samsung-galaxy-s26-fe-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/08/Samsung-Galaxy-S26-FE.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "vivo-v80-512gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/10/Vivo-V80-2.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "apple-iphone-15-128gb-6gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2023/09/iPhone-15-3.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "xiaomi-17t-pro-512gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/06/Xiaomi-17T-Pro.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "apple-iphone-16-128gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2024/09/iPhone-16-1.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "apple-iphone-17-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/09/iPhone-17.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "apple-iphone-16-plus-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2024/09/iPhone-16-Plus-1.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "apple-iphone-17-pro-max-256gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/09/iPhone-17-Pro-Max2.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "apple-iphone-17-pro-256gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/09/iPhone-17-Pro2.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "apple-iphone-17-pro-512gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/09/iPhone-17-Pro2.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "nokia-106-4g-4mb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
  }
 }
