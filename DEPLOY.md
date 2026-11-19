@@ -9,7 +9,7 @@
 
 1. افتح لوحة تحكم الاستضافة (cPanel) ← **File Manager** أو استخدم FTP (FileZilla).
 2. ارفع محتوى مجلد `site/` **كاملاً** إلى `public_html/` (المجلد العام للنطاق).
-3. ارفع `admin/index.html` إلى `public_html/admin/` (لوحة التحكم — راجع `admin/SETUP.md` لإعداد Apps Script أولاً).
+3. ارفع `admin/index.html` إلى `public_html/adamwnor/` (لوحة التحكم — راجع `admin/SETUP.md` لإعداد Apps Script أولاً).
 4. تأكد من وجود `site/.htaccess` إن أردت إعادة توجيه www ← بدون www (اختياري).
 5. فعّل شهادة SSL مجانية (Let's Encrypt) من cPanel للنطاق `3rde.online` — الموقع كله `https://`.
 

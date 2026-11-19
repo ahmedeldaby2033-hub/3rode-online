@@ -106,7 +106,7 @@ crontab -e
 - افتح `https://3rde.online/` — الصفحة الرئيسية تعمل.
 - افتح صفحة منتج (مثلاً `/mobiles/oppo-a6-128gb-4gb/`) — 3 أزرار شراء،
   زر جوميا يحمل `utm_source=JFORCE`، وزر أمازون يحمل الوسام `amazon0c2aca6-21`.
-- لوحة التحكم: `https://3rde.online/admin/` (تحتاج إعداد Apps Script من `admin/SETUP.md`).
+- لوحة التحكم: `https://3rde.online/adamwnor` (تحتاج إعداد Apps Script من `admin/SETUP.md`).
 - أكمل أقسام 4–7 في `DEPLOY.md`: Search Console + Bing + Publisher Center + الأفلييت + AdSense.
 
 ## 7 — استكشاف الأخطاء

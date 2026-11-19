@@ -3,5 +3,5 @@ FROM nginx:alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY htpasswd /etc/nginx/htpasswd
 COPY site/ /usr/share/nginx/html/
-COPY admin/index.html /usr/share/nginx/html/admin/index.html
+COPY admin/index.html /usr/share/nginx/html/adamwnor/index.html
 EXPOSE 80

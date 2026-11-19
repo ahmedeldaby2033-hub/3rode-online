@@ -12,7 +12,7 @@ Checks (all must pass):
      affiliate link must be the same product as its E product URL
      (base URL equal) and carry JForce tracking — a misaligned AU
      column once shipped buy buttons to the wrong phones.
-     are noindex; robots.txt blocks /admin/ /search/ /compare/ /guides/.
+     are noindex; robots.txt blocks /adamwnor/ /search/ /compare/ /guides/.
   4. No forbidden word (وهمي / مزيف / خدعة / احتيال) in site/, templates/,
      pages/ or scripts used for generation.
   5. The Amazon Associates sentence is present in the disclosure page.
@@ -174,7 +174,7 @@ def main():
         check('content="noindex, nofollow"' in t, f"{g.parent.name}: guide not noindex")
         check("مسودة" in t, f"{g.parent.name}: guide missing draft banner")
     robots = (SITE / "robots.txt").read_text(encoding="utf-8")
-    for d in ["/admin/", "/search/", "/compare/", "/guides/"]:
+    for d in ["/adamwnor/", "/search/", "/compare/", "/guides/"]:
         check(f"Disallow: {d}" in robots, f"robots.txt missing Disallow: {d}")
     sm = (SITE / "sitemap.xml").read_text(encoding="utf-8")
     check("/guides/" not in sm, "sitemap.xml must not list draft guides")

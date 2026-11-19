@@ -1269,7 +1269,7 @@ def write_sitemap(pages_meta, news_posts):
         'xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">\n'
         + "\n".join(news_urls) + "\n</urlset>\n", encoding="utf-8")
     (SITE / "robots.txt").write_text(
-        "User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /search/\n"
+        "User-agent: *\nAllow: /\nDisallow: /adamwnor/\nDisallow: /search/\n"
         "Disallow: /compare/\nDisallow: /guides/\n"
         f"Sitemap: {BASE_URL}/sitemap.xml\n", encoding="utf-8")
 

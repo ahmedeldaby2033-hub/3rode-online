@@ -1,6 +1,6 @@
 User-agent: *
 Allow: /
-Disallow: /admin/
+Disallow: /adamwnor/
 Disallow: /search/
 Disallow: /compare/
 Disallow: /guides/
