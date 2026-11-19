@@ -599,7 +599,7 @@ def head_html(title, desc, canonical, og_image=None, noindex=False,
 <link rel="apple-touch-icon" href="/assets/icon-192.png">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0b5ed7">
-<link rel="stylesheet" href="/assets/style.css">
+<link rel="stylesheet" href="/assets/style.css?v=3">
 {verif}{ga}{extra}"""
 
 
@@ -768,28 +768,28 @@ def build_index():
     biggest_grid = f'<div class="section-head"><h2>{sec_icon("percent", "warm")} أكبر التخفيضات الآن</h2></div>\n<div class="grid">{"".join(card_html(m) for m in biggest)}</div>'
     biggest_row = f'<div class="section-head"><h2>{sec_icon("percent", "warm")} أكبر التخفيضات الآن</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in biggest)}</div>'
     biggest_feat = f'<div class="section-head"><h2>{sec_icon("percent", "warm")} أكبر التخفيضات الآن</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in biggest)}</div>'
-    drops_sec = f'<div class="section-head"><h2>{sec_icon("arrow-down", "green")} أحدث انخفاضات الأسعار</h2></div>\n{drops_html}'
+    drops_sec = f'<div class="section-head"><h2>أحدث انخفاضات الأسعار</h2></div>\n{drops_html}'
     _bym = {m.model: m for m in MODELS}
     drops_models = [_bym[d["model"]] for d in drops if d["model"] in _bym]
-    drops_cards = (f'<div class="section-head"><h2>{sec_icon("arrow-down", "green")} أحدث انخفاضات الأسعار</h2></div>\n'
+    drops_cards = (f'<div class="section-head"><h2>أحدث انخفاضات الأسعار</h2></div>\n'
                    f'<div class="grid grid-featured">{"".join(card_html(m) for m in drops_models)}</div>'
                    if drops_models else drops_sec)
-    cheapest_grid = f'<div class="section-head"><h2>{sec_icon("tag", "rose")} أرخص الهواتف</h2></div>\n<div class="grid">{"".join(card_html(m) for m in cheapest)}</div>'
-    cheapest_row = f'<div class="section-head"><h2>{sec_icon("tag", "rose")} أرخص الهواتف</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in cheapest)}</div>'
-    latest_grid = f'<div class="section-head"><h2>{sec_icon("star")} أحدث المنتجات</h2></div>\n<div class="grid">{"".join(card_html(m) for m in latest)}</div>'
-    latest_row = f'<div class="section-head"><h2>{sec_icon("star")} أحدث المنتجات</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in latest)}</div>'
-    latest_feat = f'<div class="section-head"><h2>{sec_icon("star")} أحدث المنتجات</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in latest)}</div>'
-    latest_list = f'<div class="section-head"><h2>{sec_icon("star")} أحدث المنتجات</h2></div>\n<div class="cards-list">{"".join(card_html(m) for m in latest)}</div>'
+    cheapest_grid = f'<div class="section-head"><h2>أرخص الهواتف</h2></div>\n<div class="grid">{"".join(card_html(m) for m in cheapest)}</div>'
+    cheapest_row = f'<div class="section-head"><h2>أرخص الهواتف</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in cheapest)}</div>'
+    latest_grid = f'<div class="section-head"><h2>أحدث المنتجات</h2></div>\n<div class="grid">{"".join(card_html(m) for m in latest)}</div>'
+    latest_row = f'<div class="section-head"><h2>أحدث المنتجات</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in latest)}</div>'
+    latest_feat = f'<div class="section-head"><h2>أحدث المنتجات</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in latest)}</div>'
+    latest_list = f'<div class="section-head"><h2>أحدث المنتجات</h2></div>\n<div class="cards-list">{"".join(card_html(m) for m in latest)}</div>'
     all_grid = latest_grid + f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="grid" id="models-grid">{cards}</div>'
     all_row = latest_row + f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="row-scroll" id="models-grid">{cards}</div>'
     brands_html = f'<div class="section-head" id="brands"><h2>تسوق حسب الماركة</h2></div>\n<div class="chips">{brand_cards}</div>'
     brands_tiles = f'<div class="section-head" id="brands"><h2>تسوق حسب الماركة</h2></div>\n<div class="brand-tiles">{brand_cards}</div>'
     biggest_list = f'<div class="section-head"><h2>{sec_icon("percent", "warm")} أكبر التخفيضات الآن</h2></div>\n<div class="cards-list">{"".join(card_html(m) for m in biggest)}</div>'
-    cheapest_list = f'<div class="section-head"><h2>{sec_icon("tag", "rose")} أرخص الهواتف</h2></div>\n<div class="cards-list">{"".join(card_html(m) for m in cheapest)}</div>'
-    cheapest_feat = f'<div class="section-head"><h2>{sec_icon("tag", "rose")} أرخص الهواتف</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in cheapest)}</div>'
+    cheapest_list = f'<div class="section-head"><h2>أرخص الهواتف</h2></div>\n<div class="cards-list">{"".join(card_html(m) for m in cheapest)}</div>'
+    cheapest_feat = f'<div class="section-head"><h2>أرخص الهواتف</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in cheapest)}</div>'
     all_list = latest_list + f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="cards-list" id="models-grid">{cards}</div>'
     all_feat = latest_feat + f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="grid grid-featured" id="models-grid">{cards}</div>'
-    drops_row = (f'<div class="section-head"><h2>{sec_icon("arrow-down", "green")} أحدث انخفاضات الأسعار</h2></div>\n'
+    drops_row = (f'<div class="section-head"><h2>أحدث انخفاضات الأسعار</h2></div>\n'
                  f'<div class="row-scroll">{"".join(card_html(m) for m in drops_models)}</div>'
                  if drops_models else drops_sec)
     request_html = f"""<section class="card" style="margin-top:26px">
@@ -988,7 +988,7 @@ def build_product(model):
         rating = num(c(r, "التقييم"))
         rc = int(num(c(r, "عدد التقييمات"), 0) or 0)
         rows_html += f"""<tr class="{'best-row' if i == 0 else ''}">
-<td>{('<span class="best-badge">' + icon("trophy") + ' الأرخص</span>') if i == 0 else ''} {esc(norm(c(r, 'المتجر (جوميا / أمازون)')))}</td>
+<td>{'<span class="best-badge">الأرخص</span>' if i == 0 else ''} {esc(norm(c(r, 'المتجر (جوميا / أمازون)')))}</td>
 <td>{esc(norm(c(r, 'البائع')))}</td>
 <td><strong>{fmt_price(price)} جنيه</strong></td>
 <td>{fmt_price(old) + ' جنيه' if old else '—'}</td>
@@ -1689,7 +1689,7 @@ def write_manifest():
                   {"src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png"}],
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     (SITE / "sw.js").write_text(
-        "const CACHE='r3de-v1';const CORE=['/','/assets/style.css','/assets/app.js',"
+        "const CACHE='r3de-v2';const CORE=['/','/assets/style.css','/assets/app.js',"
         "'/assets/logo.png','/assets/icon-192.png','/assets/icon-512.png'];\n"
         "self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});\n"
         "self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});\n"
