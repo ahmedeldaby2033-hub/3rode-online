@@ -637,7 +637,7 @@ def build_index():
 <h1>{esc(SITE_NAME)}</h1>
 <p>قارن أسعار الهواتف في جوميا مصر وأمازون مصر ونون مصر، وتابع انخفاض الأسعار أولاً بأول.</p>
 <form class="search-box" action="/search/" method="get" role="search">
-<input type="search" name="q" id="hero-q" placeholder="ابحث عن هاتف… مثال: OPPO A6" aria-label="ابحث عن هاتف">
+<input type="search" name="q" id="hero-q" placeholder="ابحث عن هاتف…" aria-label="ابحث عن هاتف">
 <button class="btn" type="submit">بحث</button>
 </form>
 <div class="hero-stats"><span><b>{len(MODELS)}</b> موديل</span><span><b>{len(ROWS)}</b> عرض سعر</span><span><b>{len(BRANDS)}</b> ماركة</span><span>يبدأ من <b>{fmt_price(min(m.cheapest_price for m in MODELS))} جنيه</b></span></div>

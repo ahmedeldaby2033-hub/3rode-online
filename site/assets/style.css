@@ -188,19 +188,20 @@ html[data-theme="dark"] .btn-buy { filter: brightness(1.05); }
 .hero-stats b { font-size: 1.15rem; }
 
 .toolbar {
-  display: flex; gap: 8px; flex-wrap: nowrap; align-items: center;
+  display: flex; gap: 6px; flex-wrap: nowrap; align-items: center;
   margin: 22px 0 6px;
   background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-  padding: 8px 10px; box-shadow: var(--shadow);
+  padding: 8px; box-shadow: var(--shadow);
   overflow-x: auto; scrollbar-width: thin;
 }
 .toolbar select, .toolbar input[type="number"], .toolbar input[type="search"] {
   width: auto; flex: 0 0 auto; min-width: 0;
-  padding: 7px 10px; border: 1px solid var(--border); border-radius: 9px;
-  font-family: inherit; font-size: .88rem; background: var(--card); color: var(--text);
+  padding: 6px 8px; border: 1px solid var(--border); border-radius: 9px;
+  font-family: inherit; font-size: .85rem; background: var(--card); color: var(--text);
 }
-.toolbar input[type="search"] { flex: 1 1 150px; min-width: 140px; }
-.toolbar .check { white-space: nowrap; font-size: .88rem; }
+.toolbar input[type="search"] { flex: 1 1 120px; min-width: 110px; }
+.toolbar input[type="number"] { width: 118px; }
+.toolbar .check { white-space: nowrap; font-size: .85rem; }
 .chip {
   display: inline-block; padding: 7px 14px; border-radius: 999px;
   border: 1px solid var(--border); background: var(--card); color: var(--text);
@@ -389,7 +390,7 @@ html[data-theme="dark"] .install-result { color: #fff; }
   .site-header { padding: 8px 0; }
   .site-header .container { flex-wrap: nowrap; gap: 10px; }
   .brand img { height: 34px; }
-  .brand-name { font-size: 1.05rem; }
+  .brand-name { display: none; }
   .nav-toggle { display: inline-block; margin-inline-start: auto; }
   .main-nav {
     display: none;
