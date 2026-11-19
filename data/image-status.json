@@ -927,6 +927,11 @@
   "working_url": "https://mobizil.com/wp-content/uploads/2026/02/Vivo-Y31d-4G.jpg",
   "note": "downloaded + watermarked A"
  },
+ "oppo-a6t-128gb-6gb-2": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/07/Oppo-A6t-5G.jpg",
+  "note": "downloaded + watermarked A"
+ },
  "samsung-galaxy-a26-256gb-8gb": {
   "local": true,
   "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/03/Samsung-Galaxy-A26.jpg",
@@ -952,9 +957,19 @@
   "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2024/09/iPhone-16-Plus-1.jpg",
   "note": "downloaded + watermarked A"
  },
- "oppo-a6t-128gb-6gb-2": {
+ "nokia-125-4mb-4mb": {
   "local": true,
-  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/07/Oppo-A6t-5G.jpg",
+  "working_url": "https://cdn.nieuwemobiel.nl/media/nokia/nokia-125-1x1-bc3efc56.webp",
+  "note": "downloaded + watermarked A"
+ },
+ "nokia-6310": {
+  "local": true,
+  "working_url": "https://images.ctfassets.net/wcfotm6rrl7u/1YyhaoBhUQQUS9y7z3QBny/2d790d178d2f17d005344b949d0b9a88/nokia-6310-2024-green-front_back-int.png?h=2000&fm=png&fl=png8",
+  "note": "downloaded + watermarked A"
+ },
+ "honor-choice-t10-64gb-4gb-2": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/09/Honor-Choice-T10.jpg",
   "note": "downloaded + watermarked A"
  }
 }
