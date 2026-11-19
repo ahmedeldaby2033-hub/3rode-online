@@ -293,9 +293,9 @@ html[data-theme="dark"] .price { color: #fff; }
 .rating { color: #b45309; font-weight: 700; font-size: .9rem; }
 .pcard .actions { display: flex; gap: 8px; margin-top: auto; padding-top: 8px; }
 .btn-mini {
-  flex: 1; text-align: center; padding: 10px 6px; border-radius: 10px; font-weight: 800;
-  font-size: .9rem; border: 1px solid transparent; color: #fff; cursor: pointer;
-  transition: filter .15s ease, transform .15s ease;
+  flex: 1; text-align: center; padding: 5px 4px; border-radius: 8px; font-weight: 800;
+  font-size: .7rem; border: 1px solid transparent; color: #fff; cursor: pointer;
+  white-space: nowrap; transition: filter .15s ease, transform .15s ease;
 }
 .btn-mini:hover { text-decoration: none; filter: brightness(1.08); }
 .btn-mini:active { transform: scale(.97); }
@@ -305,6 +305,7 @@ html[data-theme="dark"] .price { color: #fff; }
 .btn-fav:hover { border-color: transparent; filter: brightness(1.08); }
 .btn-fav.fav-on { background: linear-gradient(180deg, #e11d48, #be123c); border-color: transparent; color: #fff; }
 html[data-theme="dark"] .btn-fav { color: #fff; border-color: transparent; }
+html[data-theme="dark"] .btn-mini { color: #fff; }
 
 .section-head { display: flex; align-items: baseline; gap: 12px; margin: 30px 0 4px; flex-wrap: wrap; }
 .section-head h2 { margin: 0; font-size: 1.35rem; color: var(--blue-dark); }

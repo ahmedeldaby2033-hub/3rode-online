@@ -599,7 +599,7 @@ def head_html(title, desc, canonical, og_image=None, noindex=False,
 <link rel="apple-touch-icon" href="/assets/icon-192.png">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0b5ed7">
-<link rel="stylesheet" href="/assets/style.css?v=3">
+<link rel="stylesheet" href="/assets/style.css?v=4">
 {verif}{ga}{extra}"""
 
 
@@ -1851,7 +1851,7 @@ def write_manifest():
                   {"src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png"}],
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     (SITE / "sw.js").write_text(
-        "const CACHE='r3de-v2';const CORE=['/','/assets/style.css','/assets/app.js',"
+        "const CACHE='r3de-v3';const CORE=['/','/assets/style.css','/assets/app.js',"
         "'/assets/logo.png','/assets/icon-192.png','/assets/icon-512.png'];\n"
         "self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});\n"
         "self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});\n"
