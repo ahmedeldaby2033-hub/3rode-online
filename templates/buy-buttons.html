@@ -1,0 +1,43 @@
+<!-- Buy buttons snippet — 3rode.online
+     Include this in every product card and product page.
+     RULE (audit ت-6): every buy link MUST carry rel="sponsored noopener"
+     and target="_blank". No exceptions. The href is filled by the sync
+     from the sheet (Jumia = real product link) or, for Amazon/Noon until
+     real links exist, a model search link — both with the affiliate tag
+     from Settings. Coupon button: copies the code, shows a toast, then
+     redirects to the store link WITH the affiliate tag (audit ت-12).
+-->
+<div class="buy-buttons" data-model="{{MODEL_SLUG}}">
+  <a class="btn-buy btn-jumia"
+     href="{{JUMIA_URL}}"
+     rel="sponsored noopener" target="_blank"
+     data-store="jumia" data-event="buy-click">اشترِ من جوميا مصر</a>
+  <a class="btn-buy btn-amazon"
+     href="{{AMAZON_URL}}"
+     rel="sponsored noopener" target="_blank"
+     data-store="amazon" data-event="buy-click">اشترِ من أمازون مصر</a>
+  <a class="btn-buy btn-noon"
+     href="{{NOON_URL}}"
+     rel="sponsored noopener" target="_blank"
+     data-store="noon" data-event="buy-click">اشترِ من نون مصر</a>
+  <p class="affiliate-note">روابط شراء بالعمولة — <a href="/affiliate-disclosure/">اقرأ الإفصاح</a></p>
+</div>
+
+<!-- Coupon button: copy code, show toast, then redirect with affiliate tag -->
+<button class="btn-coupon" type="button"
+        data-coupon="{{COUPON_CODE}}"
+        data-redirect="{{STORE_URL_WITH_AFFILIATE_TAG}}">انسخ الكود وانتقل للمتجر</button>
+<script>
+document.addEventListener('click', function (e) {
+  var b = e.target.closest('.btn-coupon');
+  if (!b) return;
+  var code = b.dataset.coupon || '';
+  var go = function () { window.open(b.dataset.redirect, '_blank'); };
+  if (navigator.clipboard && code) {
+    navigator.clipboard.writeText(code).then(function () {
+      alert('تم نسخ الكود: ' + code + ' — سيتم تحويلك إلى المتجر الآن.');
+      go();
+    }, go);
+  } else { go(); }
+});
+</script>

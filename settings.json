@@ -1,0 +1,42 @@
+{
+  "site_name": "عروض أونلاين",
+  "site_domain": "3rode.online",
+  "site_slogan": "عروضي لاقتناص العروض",
+  "contact_email": "da3m@3rode.online",
+  "currency": "EGP",
+  "sync_frequency": "hourly",
+  "sheet_url": "https://docs.google.com/spreadsheets/d/1VeOXP8ly-W0dwT0QQK9kqf9z_834zok9ekIqGjfPNdE/edit?gid=0#gid=0",
+  "affiliate": {
+    "amazon_associates_tag": "amazon0c2aca6-21",
+    "amazon_associates_portal": "https://affiliate-program.amazon.eg/",
+    "jumia_sub_id": "",
+    "jumia_note": "Jumia JForce affiliate link verified 2026-11-19: short link redirects via Adjust to jumia.com.eg homepage with JFORCE tracking. For product deep links, append the same utm/adj_label params to the product URL (verify attribution in the JForce dashboard).",
+    "noon_affiliate_tag": "",
+    "jumia_jforce_link": "https://jforce.jumia.com.eg/s/C4i51XK",
+    "jumia_tracking_params": {
+      "utm_source": "JFORCE",
+      "utm_medium": "JF_Affiliate",
+      "utm_campaign": "JF_Affiliate_EG",
+      "adj_label": "casid*cf5c450e-259d-49d2-889e-95c558384bcd^type*jforce"
+    },
+    "jumia_homepage_url": "https://www.jumia.com.eg/ar/?utm_source=JFORCE&utm_medium=JF_Affiliate&utm_campaign=JF_Affiliate_EG&adj_label=casid*cf5c450e-259d-49d2-889e-95c558384bcd%5Etype*jforce"
+  },
+  "ads": {
+    "adsense_client": "",
+    "slots": {
+      "top": "",
+      "in_list": "",
+      "in_product": "",
+      "bottom": ""
+    }
+  },
+  "analytics": {
+    "google_analytics_id": "",
+    "search_console_verification": "",
+    "bing_verification": ""
+  },
+  "notifications": {
+    "onesignal_app_id": "",
+    "telegram_bot": ""
+  }
+}

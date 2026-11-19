@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>لوحة تحكم — عروض أونلاين</title>
+<style>
+:root{--bg:#f4f6fb;--surface:#fff;--text:#101828;--muted:#667085;--border:#e4e7ec;--accent:#0b3d91;--green:#067647;--red:#b42318;--amber:#b54708}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{background:var(--accent);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+header h1{font-size:20px;margin:0}
+header a{color:#fff}
+main{max-width:1100px;margin:0 auto;padding:20px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:16px}
+.card h2{margin:0 0 12px;font-size:18px}
+label{display:block;font-weight:600;margin:10px 0 4px}
+input[type=text],input[type=url],input[type=number],input[type=date],select,textarea{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font:inherit}
+textarea{min-height:90px}
+[dir=ltr]{direction:ltr;text-align:left}
+button{cursor:pointer;border:0;border-radius:8px;padding:10px 16px;font:inherit;font-weight:600}
+.btn{background:var(--accent);color:#fff}
+.btn-ghost{background:#fff;border:1px solid var(--border);color:var(--text)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-green{background:var(--green);color:#fff}
+.btn-amazon{background:#ff9900;color:#111}
+.btn-jumia{background:#f68b1e;color:#fff}
+.btn-search{margin:4px 0 4px 8px}
+.hint{color:var(--muted);font-size:13px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.row{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{border-bottom:1px solid var(--border);padding:8px;text-align:right;vertical-align:top}
+th{background:#f9fafb}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;background:#eef2f7}
+.badge.green{background:#d1fadf;color:var(--green)}
+.badge.amber{background:#fef0c7;color:var(--amber)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tabs button{background:#fff;border:1px solid var(--border);color:var(--text)}
+.tabs button.active{background:var(--accent);color:#fff}
+section.tab{display:none}
+section.tab.active{display:block}
+#toast{position:fixed;bottom:20px;right:20px;background:#101828;color:#fff;padding:12px 18px;border-radius:10px;display:none;z-index:99}
+.error{color:var(--red);font-weight:600}
+.ok{color:var(--green);font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <h1>لوحة تحكم — عروض أونلاين <span style="font-weight:400">3rode.online</span></h1>
+  <span><a href="https://3rode.online/" target="_blank" rel="noopener">عرض الموقع ↗</a> &nbsp;·&nbsp; <a href="https://docs.google.com/spreadsheets/d/1VeOXP8ly-W0dwT0QQK9kqf9z_834zok9ekIqGjfPNdE" target="_blank" rel="noopener">فتح الشيت ↗</a></span>
+</header>
+<main>
+
+<!-- ============ CONFIG: paste the Apps Script web app URL here ============ -->
+<script>
+var APPS_SCRIPT_URL = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE"; // مثال: https://script.google.com/macros/s/AKfy.../exec
+var SHEET_ID = "1VeOXP8ly-W0dwT0QQK9kqf9z_834zok9ekIqGjfPNdE";
+var token = sessionStorage.getItem("admin_token") || "";
+// window.SETTINGS is filled from the backend after login; the store-search
+// buttons below read it at CLICK time (not at page load).
+window.SETTINGS = { amazon_associates_tag: "amazon0c2aca6-21", jumia_tracking_params: {} };
+</script>
+
+<div class="card" id="login-card">
+  <h2>تسجيل الدخول</h2>
+  <p class="hint">أدخل رمز المدير ADMIN_TOKEN (المحفوظ في إعدادات مشروع Apps Script). يُحفظ في هذه الجلسة فقط، ولا يُرسل إلا إلى تطبيق Apps Script الخاص بك.</p>
+  <div class="row">
+    <div><label for="token-input">رمز المدير</label>
+    <input type="text" id="token-input" dir="ltr" placeholder="ADMIN_TOKEN" autocomplete="off"></div>
+    <div><label>&nbsp;</label><button class="btn" onclick="login()">دخول</button></div>
+  </div>
+  <p id="login-msg"></p>
+</div>
+
+<div id="admin" style="display:none">
+  <div class="tabs">
+    <button class="active" onclick="showTab(event,'tab-overview')">نظرة عامة</button>
+    <button onclick="showTab(event,'tab-products')">المنتجات</button>
+    <button onclick="showTab(event,'tab-coupons')">الكوبونات</button>
+    <button onclick="showTab(event,'tab-settings')">الإعدادات والإعلانات</button>
+    <button onclick="showTab(event,'tab-guides')">الأدلة</button>
+    <button onclick="showTab(event,'tab-news')">الأخبار</button>
+    <button onclick="showTab(event,'tab-logs')">سجل المزامنة والأسعار</button>
+  </div>
+
+  <section class="tab active" id="tab-overview">
+    <div class="card"><h2>نظرة عامة</h2>
+      <p id="overview-stats">جارٍ التحميل…</p>
+      <p><button class="btn" onclick="syncNow()">مزامنة الآن (طلب تحديث)</button>
+      <button class="btn-ghost" onclick="loadOverview()">تحديث الأرقام</button></p>
+      <p class="hint">المزامنة الفعلية كل ساعة عبر scripts/sync.py على الاستضافة. زر «مزامنة الآن» يسجّل طلباً في سجل المزامنة ليُلتقط في التشغيل التالي.</p>
+      <h3>بلاغات أسعار خاطئة</h3><div id="reports-list">—</div>
+      <h3>طلبات منتجات غير موجودة</h3><div id="requests-list">—</div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-products">
+    <div class="card"><h2>المنتجات (الشيت هو المصدر الوحيد)</h2>
+      <div class="row">
+        <div><label for="prod-search">بحث بالاسم</label><input type="text" id="prod-search" placeholder="مثال: OPPO A6"></div>
+        <div><label for="prod-brand">العلامة</label><select id="prod-brand"><option value="">كل العلامات</option></select></div>
+      </div>
+      <p><button class="btn" onclick="loadProducts()">بحث</button>
+      <button class="btn-ghost" onclick="newProduct()">+ إضافة منتج جديد</button></p>
+      <div id="products-table">—</div>
+    </div>
+
+    <div class="card" id="product-form-card" style="display:none">
+      <h2 id="product-form-title">إضافة / تعديل منتج</h2>
+      <form id="product-form" onsubmit="return saveProduct(event)">
+        <div class="row">
+          <div><label for="product-name">اسم المنتج (بالإنجليزية كما في المتجر) *</label>
+          <input type="text" id="product-name" dir="ltr" required></div>
+          <div><label for="product-name-ar">الاسم بالعربية</label>
+          <input type="text" id="product-name-ar"></div>
+        </div>
+        <div class="row">
+          <div><label for="product-brand">العلامة *</label>
+          <input type="text" id="product-brand" list="brands-list" required></div>
+          <div><label for="product-model">الموديل *</label>
+          <input type="text" id="product-model" dir="ltr" required></div>
+        </div>
+        <datalist id="brands-list"></datalist>
+        <div class="row">
+          <div><label for="product-price">السعر الحالي (جنيه) *</label>
+          <input type="number" id="product-price" required></div>
+          <div><label for="product-old-price">السعر القديم (جنيه)</label>
+          <input type="number" id="product-old-price"></div>
+        </div>
+        <div class="row">
+          <div><label for="product-storage">التخزين</label><input type="text" id="product-storage" dir="ltr"></div>
+          <div><label for="product-ram">الرام</label><input type="text" id="product-ram" dir="ltr"></div>
+        </div>
+        <div class="row">
+          <div><label for="product-seller">البائع</label><input type="text" id="product-seller"></div>
+          <div><label for="product-availability">التوفر</label>
+          <select id="product-availability"><option>متوفر</option><option>غير متوفر</option></select></div>
+        </div>
+        <div class="row">
+          <div><label for="product-image">رابط الصورة</label>
+          <input type="url" id="product-image" dir="ltr"></div>
+          <div><label for="product-mobizil">رابط موبيزل</label>
+          <input type="url" id="product-mobizil" dir="ltr"></div>
+        </div>
+        <label for="product-url">رابط المنتج الأصلي في جوميا (بدون وسوم تتبع)</label>
+        <input type="url" id="product-url" dir="ltr" placeholder="https://www.jumia.com.eg/ar/...">
+
+        <!-- ===== BEGIN: templates/admin-search-buttons.html (integrated verbatim markup) =====
+             Two SEPARATE auto-search buttons, next to the store link fields.
+             The search happens in the ADMIN's own browser, on the store's own
+             site — no scraping, no login. The admin finds the right product,
+             copies its link, and pastes it into the form below. Admin panel
+             only — visitor buy buttons on the site are unchanged.
+             JS note: settings are read at CLICK time from window.SETTINGS
+             (loaded from the backend after login), not at page load. -->
+        <div class="store-search">
+          <button type="button" class="btn-search btn-amazon" id="btn-search-amazon">
+            🔍 بحث تلقائي في أمازون
+          </button>
+          <button type="button" class="btn-search btn-jumia" id="btn-search-jumia">
+            🔍 بحث تلقائي في جوميا
+          </button>
+          <p class="hint">ابحث باسم المنتج في المتجر، ثم انسخ رابط المنتج الصحيح
+            والصقه في الخانة المناسبة بالأسفل. لروابط أمازون يُستخرج ASIN تلقائياً.</p>
+        </div>
+
+        <div class="form-row">
+          <label for="amazon-url">رابط أمازون (أو الصق رابط منتج أمازون لاستخراج ASIN)</label>
+          <input type="text" id="amazon-url" name="amazon_url" dir="ltr"
+                 placeholder="https://www.amazon.eg/dp/B0.../?tag=amazon0c2aca6-21">
+          <label for="amazon-asin">ASIN أمازون</label>
+          <input type="text" id="amazon-asin" name="amazon_asin" dir="ltr"
+                 placeholder="مثال: B0CX123456" maxlength="10">
+        </div>
+
+        <div class="form-row">
+          <label for="jumia-url">رابط جوميا (رابط التتبع الكامل من JForce — العمود AU في الشيت)</label>
+          <input type="text" id="jumia-url" name="jumia_url" dir="ltr"
+                 placeholder="https://www.jumia.com.eg/ar/...">
+        </div>
+        <!-- ===== END: templates/admin-search-buttons.html ===== -->
+
+        <label for="product-specs">المواصفات الكاملة</label>
+        <textarea id="product-specs"></textarea>
+        <div class="row">
+          <div><label for="product-pros">المميزات</label><textarea id="product-pros"></textarea></div>
+          <div><label for="product-cons">العيوب</label><textarea id="product-cons"></textarea></div>
+        </div>
+        <p>
+          <button class="btn-green" type="submit">حفظ في الشيت</button>
+          <button class="btn-ghost" type="button" onclick="hideProductForm()">إلغاء</button>
+          <button class="btn-danger" type="button" id="btn-delete-product" onclick="deleteProduct()" style="display:none">حذف المنتج</button>
+        </p>
+        <p class="hint">الحفظ يكتب في الشيت أولاً، ثم تُعاد المزامنة. إذا تغيّر السعر يُسجَّل في «سجل الأسعار» تلقائياً.</p>
+      </form>
+    </div>
+
+    <div class="card"><h2>استيراد جماعي (CSV)</h2>
+      <p class="hint">سطر لكل منتج، بنفس ترتيب أعمدة الشيت الـ 46 (الاسم، الاسم العربي، العلامة، الموديل، رابط المنتج، المتجر، البائع، السعر الحالي، …). يُضاف كل سطر كعرض جديد.</p>
+      <textarea id="csv-input" placeholder="اسم المنتج,الاسم العربي,العلامة,الموديل,https://...,جوميا,البائع,9999,..."></textarea>
+      <p><button class="btn" onclick="bulkImport()">استيراد</button></p>
+    </div>
+
+    <div class="card"><h2>تعديل جماعي حسب العلامة</h2>
+      <div class="row">
+        <div><label for="bulk-brand">العلامة</label><select id="bulk-brand"></select></div>
+        <div><label for="bulk-field">الحقل</label>
+        <select id="bulk-field">
+          <option value="التوفر">التوفر</option>
+          <option value="البائع">البائع</option>
+          <option value="الضمان">الضمان</option>
+          <option value="الشحن">الشحن</option>
+        </select></div>
+      </div>
+      <label for="bulk-value">القيمة الجديدة</label>
+      <input type="text" id="bulk-value">
+      <p><button class="btn" onclick="bulkEdit()">تطبيق على كل منتجات العلامة</button></p>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-coupons">
+    <div class="card"><h2>الكوبونات</h2>
+      <div id="coupons-table">—</div>
+      <h3>إضافة / تعديل كوبون</h3>
+      <div class="row">
+        <div><label for="cp-title">العنوان</label><input type="text" id="cp-title"></div>
+        <div><label for="cp-store">المتجر</label>
+        <select id="cp-store"><option value="jumia">جوميا</option><option value="amazon">أمازون</option><option value="noon">نون</option></select></div>
+      </div>
+      <div class="row">
+        <div><label for="cp-code">الكود</label><input type="text" id="cp-code" dir="ltr"></div>
+        <div><label for="cp-value">القيمة</label><input type="text" id="cp-value"></div>
+      </div>
+      <label for="cp-url">رابط التوجيه (رابط المتجر مع التتبع)</label>
+      <input type="url" id="cp-url" dir="ltr">
+      <div class="row">
+        <div><label for="cp-expires">تاريخ الانتهاء</label><input type="date" id="cp-expires"></div>
+        <div><label for="cp-active">مفعّل</label>
+        <select id="cp-active"><option value="true">نعم</option><option value="false">لا</option></select></div>
+      </div>
+      <input type="hidden" id="cp-id">
+      <p><button class="btn-green" onclick="saveCoupon()">حفظ الكوبون</button></p>
+      <p class="hint">عند النقر على الكوبون في الموقع يُنسخ الكود ثم يُوجَّه الزائر إلى رابط المتجر مباشرة.</p>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-settings">
+    <div class="card"><h2>إعدادات الموقع</h2>
+      <div id="settings-form">جارٍ التحميل…</div>
+      <p><button class="btn-green" onclick="saveSettings()">حفظ الإعدادات</button></p>
+      <p class="hint">وسام أمازون يجب أن ينتهي بـ -21 — النظام يرفض أي وسام آخر (وسام -20 الأمريكي لا يحقق أي عمولة على amazon.eg).</p>
+    </div>
+    <div class="card"><h2>أكواد الإعلانات (AdSense)</h2>
+      <p class="hint">ألصق كود كل موضع؛ أوقف موضعاً بإفراغ خانته دون حذف الكود من أي مكان آخر. كل موضع بارتفاع ثابت في الموقع لحماية CLS.</p>
+      <div id="ads-form">—</div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-guides">
+    <div class="card"><h2>أدلة الشراء</h2>
+      <p class="hint">الأدلة المولَّدة آلياً تبقى <b>مسودات</b> حتى تراجعها أنت بنفسك وتكتب المراجعة البشرية — لا يُنشر دليل قبل ذلك (سياسة المحتوى الموسَّع في Google).</p>
+      <div id="guides-table">—</div>
+      <h3>إضافة / تعديل دليل</h3>
+      <div class="row">
+        <div><label for="gd-slug">الرابط المختصر (slug)</label><input type="text" id="gd-slug" dir="ltr"></div>
+        <div><label for="gd-title">العنوان</label><input type="text" id="gd-title"></div>
+      </div>
+      <label for="gd-criterion">المعيار</label><input type="text" id="gd-criterion">
+      <label for="gd-desc">الوصف</label><textarea id="gd-desc"></textarea>
+      <label for="gd-review">المراجعة البشرية (إلزامية قبل النشر)</label><textarea id="gd-review"></textarea>
+      <label for="gd-status">الحالة</label>
+      <select id="gd-status"><option value="draft">مسودة</option><option value="published">منشور</option></select>
+      <p><button class="btn-green" onclick="saveGuide()">حفظ الدليل</button></p>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-news">
+    <div class="card"><h2>الأخبار</h2>
+      <p class="hint">قسم /news/ منفصل عن صفحات المنتجات (صفحات المنتجات لا تدخل Google News أبداً). كل خبر يحتاج مراجعة بشرية وصورة 1200px على الأقل.</p>
+      <div id="news-table">—</div>
+      <h3>إضافة / تعديل خبر</h3>
+      <div class="row">
+        <div><label for="nw-slug">الرابط المختصر (slug)</label><input type="text" id="nw-slug" dir="ltr"></div>
+        <div><label for="nw-title">العنوان</label><input type="text" id="nw-title"></div>
+      </div>
+      <label for="nw-desc">الوصف</label><textarea id="nw-desc"></textarea>
+      <label for="nw-body">نص الخبر</label><textarea id="nw-body"></textarea>
+      <div class="row">
+        <div><label for="nw-model">موديل مرتبط (اختياري)</label><input type="text" id="nw-model" dir="ltr"></div>
+        <div><label for="nw-date">تاريخ النشر</label><input type="date" id="nw-date"></div>
+      </div>
+      <p><button class="btn-green" onclick="saveNews()">حفظ الخبر</button></p>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-logs">
+    <div class="card"><h2>سجل المزامنة</h2><div id="sync-log">—</div></div>
+    <div class="card"><h2>سجل الأسعار (آخر التغييرات)</h2><div id="price-log">—</div></div>
+    <div class="card"><h2>نقرات أزرار الشراء</h2><div id="clicks-stats">—</div></div>
+  </section>
+</div>
+</main>
+<div id="toast"></div>
+
+<script>
+function toast(msg){var t=document.getElementById("toast");t.textContent=msg;t.style.display="block";setTimeout(function(){t.style.display="none"},3000)}
+function showTab(ev,id){document.querySelectorAll(".tabs button").forEach(function(b){b.classList.remove("active")});ev.target.classList.add("active");document.querySelectorAll("section.tab").forEach(function(s){s.classList.remove("active")});document.getElementById(id).classList.add("active");
+  if(id==="tab-coupons")loadCoupons(); if(id==="tab-guides")loadGuides(); if(id==="tab-news")loadNews(); if(id==="tab-logs")loadLogs();}
+
+async function api(action, body){
+  if(APPS_SCRIPT_URL.indexOf("PASTE_YOUR")===0){throw new Error("ألصق رابط تطبيق Apps Script أولاً في أعلى الملف (APPS_SCRIPT_URL)")}
+  var url = APPS_SCRIPT_URL + "?action=" + encodeURIComponent(action) + "&token=" + encodeURIComponent(token);
+  var opts = {method: body ? "POST" : "GET", redirect: "follow"};
+  if(body){opts.headers = {"Content-Type":"text/plain;charset=utf-8"}; opts.body = JSON.stringify(body);}
+  var res = await fetch(url, opts);
+  var data = await res.json();
+  if(!data.ok) throw new Error(data.error || "خطأ غير معروف");
+  return data;
+}
+
+async function login(){
+  token = document.getElementById("token-input").value.trim();
+  if(!token){document.getElementById("login-msg").textContent="اكتب الرمز أولاً.";return;}
+  sessionStorage.setItem("admin_token", token);
+  try{
+    var s = await api("settings");
+    window.SETTINGS = {
+      amazon_associates_tag: s.settings.amazon_associates_tag || "amazon0c2aca6-21",
+      jumia_tracking_params: {
+        utm_source: "JFORCE", utm_medium: "JF_Affiliate", utm_campaign: "JF_Affiliate_EG",
+        adj_label: "casid*cf5c450e-259d-49d2-889e-95c558384bcd^type*jforce"
+      },
+      jumia_jforce_link: s.settings.jumia_jforce_link || "",
+      settings: s.settings
+    };
+    document.getElementById("login-card").style.display="none";
+    document.getElementById("admin").style.display="block";
+    renderSettingsForm(s.settings);
+    loadOverview(); loadProducts();
+    toast("تم تسجيل الدخول");
+  }catch(err){
+    document.getElementById("login-msg").innerHTML = '<span class="error">'+err.message+"</span>";
+  }
+}
+
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;")}
+
+/* ---------------- overview ---------------- */
+async function loadOverview(){
+  try{
+    var clicks = await api("clicks");
+    var reports = await api("reports");
+    var requests = await api("requests");
+    var top = Object.keys(clicks.byModel||{}).sort(function(a,b){return clicks.byModel[b]-clicks.byModel[a]}).slice(0,5);
+    document.getElementById("overview-stats").innerHTML =
+      "نقرات أزرار الشراء (كل الفترة): <b>"+clicks.total+"</b> — جوميا: <b>"+(clicks.byStore["جوميا"]||0)+
+      "</b> · أمازون: <b>"+(clicks.byStore["أمازون"]||0)+"</b> · نون: <b>"+(clicks.byStore["نون"]||0)+
+      "</b><br>أكثر المنتجات نقراً: " + (top.map(function(m){return esc(m)+" ("+clicks.byModel[m]+")"}).join("، ")||"—");
+    document.getElementById("reports-list").innerHTML = reports.rows.length ?
+      "<table><tr><th>التاريخ</th><th>الموديل</th><th>السعر الصحيح</th><th>ملاحظة</th></tr>"+reports.rows.slice(0,10).map(function(r){return "<tr><td>"+esc(r[0])+"</td><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td>"+esc(r[3])+"</td></tr>"}).join("")+"</table>" : "لا توجد بلاغات.";
+    document.getElementById("requests-list").innerHTML = requests.rows.length ?
+      "<table><tr><th>التاريخ</th><th>الموديل</th><th>الميزانية</th><th>البريد</th></tr>"+requests.rows.slice(0,10).map(function(r){return "<tr><td>"+esc(r[0])+"</td><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td>"+esc(r[3])+"</td></tr>"}).join("")+"</table>" : "لا توجد طلبات.";
+  }catch(err){document.getElementById("overview-stats").innerHTML='<span class="error">'+err.message+"</span>"}
+}
+async function syncNow(){try{var r=await api("syncNow",{});toast("تم تسجيل طلب المزامنة")}catch(err){toast(err.message)}}
+
+/* ---------------- products ---------------- */
+var HEADERS = [];
+async function loadProducts(){
+  try{
+    var q = document.getElementById("prod-search").value;
+    var brand = document.getElementById("prod-brand").value;
+    var d = await api("products&q="+encodeURIComponent(q)+"&brand="+encodeURIComponent(brand));
+    HEADERS = d.headers;
+    var brands = [...new Set(HEADERS ? [] : [])];
+    var sel = document.getElementById("prod-brand");
+    if(sel.options.length<=1){
+      var all = await api("products");
+      var bs = [...new Set(all.rows.map(function(r){return r[2]}))].filter(Boolean).sort();
+      bs.forEach(function(b){var o=document.createElement("option");o.value=b;o.textContent=b;sel.appendChild(o);
+        var o2=o.cloneNode(true);document.getElementById("bulk-brand").appendChild(o2);
+        var o3=o.cloneNode(true);document.getElementById("brands-list").appendChild(o3);});
+    }
+    document.getElementById("products-table").innerHTML =
+      "<p>النتائج: <b>"+d.total+"</b></p><table><tr><th>المنتج</th><th>العلامة</th><th>السعر</th><th>المتجر</th><th></th></tr>"+
+      d.rows.map(function(r){return "<tr><td>"+esc(r[0])+"</td><td>"+esc(r[2])+"</td><td>"+esc(r[7])+"</td><td>"+esc(r[5])+"</td><td><button class='btn-ghost' onclick='editProduct("+JSON.stringify(r[4])+')\'>تعديل</button></td></tr>'}).join("")+"</table>";
+  }catch(err){document.getElementById("products-table").innerHTML='<span class="error">'+err.message+"</span>"}
+}
+function hideProductForm(){document.getElementById("product-form-card").style.display="none"}
+function newProduct(){
+  document.getElementById("product-form").reset();
+  document.getElementById("product-form-title").textContent="إضافة منتج جديد";
+  document.getElementById("btn-delete-product").style.display="none";
+  document.getElementById("product-form-card").style.display="block";
+  window.scrollTo(0, document.getElementById("product-form-card").offsetTop);
+}
+async function editProduct(url){
+  var d = await api("products&q="+encodeURIComponent(url));
+  var r = d.rows.find(function(x){return x[4]===url});
+  if(!r){toast("المنتج غير موجود");return;}
+  newProduct();
+  document.getElementById("product-form-title").textContent="تعديل منتج";
+  document.getElementById("btn-delete-product").style.display="inline-block";
+  var v = function(i){return r[i]||""};
+  document.getElementById("product-name").value=v(0);
+  document.getElementById("product-name-ar").value=v(1);
+  document.getElementById("product-brand").value=v(2);
+  document.getElementById("product-model").value=v(3);
+  document.getElementById("product-url").value=v(4);
+  document.getElementById("product-seller").value=v(6);
+  document.getElementById("product-price").value=v(7);
+  document.getElementById("product-old-price").value=v(8);
+  document.getElementById("product-availability").value=v(10)==="غير متوفر"?"غير متوفر":"متوفر";
+  document.getElementById("product-storage").value=v(13);
+  document.getElementById("product-ram").value=v(14);
+  document.getElementById("product-image").value=v(30);
+  document.getElementById("product-mobizil").value=v(38);
+  document.getElementById("product-specs").value=v(39);
+  document.getElementById("product-pros").value=v(40);
+  document.getElementById("product-cons").value=v(41);
+  document.getElementById("jumia-url").value=v(46);
+  document.getElementById("product-form").dataset.editingUrl = url;
+}
+function productValues(){
+  var g = function(id){return document.getElementById(id).value.trim()};
+  var row = new Array(46).fill("");
+  row[0]=g("product-name"); row[1]=g("product-name-ar"); row[2]=g("product-brand"); row[3]=g("product-model");
+  row[4]=g("product-url"); row[5]="جوميا"; row[6]=g("product-seller"); row[7]=g("product-price");
+  row[8]=g("product-old-price"); row[10]=g("product-availability"); row[13]=g("product-storage");
+  row[14]=g("product-ram"); row[25]=new Date().toISOString().slice(0,10);
+  row[30]=g("product-image"); row[38]=g("product-mobizil"); row[39]=g("product-specs");
+  row[40]=g("product-pros"); row[41]=g("product-cons"); row[46]=g("jumia-url");
+  return row;
+}
+async function saveProduct(ev){
+  ev.preventDefault();
+  try{
+    var r = await api("saveProduct", {values: productValues()});
+    toast(r.updated ? "تم تحديث المنتج في الشيت" : "تمت إضافة المنتج إلى الشيت");
+    hideProductForm(); loadProducts();
+  }catch(err){toast(err.message)}
+  return false;
+}
+async function deleteProduct(){
+  var url = document.getElementById("product-form").dataset.editingUrl;
+  if(!url || !confirm("حذف هذا المنتج من الشيت نهائياً؟")) return;
+  try{await api("deleteProduct", {productUrl: url}); toast("تم الحذف"); hideProductForm(); loadProducts();}
+  catch(err){toast(err.message)}
+}
+async function bulkImport(){
+  var csv = document.getElementById("csv-input").value;
+  if(!csv.trim()){toast("ألصق أسطر CSV أولاً");return;}
+  try{var r=await api("bulkImport",{csv:csv}); toast("تم استيراد "+r.added+" منتجاً"); loadProducts();}
+  catch(err){toast(err.message)}
+}
+async function bulkEdit(){
+  try{var r=await api("bulkEdit",{brand:document.getElementById("bulk-brand").value, field:document.getElementById("bulk-field").value, value:document.getElementById("bulk-value").value});
+  toast("تم تعديل "+r.changed+" منتجاً"); loadProducts();}
+  catch(err){toast(err.message)}
+}
+
+/* ---------------- coupons ---------------- */
+async function loadCoupons(){
+  try{var d=await api("coupons");
+    document.getElementById("coupons-table").innerHTML = d.rows.length>1 ?
+      "<table><tr><th>العنوان</th><th>المتجر</th><th>الكود</th><th>القيمة</th><th>ينتهي</th><th>مفعّل</th><th></th></tr>"+
+      d.rows.slice(1).map(function(r){return "<tr><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td dir='ltr'>"+esc(r[3])+"</td><td>"+esc(r[4])+"</td><td>"+esc(r[6])+"</td><td>"+(r[7]?"نعم":"لا")+"</td><td><button class='btn-ghost' onclick='fillCoupon("+JSON.stringify(r)+")'>تعديل</button> <button class='btn-danger' onclick='deleteCoupon("+JSON.stringify(r[0])+")'>حذف</button></td></tr>"}).join("")+"</table>" : "لا توجد كوبونات.";
+  }catch(err){document.getElementById("coupons-table").innerHTML='<span class="error">'+err.message+"</span>"}
+}
+function fillCoupon(r){
+  document.getElementById("cp-id").value=r[0]; document.getElementById("cp-title").value=r[1];
+  document.getElementById("cp-store").value=r[2]; document.getElementById("cp-code").value=r[3];
+  document.getElementById("cp-value").value=r[4]; document.getElementById("cp-url").value=r[5];
+  document.getElementById("cp-expires").value=r[6]; document.getElementById("cp-active").value=r[7]?"true":"false";
+}
+async function saveCoupon(){
+  var c={id:document.getElementById("cp-id").value||("cp-"+Date.now()),
+    title:document.getElementById("cp-title").value, store:document.getElementById("cp-store").value,
+    code:document.getElementById("cp-code").value, value:document.getElementById("cp-value").value,
+    redirect_url:document.getElementById("cp-url").value, expires_at:document.getElementById("cp-expires").value,
+    active:document.getElementById("cp-active").value==="true"};
+  try{await api("saveCoupon",{coupon:c}); toast("تم حفظ الكوبون"); loadCoupons();}
+  catch(err){toast(err.message)}
+}
+async function deleteCoupon(id){
+  if(!confirm("حذف هذا الكوبون؟"))return;
+  try{await api("deleteCoupon",{id:id}); toast("تم الحذف"); loadCoupons();}
+  catch(err){toast(err.message)}
+}
+
+/* ---------------- settings ---------------- */
+var SETTING_FIELDS = [
+  ["site_name","اسم الموقع"],["site_domain","النطاق"],["contact_email","بريد التواصل"],
+  ["amazon_associates_tag","وسام أمازون (يجب أن ينتهي بـ -21)"],
+  ["jumia_jforce_link","رابط JForce الشخصي"],["jumia_homepage_url","رابط صفحة جوميا الرئيسية المُتتبَّعة"],
+  ["jumia_sub_id","Jumia Sub ID (اختياري)"],["noon_affiliate_tag","وسام نون"],
+  ["google_analytics_id","Google Analytics ID"],["search_console_verification","Search Console verification"],
+  ["bing_verification","Bing verification"],["onesignal_app_id","OneSignal App ID"],
+  ["telegram_bot","بوت تيليجرام"],["telegram_channel","قناة تيليجرام"]
+];
+function renderSettingsForm(settings){
+  var html = SETTING_FIELDS.map(function(f){
+    var val = settings[f[0]]||"";
+    return "<label for='set-"+f[0]+"'>"+f[1]+"</label><input type='text' id='set-"+f[0]+"' dir='ltr' value='"+esc(val)+"'>";
+  }).join("");
+  document.getElementById("settings-form").innerHTML = html +
+    "<label for='set-sheet_url'>رابط الشيت (مصدر البيانات)</label><input type='text' id='set-sheet_url' dir='ltr' value='https://docs.google.com/spreadsheets/d/"+SHEET_ID+"'>";
+  var ads = ["adsense_client","ads_top","ads_in_list","ads_in_product","ads_bottom"];
+  document.getElementById("ads-form").innerHTML = ads.map(function(k){
+    return "<label for='set-"+k+"'>"+k+"</label><textarea id='set-"+k+"' dir='ltr'>"+esc(settings[k]||"")+"</textarea>";
+  }).join("");
+}
+async function saveSettings(){
+  var values = {};
+  document.querySelectorAll("#settings-form input, #ads-form textarea").forEach(function(el){
+    values[el.id.replace("set-","")] = el.value;
+  });
+  var tag = values.amazon_associates_tag || "";
+  if(tag && tag.slice(-3) !== "-21"){toast("وسام أمازون يجب أن ينتهي بـ -21"); return;}
+  try{await api("saveSettings",{settings:values}); toast("تم حفظ الإعدادات");}
+  catch(err){toast(err.message)}
+}
+
+/* ---------------- guides / news ---------------- */
+async function loadGuides(){
+  try{var d=await api("guides");
+    document.getElementById("guides-table").innerHTML = d.rows.length>1 ?
+      "<table><tr><th>العنوان</th><th>المعيار</th><th>الحالة</th><th>مراجعة بشرية</th></tr>"+
+      d.rows.slice(1).map(function(r){return "<tr><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td><span class='badge "+(r[5]==="published"?"green":"amber")+"'>"+esc(r[5])+"</span></td><td>"+(r[4]?"نعم":"لا")+"</td></tr>"}).join("")+"</table>" : "لا توجد أدلة.";
+  }catch(err){document.getElementById("guides-table").innerHTML='<span class="error">'+err.message+"</span>"}
+}
+async function saveGuide(){
+  var g={slug:document.getElementById("gd-slug").value, title:document.getElementById("gd-title").value,
+    criterion:document.getElementById("gd-criterion").value, description:document.getElementById("gd-desc").value,
+    human_review:document.getElementById("gd-review").value, status:document.getElementById("gd-status").value,
+    author:"فريق عروض أونلاين", date:new Date().toISOString().slice(0,10)};
+  if(g.status==="published" && !g.human_review.trim()){toast("لا يمكن النشر قبل كتابة المراجعة البشرية");return;}
+  try{await api("saveGuide",{guide:g}); toast("تم حفظ الدليل"); loadGuides();}
+  catch(err){toast(err.message)}
+}
+async function loadNews(){
+  try{var d=await api("news");
+    document.getElementById("news-table").innerHTML = d.rows.length>1 ?
+      "<table><tr><th>العنوان</th><th>التاريخ</th><th>مثال؟</th></tr>"+
+      d.rows.slice(1).map(function(r){return "<tr><td>"+esc(r[1])+"</td><td>"+esc(r[6])+"</td><td>"+(r[7]?"نعم":"لا")+"</td></tr>"}).join("")+"</table>" : "لا توجد أخبار.";
+  }catch(err){document.getElementById("news-table").innerHTML='<span class="error">'+err.message+"</span>"}
+}
+async function saveNews(){
+  var n={slug:document.getElementById("nw-slug").value, title:document.getElementById("nw-title").value,
+    description:document.getElementById("nw-desc").value, body:document.getElementById("nw-body").value,
+    model_slug:document.getElementById("nw-model").value, author:"فريق عروض أونلاين",
+    date_published:document.getElementById("nw-date").value, is_example:false};
+  try{await api("saveNews",{news:n}); toast("تم حفظ الخبر"); loadNews();}
+  catch(err){toast(err.message)}
+}
+
+/* ---------------- logs ---------------- */
+async function loadLogs(){
+  try{
+    var sl=await api("syncLog");
+    document.getElementById("sync-log").innerHTML = sl.rows.length ?
+      "<table><tr><th>الوقت</th><th>الإجراء</th><th>التفاصيل</th></tr>"+sl.rows.map(function(r){return "<tr><td>"+esc(r[0])+"</td><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td></tr>"}).join("")+"</table>" : "لا توجد سجلات.";
+    var ph=await api("priceHistory");
+    document.getElementById("price-log").innerHTML = ph.rows.length ?
+      "<table><tr><th>التاريخ</th><th>المنتج</th><th>السعر القديم</th><th>السعر الجديد</th><th>الفرق</th></tr>"+ph.rows.slice(0,50).map(function(r){return "<tr><td>"+esc(r[0])+"</td><td>"+esc(r[1])+"</td><td>"+esc(r[8])+"</td><td>"+esc(r[9])+"</td><td>"+esc(r[10])+"</td></tr>"}).join("")+"</table>" : "لا توجد تغييرات أسعار مسجلة.";
+    var cl=await api("clicks");
+    document.getElementById("clicks-stats").innerHTML = "إجمالي النقرات: <b>"+cl.total+"</b><br>"+
+      Object.keys(cl.byStore||{}).map(function(s){return esc(s)+": "+cl.byStore[s]}).join(" · ");
+  }catch(err){document.getElementById("sync-log").innerHTML='<span class="error">'+err.message+"</span>"}
+}
+
+/* ===== templates/admin-search-buttons.html — JS (settings read at click time) =====
+   JS equivalent of build_amazon_search_url() / build_jumia_search_url()
+   in scripts/sync-helpers.py: Amazon tag from settings, Jumia JForce
+   params from settings. Opens the store's own search in a new tab. */
+function productName() {
+  var el = document.getElementById('product-name');
+  var name = el ? el.value.trim() : '';
+  if (!name) { alert('اكتب اسم المنتج أولاً في خانة الاسم.'); return ''; }
+  return name;
+}
+function amazonSearchUrl(name) {
+  var tag = (window.SETTINGS && window.SETTINGS.amazon_associates_tag) || '';
+  return 'https://www.amazon.eg/s?k=' + encodeURIComponent(name) +
+    '&tag=' + encodeURIComponent(tag);
+}
+function jumiaSearchUrl(name) {
+  var params = (window.SETTINGS && window.SETTINGS.jumia_tracking_params) || {};
+  var p = new URLSearchParams({ q: name });
+  Object.keys(params).forEach(function (k) { p.set(k, params[k]); });
+  return 'https://www.jumia.com.eg/ar/catalog/?' + p.toString();
+}
+document.getElementById('btn-search-amazon').addEventListener('click', function () {
+  var name = productName();
+  if (name) window.open(amazonSearchUrl(name), '_blank');
+});
+document.getElementById('btn-search-jumia').addEventListener('click', function () {
+  var name = productName();
+  if (name) window.open(jumiaSearchUrl(name), '_blank');
+});
+
+// Extract the ASIN automatically when an Amazon product URL is pasted.
+document.getElementById('amazon-url').addEventListener('input', function (e) {
+  var m = e.target.value.match(/\/(?:dp|gp\/product)\/([A-Z0-9]{10})/);
+  if (m) document.getElementById('amazon-asin').value = m[1];
+});
+
+if(token){document.getElementById("token-input").value=token;}
+</script>
+</body>
+</html>

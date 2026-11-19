@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بحث | عروض أونلاين</title>
+<meta name="description" content="ابحث عن أي هاتف في عروض أونلاين.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://3rode.online/search/">
+<link rel="alternate" hreflang="ar-eg" href="https://3rode.online/search/">
+<meta property="og:locale" content="ar_EG">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="عروض أونلاين">
+<meta property="og:title" content="بحث | عروض أونلاين">
+<meta property="og:description" content="ابحث عن أي هاتف في عروض أونلاين.">
+<meta property="og:url" content="https://3rode.online/search/">
+<link rel="icon" href="/assets/logo.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0b5ed7">
+<link rel="stylesheet" href="/assets/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+
+
+</head>
+<body>
+<header class="site-header"><div class="container wide">
+<a class="brand" href="/"><img src="/assets/logo.png" alt="عروض أونلاين 3rode.online" width="160" height="55"><span><span class="brand-name">عروض أونلاين</span><br><span class="brand-tag">عروضي لاقتناص العروض</span></span></a>
+<nav class="main-nav">
+<a href="/">الرئيسية</a><a href="/coupons/">الكوبونات</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/#brands">الماركات</a><a href="/about/">من نحن</a>
+</nav>
+<button id="theme-toggle" class="theme-toggle" type="button">🌙 الوضع الليلي</button>
+<button id="pwa-install" class="theme-toggle" type="button" style="display:none">📲 ثبّت التطبيق</button>
+</div></header>
+
+<main class="container wide">
+<h1>ابحث في عروض أونلاين</h1>
+<form class="search-box" onsubmit="return false">
+<input type="search" id="search-q" placeholder="ابحث عن هاتف أو ماركة…" aria-label="بحث">
+</form>
+<div id="search-results" style="margin-top:18px"></div>
+<script>
+(function () {
+  var q = new URLSearchParams(location.search).get('q') || '';
+  var input = document.getElementById('search-q');
+  var out = document.getElementById('search-results');
+  input.value = q;
+  fetch('/data/products.json').then(function (r) { return r.json(); }).then(function (all) {
+    function render() {
+      var term = input.value.trim().toLowerCase();
+      if (!term) { out.innerHTML = '<p>اكتب اسم هاتف أو ماركة للبحث.</p>'; return; }
+      var list = all.filter(function (p) {
+        return (p.name + ' ' + p.name_en + ' ' + p.brand + ' ' + p.model).toLowerCase().indexOf(term) !== -1;
+      }).slice(0, 20);
+      out.innerHTML = list.length
+        ? '<div class="grid">' + list.map(function (p) {
+            return '<article class="pcard"><div class="pcard-body"><h3><a href="/mobiles/' + p.slug + '/">' + p.name + '</a></h3>' +
+              '<div class="price-row"><span class="price">' + p.price.toLocaleString('en-US') + ' جنيه</span></div>' +
+              '<div class="brand-line">' + p.brand + ' • ' + p.storage + ' / ' + p.ram + '</div>' +
+              '<div class="actions"><a class="btn-mini" href="/mobiles/' + p.slug + '/">عرض السعر</a></div></div></article>';
+          }).join('') + '</div>'
+        : '<p>لا توجد نتائج مطابقة لـ "' + input.value + '". جرّب اسماً آخر، أو <a href="/contact/">اطلب الهاتف</a> وسنضيفه.</p>';
+    }
+    input.addEventListener('input', render);
+    render();
+  });
+})();
+</script>
+</main>
+<footer class="site-footer"><div class="container wide">
+<div class="cols">
+<div><h3>عروض أونلاين</h3><p>عروضي لاقتناص العروض<br>مقارنة أسعار الهواتف في مصر.</p>
+<p class="muted">آخر تحديث للأسعار من الشيت: 2026-11-19 — تُحدَّث كل ساعة.</p></div>
+<div><h3>روابط سريعة</h3><a href="/coupons/">الكوبونات</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/budget/">البحث بالميزانية</a><a href="/compare/">قارن بين الهواتف</a><a href="/about/">من نحن</a><a href="/contact/">اتصل بنا</a></div>
+<div><h3>سياسات الموقع</h3><a href="/privacy/">سياسة الخصوصية</a><a href="/terms/">شروط الاستخدام</a><a href="/affiliate-disclosure/">إفصاح التسويق بالعمولة</a><a href="/cookies/">سياسة ملفات تعريف الارتباط</a></div>
+<div><h3>تواصل معنا</h3><a href="mailto:da3m@3rode.online">da3m@3rode.online</a></div>
+</div>
+<div class="bottom">© 2026 عروض أونلاين 3rode.online — جميع الحقوق محفوظة. الأسعار استرشادية والسعر النهائي هو سعر المتجر وقت الشراء.</div>
+</div></footer>
+<div class="compare-bar" id="compare-bar"><span id="compare-list"></span><button class="btn" id="compare-go" type="button">عرض المقارنة</button><button class="clear" id="compare-clear" type="button">مسح</button></div>
+<div class="cookie-banner" id="cookie-banner"><div class="container wide">نستخدم ملفات تعريف الارتباط لتحسين تجربتك وعرض إعلانات مناسبة. <a href="/cookies/">اقرأ سياسة ملفات تعريف الارتباط</a>. <button class="btn" id="cookie-ok" type="button">موافق</button></div></div>
+<div class="toast" id="toast" role="status"></div>
+<script>window.SITE_CONFIG = {"adminApiUrl": "", "onesignalAppId": "", "contactEmail": "da3m@3rode.online"};</script>
+<script src="/assets/app.js" defer></script>
+</body>
+</html>

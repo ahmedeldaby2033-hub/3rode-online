@@ -1,0 +1,79 @@
+<!-- Admin product form — automatic store search buttons
+     Added 2026-11-19 at the user's request.
+     Two SEPARATE buttons in the add/edit product form, next to the store
+     link fields. Each opens the store's own search for the product name
+     (typed in the form) in a new tab, WITH the affiliate tracking
+     (Amazon tag / Jumia JForce params) already applied:
+       - "بحث تلقائي في أمازون" -> amazon.eg search, tag from settings
+       - "بحث تلقائي في جوميا"  -> jumia.com.eg Arabic catalog search,
+         JForce tracking params
+     The admin then finds the right product, copies its link (and the
+     ASIN for Amazon — the form extracts it automatically from a pasted
+     Amazon URL), and pastes it into the form. No scraping, no login
+     needed: the search happens in the admin's own browser, on the
+     store's own site.
+     Requires in the admin page: settings.amazon_associates_tag,
+     settings.jumia_tracking_params (from settings.json), and the
+     product-name input #product-name.
+-->
+<div class="store-search">
+  <button type="button" class="btn-search btn-amazon" id="btn-search-amazon">
+    🔍 بحث تلقائي في أمازون
+  </button>
+  <button type="button" class="btn-search btn-jumia" id="btn-search-jumia">
+    🔍 بحث تلقائي في جوميا
+  </button>
+  <p class="hint">ابحث باسم المنتج في المتجر، ثم انسخ رابط المنتج الصحيح
+    والصقه في الخانة المناسبة بالأسفل. لروابط أمازون يُستخرج ASIN تلقائياً.</p>
+</div>
+
+<div class="form-row">
+  <label for="amazon-url">رابط أمازون (أو الصق رابط منتج أمازون لاستخراج ASIN)</label>
+  <input type="text" id="amazon-url" name="amazon_url" dir="ltr"
+         placeholder="https://www.amazon.eg/dp/B0.../?tag=amazon0c2aca6-21">
+  <label for="amazon-asin">ASIN أمازون</label>
+  <input type="text" id="amazon-asin" name="amazon_asin" dir="ltr"
+         placeholder="مثال: B0CX123456" maxlength="10">
+</div>
+
+<div class="form-row">
+  <label for="jumia-url">رابط جوميا (رابط التتبع الكامل من JForce)</label>
+  <input type="text" id="jumia-url" name="jumia_url" dir="ltr"
+         placeholder="https://www.jumia.com.eg/ar/...">
+</div>
+
+<script>
+// Filled from settings.json by the admin page:
+var AMAZON_TAG = window.SETTINGS && window.SETTINGS.amazon_associates_tag || '';
+var JUMIA_PARAMS = (window.SETTINGS && window.SETTINGS.jumia_tracking_params) || {};
+
+function productName() {
+  var el = document.getElementById('product-name');
+  var name = el ? el.value.trim() : '';
+  if (!name) { alert('اكتب اسم المنتج أولاً في خانة الاسم.'); return ''; }
+  return name;
+}
+function amazonSearchUrl(name) {
+  return 'https://www.amazon.eg/s?k=' + encodeURIComponent(name) +
+    '&tag=' + encodeURIComponent(AMAZON_TAG);
+}
+function jumiaSearchUrl(name) {
+  var p = new URLSearchParams({ q: name });
+  Object.keys(JUMIA_PARAMS).forEach(function (k) { p.set(k, JUMIA_PARAMS[k]); });
+  return 'https://www.jumia.com.eg/ar/catalog/?' + p.toString();
+}
+document.getElementById('btn-search-amazon').addEventListener('click', function () {
+  var name = productName();
+  if (name) window.open(amazonSearchUrl(name), '_blank');
+});
+document.getElementById('btn-search-jumia').addEventListener('click', function () {
+  var name = productName();
+  if (name) window.open(jumiaSearchUrl(name), '_blank');
+});
+
+// Extract the ASIN automatically when an Amazon product URL is pasted.
+document.getElementById('amazon-url').addEventListener('input', function (e) {
+  var m = e.target.value.match(/\/(?:dp|gp\/product)\/([A-Z0-9]{10})/);
+  if (m) document.getElementById('amazon-asin').value = m[1];
+});
+</script>

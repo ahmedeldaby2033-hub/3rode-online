@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>قارن بين الهواتف | عروض أونلاين</title>
+<meta name="description" content="قارن بين هاتفين أو ثلاثة: السعر والمواصفات والبطارية والكاميرا.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://3rode.online/compare/">
+<link rel="alternate" hreflang="ar-eg" href="https://3rode.online/compare/">
+<meta property="og:locale" content="ar_EG">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="عروض أونلاين">
+<meta property="og:title" content="قارن بين الهواتف | عروض أونلاين">
+<meta property="og:description" content="قارن بين هاتفين أو ثلاثة: السعر والمواصفات والبطارية والكاميرا.">
+<meta property="og:url" content="https://3rode.online/compare/">
+<link rel="icon" href="/assets/logo.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0b5ed7">
+<link rel="stylesheet" href="/assets/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+
+
+</head>
+<body>
+<header class="site-header"><div class="container wide">
+<a class="brand" href="/"><img src="/assets/logo.png" alt="عروض أونلاين 3rode.online" width="160" height="55"><span><span class="brand-name">عروض أونلاين</span><br><span class="brand-tag">عروضي لاقتناص العروض</span></span></a>
+<nav class="main-nav">
+<a href="/">الرئيسية</a><a href="/coupons/">الكوبونات</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/#brands">الماركات</a><a href="/about/">من نحن</a>
+</nav>
+<button id="theme-toggle" class="theme-toggle" type="button">🌙 الوضع الليلي</button>
+<button id="pwa-install" class="theme-toggle" type="button" style="display:none">📲 ثبّت التطبيق</button>
+</div></header>
+
+<main class="container wide">
+<h1>قارن بين الهواتف</h1>
+<p>اختر هاتفين أو ثلاثة من أي صفحة منتج أو بطاقة (زر "قارن")، وستظهر المقارنة هنا جنباً إلى جنب.</p>
+<div id="compare-root"><p>جارٍ تحميل المقارنة…</p></div>
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var slugs = (params.get('m') || '').split(',').filter(Boolean).slice(0, 3);
+  var root = document.getElementById('compare-root');
+  if (!slugs.length) { root.innerHTML = '<p>لم تختر هواتف للمقارنة بعد. تصفح <a href="/#models">كل الهواتف</a> واضغط "قارن" على الهواتف التي تريد مقارنتها.</p>'; return; }
+  fetch('/data/products.json').then(function (r) { return r.json(); }).then(function (all) {
+    var items = slugs.map(function (s) { return all.find(function (p) { return p.slug === s; }); }).filter(Boolean);
+    if (!items.length) { root.innerHTML = '<p>لم نعثر على الهواتف المطلوبة.</p>'; return; }
+    var rows = [['السعر', function (p) { return p.price.toLocaleString('en-US') + ' جنيه'; }],
+      ['الماركة', function (p) { return p.brand; }],
+      ['التخزين / الرام', function (p) { return p.storage + ' / ' + p.ram; }],
+      ['الشاشة', function (p) { return p.screen || '—'; }],
+      ['المعالج', function (p) { return p.processor || '—'; }],
+      ['البطارية', function (p) { return p.battery || '—'; }],
+      ['الكاميرا الخلفية', function (p) { return p.rear_camera || '—'; }],
+      ['يدعم 5G', function (p) { return p.g5 ? 'نعم' : 'لا'; }],
+      ['التقييم', function (p) { return p.rating ? ('★ ' + p.rating + ' (' + p.rating_count + ')') : '—'; }]];
+    var h = '<div style="overflow-x:auto"><table class="offers"><thead><tr><th>المواصفة</th>' +
+      items.map(function (p) { return '<th><a href="/mobiles/' + p.slug + '/">' + p.name + '</a></th>'; }).join('') + '</tr></thead><tbody>';
+    rows.forEach(function (row) {
+      h += '<tr><td><strong>' + row[0] + '</strong></td>' +
+        items.map(function (p) { return '<td>' + row[1](p) + '</td>'; }).join('') + '</tr>';
+    });
+    h += '</tbody></table></div><p>' + items.map(function (p) {
+      return '<a class="btn" href="/mobiles/' + p.slug + '/" style="margin:4px">عرض ' + p.name + '</a>';
+    }).join('') + '</p>';
+    root.innerHTML = h;
+  });
+})();
+</script>
+</main>
+<footer class="site-footer"><div class="container wide">
+<div class="cols">
+<div><h3>عروض أونلاين</h3><p>عروضي لاقتناص العروض<br>مقارنة أسعار الهواتف في مصر.</p>
+<p class="muted">آخر تحديث للأسعار من الشيت: 2026-11-19 — تُحدَّث كل ساعة.</p></div>
+<div><h3>روابط سريعة</h3><a href="/coupons/">الكوبونات</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/budget/">البحث بالميزانية</a><a href="/compare/">قارن بين الهواتف</a><a href="/about/">من نحن</a><a href="/contact/">اتصل بنا</a></div>
+<div><h3>سياسات الموقع</h3><a href="/privacy/">سياسة الخصوصية</a><a href="/terms/">شروط الاستخدام</a><a href="/affiliate-disclosure/">إفصاح التسويق بالعمولة</a><a href="/cookies/">سياسة ملفات تعريف الارتباط</a></div>
+<div><h3>تواصل معنا</h3><a href="mailto:da3m@3rode.online">da3m@3rode.online</a></div>
+</div>
+<div class="bottom">© 2026 عروض أونلاين 3rode.online — جميع الحقوق محفوظة. الأسعار استرشادية والسعر النهائي هو سعر المتجر وقت الشراء.</div>
+</div></footer>
+<div class="compare-bar" id="compare-bar"><span id="compare-list"></span><button class="btn" id="compare-go" type="button">عرض المقارنة</button><button class="clear" id="compare-clear" type="button">مسح</button></div>
+<div class="cookie-banner" id="cookie-banner"><div class="container wide">نستخدم ملفات تعريف الارتباط لتحسين تجربتك وعرض إعلانات مناسبة. <a href="/cookies/">اقرأ سياسة ملفات تعريف الارتباط</a>. <button class="btn" id="cookie-ok" type="button">موافق</button></div></div>
+<div class="toast" id="toast" role="status"></div>
+<script>window.SITE_CONFIG = {"adminApiUrl": "", "onesignalAppId": "", "contactEmail": "da3m@3rode.online"};</script>
+<script src="/assets/app.js" defer></script>
+</body>
+</html>

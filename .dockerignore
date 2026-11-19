@@ -1,0 +1,7 @@
+.git
+data/raw/
+previews/
+__pycache__/
+*.pyc
+*.log
+data/sync-cron.log

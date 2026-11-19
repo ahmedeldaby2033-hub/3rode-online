@@ -1,0 +1,14 @@
+{
+ "started_at": "2026-11-19T10:36:21.507309+00:00",
+ "steps": [
+  "refresh-sheet: refreshed",
+  "diff-prices: 0 price change(s) — history rows only for these",
+  "download-images: 0 new, 0 failed",
+  "build: site rebuilt OK"
+ ],
+ "price_changes": [],
+ "image_downloads": [],
+ "image_failures": [],
+ "errors": [],
+ "finished_at": "2026-11-19T10:36:24.184015+00:00"
+}
