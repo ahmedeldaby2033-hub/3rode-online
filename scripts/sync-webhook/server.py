@@ -39,6 +39,8 @@ REPO_URL = os.environ.get(
 REPO_BRANCH = os.environ.get("REPO_BRANCH", "main")
 SYNC_TOKEN = os.environ.get("SYNC_TOKEN", "")
 DEPLOY_KEY = os.environ.get("DEPLOY_KEY", "")
+DEPLOY_KEY_FILE = os.environ.get("DEPLOY_KEY_FILE",
+                                 "/run/secrets/deploy-key")
 DEPLOY_WEBHOOK = os.environ.get("COOLIFY_DEPLOY_WEBHOOK", "")
 
 TAB_FILES = {
@@ -67,9 +69,17 @@ def run(cmd, cwd=None, env=None, timeout=600):
 def git_env():
     env = dict(os.environ)
     key_path = "/tmp/sync-deploy-key"
-    if DEPLOY_KEY:
+    # Prefer a key file mounted from the host (exact bytes, no copy/paste);
+    # fall back to the DEPLOY_KEY env var.
+    key_data = None
+    if os.path.isfile(DEPLOY_KEY_FILE):
+        with open(DEPLOY_KEY_FILE, encoding="utf-8") as f:
+            key_data = f.read()
+    elif DEPLOY_KEY:
+        key_data = DEPLOY_KEY
+    if key_data:
         with open(key_path, "w", encoding="utf-8") as f:
-            f.write(DEPLOY_KEY if DEPLOY_KEY.endswith("\n") else DEPLOY_KEY + "\n")
+            f.write(key_data if key_data.endswith("\n") else key_data + "\n")
         os.chmod(key_path, 0o600)
         env["GIT_SSH_COMMAND"] = (
             f"ssh -i {key_path} -o StrictHostKeyChecking=accept-new "
