@@ -1028,5 +1028,67 @@
   "local": true,
   "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2020/10/Apple-iPhone-12.jpg",
   "note": "downloaded + watermarked A"
+ },
+ "nokia-130-4mb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "micromax-x701": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "nokia-108-32mb-16mb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "itel-it5032": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "nokia-125": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "honor-t10-64gb-4gb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "apple-iphone-12-pro-128gb-6gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2020/10/Apple-iPhone-12-Pro.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "apple-iphone-13-pro-max-128gb-6gb": {
+  "local": false,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2021/09/iPhone-13-Pro-Max-1.jpg",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "apple-iphone-15-pro-max-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2023/09/iPhone-15-Pro-Max-2.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "apple-iphone-18-pro-max-256gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/09/iphone18promax.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "apple-iphone-18-pro-max-512gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/09/iphone18promax.jpg",
+  "note": "downloaded + watermarked A"
  }
 }
