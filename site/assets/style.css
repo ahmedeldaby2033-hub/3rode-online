@@ -55,7 +55,7 @@ a:hover { text-decoration: underline; }
 }
 .brand { display: flex; align-items: center; gap: 12px; color: #fff; }
 .brand:hover { text-decoration: none; }
-.brand img { height: 46px; width: auto; display: block; }
+.brand img { height: 56px; width: auto; display: block; }
 .brand-name { font-size: 1.35rem; font-weight: 800; line-height: 1.2; }
 .main-nav { margin-inline-start: auto; display: flex; gap: 4px; flex-wrap: wrap; }
 .main-nav a {
@@ -417,7 +417,7 @@ html[data-theme="dark"] .install-result { color: #fff; }
 @media (max-width: 640px) {
   .site-header { padding: 8px 0; }
   .site-header .container { flex-wrap: nowrap; gap: 10px; }
-  .brand img { height: 34px; }
+  .brand img { height: 42px; }
   .brand-name { display: none; }
   .nav-toggle { display: inline-block; margin-inline-start: auto; }
   .main-nav {
@@ -500,18 +500,57 @@ body.theme-gold .section-head h2, body.theme-gold .card h2, body.theme-gold .car
 body.theme-gold .price { color: #ffd97a; }
 
 /* ================== احترافية الألوان والأيقونات (2026-11-19) ================== */
-/* --- أيقونات عناوين الأقسام: صغيرة وبسيطة بلون أزرق واحد، بلا خلفية ملوّنة --- */
+/* --- أيقونات عناوين الأقسام: صغيرة جداً، ألوان مميزة، تأثير عند التحويم --- */
 .ic { display: inline-block; width: 1.15em; height: 1.15em; vertical-align: -0.18em; flex: none; }
 .ic svg { display: block; width: 100%; height: 100%; }
 .sec-icon {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 24px; height: 24px; margin-inline-end: 0;
-  background: none; box-shadow: none;
-  color: var(--blue);
+  width: 20px; height: 20px; border-radius: 6px; margin-inline-end: 0;
+  background: #e8f0fe; color: #0b5ed7;
   vertical-align: 0;
+  transition: transform .18s ease, background .18s ease;
 }
-.sec-icon .ic { width: 20px; height: 20px; vertical-align: 0; }
+.sec-icon svg { width: 14px; height: 14px; }
+.sec-icon:hover { transform: scale(1.18); }
+.sec-icon.warm { background: #fff3e0; color: #e65100; }
+.sec-icon.green { background: #e8f5e9; color: #2e7d32; }
+.sec-icon.rose { background: #fce4ec; color: #c62828; }
+html[data-theme="dark"] .sec-icon { background: #1b3049; color: #7db4ff; }
+html[data-theme="dark"] .sec-icon.warm { background: #3a2a12; color: #ffb74d; }
+html[data-theme="dark"] .sec-icon.green { background: #122b1d; color: #81c784; }
+html[data-theme="dark"] .sec-icon.rose { background: #33121d; color: #f48fb1; }
 .section-head h2 { display: flex; align-items: center; gap: 8px; }
+/* --- عناوين مميزة: خلفية مظللة خفيفة مع شريط لوني جانبي (فاتح وداكن) --- */
+.section-head h2 {
+  background: #eef4fc; border-inline-start: 4px solid var(--blue);
+  border-radius: 10px; padding: 7px 14px;
+}
+html[data-theme="dark"] .section-head h2 { background: #1b3049; border-inline-start-color: #7db4ff; }
+.card h2 {
+  background: #eef4fc; border-inline-start: 4px solid var(--orange);
+  border-radius: 10px; padding: 9px 14px; border-bottom: 0;
+}
+html[data-theme="dark"] .card h2 { background: #1b3049; }
+/* --- زر «اشترِ» في جداول العروض: زر احترافي متدرج --- */
+.buy-mini {
+  display: inline-block; text-align: center; white-space: nowrap;
+  background: linear-gradient(180deg, #fb923c, #ea580c);
+  color: #fff !important; font-weight: 800; font-size: .88rem;
+  padding: 8px 16px; border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(234, 88, 12, .4);
+  transition: filter .15s ease, transform .15s ease;
+}
+.buy-mini:hover { text-decoration: none; filter: brightness(1.1); transform: translateY(-1px); }
+/* --- بنر طلب الخصم بجانب البحث --- */
+.request-banner {
+  display: block; text-align: center; margin-top: 16px;
+  background: rgba(255, 255, 255, .16); border: 1px solid rgba(255, 255, 255, .35);
+  color: #fff; font-weight: 700; font-size: .98rem;
+  padding: 11px 16px; border-radius: 12px;
+  transition: background .18s ease, transform .18s ease;
+}
+.request-banner:hover { background: rgba(255, 255, 255, .26); text-decoration: none; transform: translateY(-1px); }
+.request-banner strong { color: #ffe08a; }
 /* --- أزرار الماركات: لمسة احترافية (لون فقط، دون تغيير السلوك) --- */
 .chip { transition: border-color .15s ease, background .15s ease, transform .15s ease, box-shadow .15s ease; }
 .chip:hover { border-color: var(--blue); box-shadow: 0 2px 10px rgba(11, 94, 215, .18); transform: translateY(-1px); }
@@ -526,3 +565,65 @@ html[data-theme="dark"] .best-badge { color: #fbbf24; }
 /* --- لوحة ألوان داكنة أعمق وأكثر اتساقاً --- */
 html[data-theme="dark"] { --bg: #0b1420; --card: #121e2e; --border: #22364d; --muted: #a6b7cb; }
 html[data-theme="dark"] .pcard img, html[data-theme="dark"] .product-img { background: #fff; }
+
+/* ================== صفحة الماركات + المتاجر + الأدلة والأخبار (2026-11-19) ================== */
+/* --- وسوم (tag chips) قابلة للنقر --- */
+.tag-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.tag-chip {
+  display: inline-block; padding: 5px 13px; border-radius: 999px;
+  background: #eef4fc; color: var(--blue); font-size: .85rem; font-weight: 700;
+  border: 1px solid var(--border);
+}
+.tag-chip:hover { background: var(--blue); color: #fff; text-decoration: none; }
+html[data-theme="dark"] .tag-chip { background: #1b3049; color: #7db4ff; }
+/* --- صورة رأس المقال (دليل / خبر) --- */
+.article-hero { margin: 0 -18px 20px; }
+.article-hero img { width: 100%; max-height: 380px; object-fit: cover; display: block; }
+.article-hero-fallback {
+  background: linear-gradient(135deg, var(--blue) 0%, #0a7cff 55%, var(--orange) 130%);
+  color: #fff; padding: 40px 20px; text-align: center;
+}
+.article-hero-fallback strong { color: #fff; font-size: 1.2rem; }
+/* --- بطاقات المقالات (قوائم الأدلة والأخبار) --- */
+.article-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin: 18px 0; }
+.article-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column;
+}
+.article-card img { width: 100%; height: 180px; object-fit: cover; display: block; }
+.article-card-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.article-card h3 { margin: 0; font-size: 1.1rem; line-height: 1.5; }
+.article-card h3 a { color: var(--text); }
+.article-card .excerpt { color: var(--muted); font-size: .92rem; margin: 0; }
+.article-card .meta { color: var(--muted); font-size: .85rem; margin: 0; }
+/* --- شبكة الماركات (صفحة /brands/) --- */
+.brand-logo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; margin: 18px 0; }
+.brand-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 18px 10px 14px; text-align: center; display: flex; flex-direction: column;
+  align-items: center; gap: 8px; box-shadow: var(--shadow);
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.brand-card:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--blue); box-shadow: 0 4px 16px rgba(11, 94, 215, .18); }
+.brand-logo {
+  height: 64px; width: 100%; max-width: 150px; display: flex; align-items: center;
+  justify-content: center; background: #fff; border-radius: 10px; padding: 8px;
+}
+.brand-logo img { max-height: 48px; max-width: 130px; object-fit: contain; }
+.brand-logo-fallback {
+  font-weight: 800; font-size: 1.6rem; color: var(--blue);
+  background: #e8f0fe; border-radius: 50%; width: 56px; height: 56px;
+  display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1;
+}
+html[data-theme="dark"] .brand-logo-fallback { background: #1b3049; color: #7db4ff; }
+.brand-card-name { font-weight: 800; color: var(--text); }
+.brand-card-count { color: var(--muted); font-size: .85rem; }
+/* --- شبكة المتاجر (أعلى صفحة /brands/) --- */
+.store-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin: 18px 0; }
+.store-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 18px 12px 14px; text-align: center; display: flex; flex-direction: column;
+  align-items: center; gap: 8px; box-shadow: var(--shadow);
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.store-card:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--orange); box-shadow: 0 4px 16px rgba(255, 138, 0, .20); }
