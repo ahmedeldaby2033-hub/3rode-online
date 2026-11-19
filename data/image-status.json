@@ -971,5 +971,62 @@
   "local": true,
   "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/09/Honor-Choice-T10.jpg",
   "note": "downloaded + watermarked A"
+ },
+ "sunelan-s8-32mb-32mb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "itel-neo-r60-128mb-64mb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "zte-nubia-a36-64gb-6gb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "vivo-y05e-64gb-4gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/10/Vivo-Y05e.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "tecno-spark-40-pro-256gb-8gb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "tecno-camon-40-256gb-8gb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "motorola-moto-g56-5g-256gb-12gb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "samsung-galaxy-a27-128gb-6gb": {
+  "local": true,
+  "working_url": "https://mobizil.com/wp-content/uploads/2026/06/Samsung-Galaxy-A27.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "tecno-camon-40-pro-5g-256gb-12gb": {
+  "local": false,
+  "working_url": "",
+  "tried_at": "2026-11-19",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+ },
+ "apple-iphone-12-128gb-4gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2020/10/Apple-iPhone-12.jpg",
+  "note": "downloaded + watermarked A"
  }
 }
