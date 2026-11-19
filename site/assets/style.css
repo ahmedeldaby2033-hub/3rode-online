@@ -127,7 +127,7 @@ table.data th { background: #eef4fc; color: var(--blue-dark); }
 
 /* ---------- forms ---------- */
 label { display: block; font-weight: 700; margin: 14px 0 6px; }
-input[type="text"], input[type="email"], textarea, select {
+input[type="text"], input[type="email"], input[type="number"], input[type="tel"], textarea, select {
   width: 100%;
   padding: 11px 13px;
   border: 1px solid var(--border);
@@ -184,8 +184,6 @@ html[data-theme="dark"] .btn-buy { filter: brightness(1.05); }
   font-family: inherit; font-size: 1.05rem;
 }
 .search-box .btn { margin-top: 0; }
-.hero-stats { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 18px; font-size: .95rem; }
-.hero-stats b { font-size: 1.15rem; }
 
 .toolbar {
   display: flex; gap: 6px; flex-wrap: nowrap; align-items: center;
@@ -237,14 +235,17 @@ html[data-theme="dark"] .price { color: #fff; }
 .rating { color: #b45309; font-weight: 700; font-size: .9rem; }
 .pcard .actions { display: flex; gap: 8px; margin-top: auto; padding-top: 8px; }
 .btn-mini {
-  flex: 1; text-align: center; padding: 9px 6px; border-radius: 9px; font-weight: 800;
-  font-size: .9rem; border: 1px solid var(--border); background: var(--bg); color: var(--text);
-  cursor: pointer;
+  flex: 1; text-align: center; padding: 10px 6px; border-radius: 10px; font-weight: 800;
+  font-size: .9rem; border: 1px solid transparent; color: #fff; cursor: pointer;
+  transition: filter .15s ease, transform .15s ease;
 }
-.btn-mini:hover { text-decoration: none; border-color: var(--blue); }
-.btn-mini.fav-on { background: #fde68a; border-color: var(--orange); }
-.icon-btn { background: none; border: 0; cursor: pointer; font-size: 1.05rem; color: var(--muted); }
-.icon-btn.fav-on { color: var(--orange); }
+.btn-mini:hover { text-decoration: none; filter: brightness(1.08); }
+.btn-mini:active { transform: scale(.97); }
+.btn-prices { background: linear-gradient(180deg, #fb923c, #ea580c); box-shadow: 0 2px 8px rgba(234, 88, 12, .35); }
+.btn-compare { background: linear-gradient(180deg, #3b82f6, #1d4ed8); box-shadow: 0 2px 8px rgba(29, 78, 216, .30); }
+.btn-fav { background: var(--card); color: #e11d48; border-color: #fda4af; }
+.btn-fav:hover { border-color: #e11d48; }
+.btn-fav.fav-on { background: #e11d48; border-color: #e11d48; color: #fff; }
 
 .section-head { display: flex; align-items: baseline; gap: 12px; margin: 30px 0 4px; flex-wrap: wrap; }
 .section-head h2 { margin: 0; font-size: 1.35rem; color: var(--blue-dark); }

@@ -162,7 +162,7 @@
       return '<article class="pcard"><div class="pcard-body"><h3><a href="/mobiles/' + p.slug + '/">' + p.name + '</a></h3>' +
         '<div class="price-row"><span class="price">' + p.price.toLocaleString('en-US') + ' جنيه</span></div>' +
         '<div class="brand-line">' + p.brand + ' • ' + p.storage + ' / ' + p.ram + '</div>' +
-        '<div class="actions"><a class="btn-mini" href="/mobiles/' + p.slug + '/">عرض السعر والمقارنة</a></div></div></article>';
+        '<div class="actions"><a class="btn-mini btn-prices" href="/mobiles/' + p.slug + '/">عرض السعر والمقارنة</a></div></div></article>';
     }).join('') + '</div>';
   });
 
@@ -234,8 +234,8 @@
     postToAdmin('requestProduct', {
       model: $('#request-model').value || '',
       budget: $('#request-budget').value || '',
-      email: $('#request-email').value || ''
-    }, 'شكراً! سجلنا طلبك وسنضيف الهاتف عند توفره.');
+      whatsapp: $('#request-whatsapp').value || ''
+    }, 'شكراً! سجلنا طلبك وسنضيف المنتج عند توفره.');
     reqForm.reset();
   });
 

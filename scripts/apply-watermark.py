@@ -8,7 +8,8 @@ grey checkerboard and was only usable after background removal
 (see assets/logo-transparent.png, the cleaned version of the first file).
 
 Three watermark styles are produced from the same logo:
-  A) full logo, bottom corner (default)
+  A) full logo on a clean white rounded badge, centred at the bottom
+     (default — the whole logo is shown, nothing cropped)
   B) "3rde.online" text only, centred in a dark strip at the bottom
   C) cart icon only, bottom corner
 
@@ -17,6 +18,11 @@ product image: download -> watermark -> save to hosting -> keep the
 original unwatermarked copy as backup. If a download fails, the site
 shows the original URL without a watermark and logs it.
 
+Note (2026-11-19): the old style-B crop (x 0.32-1.0, y 0.60-1.0) cut
+the logo — the domain text actually spans x 0.069-0.977, y 0.549-0.959
+(measured from the logo's alpha channel), so the "3" was sliced off.
+Style B's crop bounds are fixed below, and the default is now A.
+
 Usage:
   python3 apply-watermark.py --demo     # rebuild demo images
   python3 apply-watermark.py in.jpg out.jpg --style A
@@ -24,7 +30,7 @@ Usage:
 import argparse
 import pathlib
 
-from PIL import Image, ImageDraw, ImageOps
+from PIL import Image, ImageDraw, ImageFilter, ImageOps
 
 BASE = pathlib.Path(__file__).resolve().parent.parent
 ASSETS = BASE / "assets"
@@ -32,13 +38,13 @@ SAMPLES = BASE / "watermark-samples"
 
 # ---------------------------------------------------------------- config
 # Width of the watermark as a fraction of the product-image width.
-FULL_WIDTH_FRAC = 0.25     # style A: full logo
+FULL_WIDTH_FRAC = 0.62     # style A: full logo on a white badge
 TEXT_WIDTH_FRAC = 0.62     # style B: "3rde.online" text in the strip
 ICON_WIDTH_FRAC = 0.15     # style C: cart icon
 OPACITY = 0.92             # watermark opacity (1.0 = fully opaque)
 PADDING_FRAC = 0.04        # padding from the image edge, as fraction of width
 POSITION = "bottom-right"  # or "bottom-left" — change in settings later
-DEFAULT_STYLE = "B"        # chosen by the user 2026-11-19: text strip
+DEFAULT_STYLE = "A"        # changed 2026-11-19: full logo, nothing cropped
 
 
 def load_logo() -> Image.Image:
@@ -67,8 +73,11 @@ def build_assets() -> dict:
     full.save(ASSETS / "watermark-full.png")
 
     # "3rde.online" text lives in the lower band of the logo.
+    # Measured bbox of the band (alpha channel): x 0.069-0.977,
+    # y 0.549-0.959 — the old (0.32, 0.60) crop sliced the "3" off.
     w, h = logo.size
-    text = trim(logo.crop((int(w * 0.32), int(h * 0.60), w, h)))
+    text = trim(logo.crop((int(w * 0.05), int(h * 0.53),
+                            int(w * 0.99), int(h * 0.97))))
     text.save(ASSETS / "watermark-text.png")
 
     # Cart (with % tag) lives in the left part of the logo.
@@ -96,11 +105,30 @@ def apply_to_product(product: Image.Image, style: str = "A") -> Image.Image:
     assets = build_assets()
 
     if style == "A":
+        # Full logo, complete, on a clean white rounded badge centred
+        # at the bottom — readable on light and dark photos alike.
         wm = with_opacity(Image.open(assets["A"]).convert("RGBA"), OPACITY)
         wm = _scaled(wm, int(w * FULL_WIDTH_FRAC))
-        x = w - wm.width - pad if POSITION == "bottom-right" else pad
-        y = h - wm.height - pad
-        base.paste(wm, (x, y), wm)
+        pad2 = max(6, int(wm.height * 0.22))
+        badge_w, badge_h = wm.width + 2 * pad2, wm.height + 2 * pad2
+        badge = Image.new("RGBA", (badge_w, badge_h), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(badge)
+        draw.rounded_rectangle([0, 0, badge_w - 1, badge_h - 1],
+                               radius=badge_h // 4,
+                               fill=(255, 255, 255, 238))
+        badge.paste(wm, (pad2, pad2), wm)
+        shadow = Image.new("RGBA", base.size, (0, 0, 0, 0))
+        sh = Image.new("RGBA", (badge_w, badge_h), (0, 0, 0, 0))
+        ImageDraw.Draw(sh).rounded_rectangle(
+            [0, 0, badge_w - 1, badge_h - 1], radius=badge_h // 4,
+            fill=(0, 0, 0, 90))
+        sh = sh.filter(ImageFilter.GaussianBlur(6))
+        bx = (w - badge_w) // 2
+        by = h - badge_h - pad
+        shadow.paste(sh, (bx, by + 3), sh)
+        base = Image.alpha_composite(base.convert("RGBA"), shadow)
+        base.paste(badge, (bx, by), badge)
+        base = base.convert("RGB")
 
     elif style == "B":
         wm = with_opacity(Image.open(assets["B"]).convert("RGBA"), OPACITY)

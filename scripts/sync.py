@@ -13,7 +13,7 @@ What it does, in order:
      try the w_800 upgrade, fall back to the original URL, and if both
      fail mark the image DEAD in data/image-status.json so the build
      uses the placeholder and the admin can fix the sheet URL.
-     Downloaded images get watermark style B (scripts/apply-watermark.py)
+     Downloaded images get the full-logo watermark badge (style A, scripts/apply-watermark.py)
      and the original is kept under site/images/originals/.
   4. Rebuild the site (scripts/build.py).
   5. Write data/sync-log.json (timestamp, counts, changes, failures).
@@ -146,7 +146,7 @@ def diff_prices():
 
 
 def download_images(limit_per_run=20):
-    """Download missing model images (w_800, fallback original), watermark B.
+    """Download missing model images (w_800, fallback original), full-logo watermark (style A).
     Only models without a local file are attempted; at most `limit_per_run`
     new downloads per run so an hourly cron stays fast."""
     import build as buildmod  # reuse the generator's model list
@@ -178,9 +178,9 @@ def download_images(limit_per_run=20):
                 orig = SITE / "images" / "originals" / f"{m.slug}.jpg"
                 orig.parent.mkdir(parents=True, exist_ok=True)
                 im.convert("RGB").save(orig, quality=92)
-                WM.apply_to_product(im, "B").save(target, quality=92)
+                WM.apply_to_product(im, "A").save(target, quality=92)
                 status[m.slug] = {"local": True, "working_url": url,
-                                  "note": "downloaded + watermarked B"}
+                                  "note": "downloaded + watermarked A"}
                 LOG["image_downloads"].append(m.slug)
                 ok = True
                 done += 1

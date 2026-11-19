@@ -596,7 +596,7 @@ def card_html(m):
 <div class="brand-line">{esc(m.brand)} {esc(m.model)} • {esc(m.storage)} / {esc(m.ram)}{g5}</div>
 <div class="price-row"><span class="price">{fmt_price(m.cheapest_price)} جنيه</span>{old}{disc}</div>
 <div class="brand-line">{rating} • أرخص سعر في جوميا</div>
-<div class="actions"><a class="btn-mini" href="/mobiles/{m.slug}/">عرض الأسعار</a><button class="btn-mini" type="button" data-compare="{m.slug}">قارن</button><button class="btn-mini icon-btn" type="button" data-fav="{m.slug}">♡ مفضلة</button></div>
+<div class="actions"><a class="btn-mini btn-prices" href="/mobiles/{m.slug}/">عرض الأسعار</a><button class="btn-mini btn-compare" type="button" data-compare="{m.slug}">قارن</button><button class="btn-mini btn-fav" type="button" data-fav="{m.slug}">♡ مفضلة</button></div>
 </div></article>"""
 
 
@@ -640,7 +640,6 @@ def build_index():
 <input type="search" name="q" id="hero-q" placeholder="ابحث عن هاتف…" aria-label="ابحث عن هاتف">
 <button class="btn" type="submit">بحث</button>
 </form>
-<div class="hero-stats"><span><b>{len(MODELS)}</b> موديل</span><span><b>{len(ROWS)}</b> عرض سعر</span><span><b>{len(BRANDS)}</b> ماركة</span><span>يبدأ من <b>{fmt_price(min(m.cheapest_price for m in MODELS))} جنيه</b></span></div>
 </div></section>"""
     body = f"""{ad_slot("top")}
 <div class="toolbar" id="filters">
@@ -669,15 +668,15 @@ def build_index():
 <div class="chips">{brand_cards}</div>
 {ad_slot("bottom")}
 <section class="card" style="margin-top:26px">
-<h2>لم تجد هاتفك؟ اطلبه وسنضيفه</h2>
-<p>أخبرنا بالهاتف الذي تبحث عنه، وسنضيفه إلى المقارنة عند توفره.</p>
+<h2>لم تجد منتج؟ اطلبه وسنضيفه</h2>
+<p>أخبرنا بالمنتج الذي تبحث عنه، وسنضيفه إلى المقارنة عند توفره.</p>
 <form id="request-form">
-<label for="request-model">اسم الهاتف المطلوب</label>
+<label for="request-model">اسم المنتج المطلوب</label>
 <input type="text" id="request-model" required placeholder="مثال: Samsung Galaxy A56">
 <label for="request-budget">ميزانيتك القصوى (جنيه) — اختياري</label>
 <input type="number" id="request-budget" min="0" placeholder="مثال: 15000">
-<label for="request-email">بريدك الإلكتروني — اختياري (لإعلامك عند إضافته)</label>
-<input type="email" id="request-email" placeholder="name@example.com">
+<label for="request-whatsapp">رقم الواتساب — اختياري (لإعلامك عند إضافته)</label>
+<input type="tel" id="request-whatsapp" dir="ltr" style="text-align:right" placeholder="مثال: 01012345678">
 <button class="btn" type="submit">أرسل الطلب</button>
 </form>
 </section>
@@ -901,8 +900,8 @@ def build_product(model):
 <a class="share-wa" href="https://wa.me/?text={share_text}%20{quote_plus(share_url)}" rel="nofollow noopener" target="_blank">مشاركة واتساب</a>
 <a class="share-tg" href="https://t.me/share/url?url={quote_plus(share_url)}&amp;text={share_text}" rel="nofollow noopener" target="_blank">مشاركة تليجرام</a>
 <a class="share-fb" href="https://www.facebook.com/sharer/sharer.php?u={quote_plus(share_url)}" rel="nofollow noopener" target="_blank">مشاركة فيسبوك</a>
-<button class="btn-mini icon-btn" type="button" data-fav="{model.slug}">♡ مفضلة</button>
-<button class="btn-mini" type="button" data-compare="{model.slug}">قارن</button>
+<button class="btn-mini btn-fav" type="button" data-fav="{model.slug}">♡ مفضلة</button>
+<button class="btn-mini btn-compare" type="button" data-compare="{model.slug}">قارن</button>
 </div>
 </div></div>
 {ad_slot("in_product")}
