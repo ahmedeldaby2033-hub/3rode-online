@@ -1020,15 +1020,74 @@ function renderSettingsForm(settings){
   }).join("");
   html += "<label for='set-home_layout'>تخطيط الصفحة الرئيسية</label><select id='set-home_layout'>"+_opts+"</select>";
   document.getElementById("settings-form").innerHTML = html +
-    "<label for='set-sheet_url'>رابط الشيت (مصدر البيانات)</label><input type='text' id='set-sheet_url' dir='ltr' value='https://docs.google.com/spreadsheets/d/"+SHEET_ID+"'>";
+    "<label for='set-sheet_url'>رابط الشيت (مصدر البيانات)</label><input type='text' id='set-sheet_url' dir='ltr' value='https://docs.google.com/spreadsheets/d/"+SHEET_ID+"'>" +
+    "<h3 style='margin-top:22px'>المتاجر (صفحة الماركات)</h3>" +
+    "<p class='hint'>المتاجر المعروضة أعلى صفحة «الماركات» — الاسم، ورابط الشعار (صورة)، ورابط المتجر. تُحفظ مع الإعدادات وتظهر بعد المزامنة التالية.</p>" +
+    "<div id='stores-editor'></div>" +
+    "<p><button type='button' class='btn-green' onclick='addStoreRow()'>+ إضافة متجر</button></p>" +
+    "<input type='hidden' id='set-stores_json' value=''>";
+  renderStoresEditor(parseStores(settings.stores_json));
   var ads = ["adsense_client","ads_top","ads_in_list","ads_in_product","ads_bottom"];
   document.getElementById("ads-form").innerHTML = ads.map(function(k){
     return "<label for='set-"+k+"'>"+k+"</label><textarea id='set-"+k+"' dir='ltr'>"+esc(settings[k]||"")+"</textarea>";
   }).join("");
 }
+/* ---------------- stores (صفحة الماركات) ---------------- */
+var DEFAULT_STORES = [
+  {name:"جوميا مصر", logo:"https://logo.clearbit.com/jumia.com.eg?size=128", url:"https://jforce.jumia.com.eg/s/C4i51XK"},
+  {name:"أمازون مصر", logo:"https://logo.clearbit.com/amazon.eg?size=128", url:"https://www.amazon.eg/?tag=amazon0c2aca6-21"},
+  {name:"نون مصر", logo:"https://logo.clearbit.com/noon.com?size=128", url:"https://www.noon.com/egypt-en/"}
+];
+function parseStores(raw){
+  try{ var v = JSON.parse(raw||""); if(Array.isArray(v) && v.length) return v; }catch(e){}
+  return DEFAULT_STORES.slice();
+}
+function renderStoresEditor(stores){
+  var box = document.getElementById("stores-editor");
+  if(!box) return;
+  box.innerHTML = (stores||[]).map(function(st, i){
+    return "<div class='store-row' style='border:1px solid var(--border,#ddd);border-radius:10px;padding:10px;margin-bottom:8px'>" +
+      "<label>اسم المتجر</label><input type='text' class='store-name' value='"+esc(st.name||"")+"' oninput='syncStoresJson()'>" +
+      "<label>رابط الشعار (صورة)</label><input type='text' class='store-logo' dir='ltr' value='"+esc(st.logo||"")+"' oninput='syncStoresJson()'>" +
+      "<label>رابط المتجر</label><input type='text' class='store-url' dir='ltr' value='"+esc(st.url||"")+"' oninput='syncStoresJson()'>" +
+      "<p><button type='button' class='btn-danger' onclick='removeStoreRow(this)'>حذف المتجر</button></p></div>";
+  }).join("");
+  syncStoresJson();
+}
+function addStoreRow(){
+  var box = document.getElementById("stores-editor");
+  if(!box) return;
+  var div = document.createElement("div");
+  div.className = "store-row";
+  div.style.cssText = "border:1px solid var(--border,#ddd);border-radius:10px;padding:10px;margin-bottom:8px";
+  div.innerHTML = "<label>اسم المتجر</label><input type='text' class='store-name' value='' oninput='syncStoresJson()'>" +
+    "<label>رابط الشعار (صورة)</label><input type='text' class='store-logo' dir='ltr' value='' oninput='syncStoresJson()'>" +
+    "<label>رابط المتجر</label><input type='text' class='store-url' dir='ltr' value='' oninput='syncStoresJson()'>" +
+    "<p><button type='button' class='btn-danger' onclick='removeStoreRow(this)'>حذف المتجر</button></p>";
+  box.appendChild(div);
+  syncStoresJson();
+}
+function removeStoreRow(btn){
+  var row = btn.closest(".store-row");
+  if(row) row.remove();
+  syncStoresJson();
+}
+function syncStoresJson(){
+  var out = [];
+  document.querySelectorAll("#stores-editor .store-row").forEach(function(row){
+    var name = row.querySelector(".store-name").value.trim();
+    var logo = row.querySelector(".store-logo").value.trim();
+    var url = row.querySelector(".store-url").value.trim();
+    if(name && url) out.push({name:name, logo:logo, url:url});
+  });
+  var hidden = document.getElementById("set-stores_json");
+  if(hidden) hidden.value = JSON.stringify(out);
+}
 async function saveSettings(){
+  syncStoresJson();
   var values = {};
   document.querySelectorAll("#settings-form input, #settings-form select, #ads-form textarea").forEach(function(el){
+    if(!el.id || el.id.indexOf("set-") !== 0) return;
     values[el.id.replace("set-","")] = el.value;
   });
   var tag = values.amazon_associates_tag || "";

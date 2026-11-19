@@ -108,8 +108,9 @@ def icon(name):
             f'{_ICON_PATHS[name]}</svg></span>')
 
 
-def sec_icon(name):
-    return (f'<span class="sec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+def sec_icon(name, tone=""):
+    cls = "sec-icon" + (f" {tone}" if tone else "")
+    return (f'<span class="{cls}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" '
             f'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
             f'{_ICON_PATHS[name]}</svg></span>')
 
@@ -399,6 +400,56 @@ BRANDS = sorted({m.brand for m in MODELS}, key=str.lower)
 BRAND_SLUGS = {b: slugify(b) for b in BRANDS}
 
 
+# ------------------------------------------- brand logos (Clearbit) + stores
+# Official domain per brand (lowercase key) for the Clearbit Logo API.
+# Brands NOT listed here (local/obscure) get a styled text tile instead.
+BRAND_DOMAINS = {
+    "samsung": "samsung.com", "apple": "apple.com", "xiaomi": "xiaomi.com",
+    "redmi": "mi.com", "oppo": "oppo.com", "vivo": "vivo.com",
+    "realme": "realme.com", "honor": "honor.com", "huawei": "huawei.com",
+    "infinix": "infinixmobility.com", "tecno": "tecno-mobile.com",
+    "itel": "itel-mobile.com", "nokia": "nokia.com", "motorola": "motorola.com",
+    "zte": "zte.com.cn", "micromax": "micromaxinfo.com",
+}
+
+
+def brand_logo_url(brand):
+    """Clearbit logo URL for a brand, or None for local/obscure brands."""
+    domain = BRAND_DOMAINS.get(str(brand).strip().lower())
+    return f"https://logo.clearbit.com/{domain}?size=128" if domain else None
+
+
+def get_stores():
+    """Stores for the /brands/ page, from settings.json (admin-editable)."""
+    stores = SETTINGS.get("stores") or []
+    out = []
+    for s in stores:
+        if not isinstance(s, dict):
+            continue
+        name = norm(s.get("name"))
+        url = norm(s.get("url"))
+        if not name or not url:
+            continue
+        out.append({"name": name, "logo": norm(s.get("logo")),
+                    "url": url})
+    return out
+
+
+def logo_img_html(logo_url, name, fallback_id):
+    """An <img> logo with an onerror fallback to a single-letter monogram tile
+    (the card already shows the full name below, so the fallback must not
+    repeat it)."""
+    initial = esc(name.strip()[:1]) if name and name.strip() else "؟"
+    if not logo_url:
+        return (f'<span class="brand-logo-fallback" id="{fallback_id}">'
+                f'{initial}</span>')
+    return (f'<img src="{esc(logo_url)}" alt="{esc(name)}" loading="lazy" '
+            f'onerror="this.style.display=\'none\';'
+            f'document.getElementById(\'{fallback_id}\').style.display=\'flex\'">'
+            f'<span class="brand-logo-fallback" id="{fallback_id}" '
+            f'style="display:none">{initial}</span>')
+
+
 # ---------------------------------------------------------- image status
 # sync.py records per-model image download results here:
 #   {slug: {"local": bool, "working_url": str, "note": str}}
@@ -554,10 +605,10 @@ def head_html(title, desc, canonical, og_image=None, noindex=False,
 
 def header_html():
     return f"""<header class="site-header"><div class="container wide">
-<a class="brand" href="/"><img src="/assets/logo.png" alt="{esc(SITE_NAME)} {DOMAIN}" width="160" height="55"><span class="brand-name">{esc(SITE_NAME)}</span></a>
+<a class="brand" href="/"><img src="/assets/logo.png" alt="{esc(SITE_NAME)} {DOMAIN}" width="162" height="56"></a>
 <button id="nav-toggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav">{icon("menu")} القائمة</button>
 <nav class="main-nav" id="main-nav">
-<a href="/">الرئيسية</a><a href="/coupons/">الكوبونات</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/#brands">الماركات</a><a href="/about/">من نحن</a>
+<a href="/">الرئيسية</a><a href="/coupons/">الكوبونات</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/brands/">الماركات</a><a href="/about/">من نحن</a>
 </nav>
 <button id="theme-toggle" class="theme-toggle" type="button">{icon("moon")} الوضع الليلي</button>
 <button id="pwa-install" class="theme-toggle" type="button" style="display:none">{icon("download")} ثبّت التطبيق</button>
@@ -699,6 +750,7 @@ def build_index():
 <input type="search" name="q" id="hero-q" placeholder="ابحث عن هاتف…" aria-label="ابحث عن هاتف">
 <button class="btn" type="submit">بحث</button>
 </form>
+<a class="request-banner" href="/#request-form">أخبرنا بطلبك في رسالة — يصلك أفضل خصم؟ <strong>اضغط هنا</strong></a>
 </div></section>"""
     toolbar_html = f"""<div class="toolbar" id="filters">
 <input type="search" id="filter-q" placeholder="ابحث بالاسم أو الموديل…" aria-label="بحث سريع" style="flex:1;min-width:180px">
@@ -713,17 +765,17 @@ def build_index():
 </div>"""
     count_html = f'<div class="muted" id="results-count">عرض {len(MODELS)} هاتفاً</div>'
     chips_html = f'<div class="chips" style="margin:10px 0">{brand_chips}</div>'
-    biggest_grid = f'<div class="section-head"><h2>{sec_icon("percent")} أكبر التخفيضات الآن</h2></div>\n<div class="grid">{"".join(card_html(m) for m in biggest)}</div>'
-    biggest_row = f'<div class="section-head"><h2>{sec_icon("percent")} أكبر التخفيضات الآن</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in biggest)}</div>'
-    biggest_feat = f'<div class="section-head"><h2>{sec_icon("percent")} أكبر التخفيضات الآن</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in biggest)}</div>'
-    drops_sec = f'<div class="section-head"><h2>{sec_icon("arrow-down")} أحدث انخفاضات الأسعار</h2></div>\n{drops_html}'
+    biggest_grid = f'<div class="section-head"><h2>{sec_icon("percent", "warm")} أكبر التخفيضات الآن</h2></div>\n<div class="grid">{"".join(card_html(m) for m in biggest)}</div>'
+    biggest_row = f'<div class="section-head"><h2>{sec_icon("percent", "warm")} أكبر التخفيضات الآن</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in biggest)}</div>'
+    biggest_feat = f'<div class="section-head"><h2>{sec_icon("percent", "warm")} أكبر التخفيضات الآن</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in biggest)}</div>'
+    drops_sec = f'<div class="section-head"><h2>{sec_icon("arrow-down", "green")} أحدث انخفاضات الأسعار</h2></div>\n{drops_html}'
     _bym = {m.model: m for m in MODELS}
     drops_models = [_bym[d["model"]] for d in drops if d["model"] in _bym]
-    drops_cards = (f'<div class="section-head"><h2>{sec_icon("arrow-down")} أحدث انخفاضات الأسعار</h2></div>\n'
+    drops_cards = (f'<div class="section-head"><h2>{sec_icon("arrow-down", "green")} أحدث انخفاضات الأسعار</h2></div>\n'
                    f'<div class="grid grid-featured">{"".join(card_html(m) for m in drops_models)}</div>'
                    if drops_models else drops_sec)
-    cheapest_grid = f'<div class="section-head"><h2>{sec_icon("tag")} أرخص الهواتف</h2></div>\n<div class="grid">{"".join(card_html(m) for m in cheapest)}</div>'
-    cheapest_row = f'<div class="section-head"><h2>{sec_icon("tag")} أرخص الهواتف</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in cheapest)}</div>'
+    cheapest_grid = f'<div class="section-head"><h2>{sec_icon("tag", "rose")} أرخص الهواتف</h2></div>\n<div class="grid">{"".join(card_html(m) for m in cheapest)}</div>'
+    cheapest_row = f'<div class="section-head"><h2>{sec_icon("tag", "rose")} أرخص الهواتف</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in cheapest)}</div>'
     latest_grid = f'<div class="section-head"><h2>{sec_icon("star")} أحدث المنتجات</h2></div>\n<div class="grid">{"".join(card_html(m) for m in latest)}</div>'
     latest_row = f'<div class="section-head"><h2>{sec_icon("star")} أحدث المنتجات</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in latest)}</div>'
     latest_feat = f'<div class="section-head"><h2>{sec_icon("star")} أحدث المنتجات</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in latest)}</div>'
@@ -732,15 +784,15 @@ def build_index():
     all_row = latest_row + f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="row-scroll" id="models-grid">{cards}</div>'
     brands_html = f'<div class="section-head" id="brands"><h2>تسوق حسب الماركة</h2></div>\n<div class="chips">{brand_cards}</div>'
     brands_tiles = f'<div class="section-head" id="brands"><h2>تسوق حسب الماركة</h2></div>\n<div class="brand-tiles">{brand_cards}</div>'
-    biggest_list = f'<div class="section-head"><h2>{sec_icon("percent")} أكبر التخفيضات الآن</h2></div>\n<div class="cards-list">{"".join(card_html(m) for m in biggest)}</div>'
-    cheapest_list = f'<div class="section-head"><h2>{sec_icon("tag")} أرخص الهواتف</h2></div>\n<div class="cards-list">{"".join(card_html(m) for m in cheapest)}</div>'
-    cheapest_feat = f'<div class="section-head"><h2>{sec_icon("tag")} أرخص الهواتف</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in cheapest)}</div>'
+    biggest_list = f'<div class="section-head"><h2>{sec_icon("percent", "warm")} أكبر التخفيضات الآن</h2></div>\n<div class="cards-list">{"".join(card_html(m) for m in biggest)}</div>'
+    cheapest_list = f'<div class="section-head"><h2>{sec_icon("tag", "rose")} أرخص الهواتف</h2></div>\n<div class="cards-list">{"".join(card_html(m) for m in cheapest)}</div>'
+    cheapest_feat = f'<div class="section-head"><h2>{sec_icon("tag", "rose")} أرخص الهواتف</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in cheapest)}</div>'
     all_list = latest_list + f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="cards-list" id="models-grid">{cards}</div>'
     all_feat = latest_feat + f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="grid grid-featured" id="models-grid">{cards}</div>'
-    drops_row = (f'<div class="section-head"><h2>{sec_icon("arrow-down")} أحدث انخفاضات الأسعار</h2></div>\n'
+    drops_row = (f'<div class="section-head"><h2>{sec_icon("arrow-down", "green")} أحدث انخفاضات الأسعار</h2></div>\n'
                  f'<div class="row-scroll">{"".join(card_html(m) for m in drops_models)}</div>'
                  if drops_models else drops_sec)
-    request_html = """<section class="card" style="margin-top:26px">
+    request_html = f"""<section class="card" style="margin-top:26px">
 <h2>لم تجد منتج؟ اطلبه وسنضيفه</h2>
 <p>أخبرنا بالمنتج الذي تبحث عنه، وسنضيفه إلى المقارنة عند توفره.</p>
 <form id="request-form">
@@ -943,7 +995,7 @@ def build_product(model):
 <td>{f'خصم {int(disc)}%' if disc else '—'}</td>
 <td>{esc(availability_ar(c(r, 'التوفر')))}</td>
 <td>{f'★ {rating} ({rc})' if rating else '—'}</td>
-<td><a href="{esc(jumia_url(norm(c(r, 'رابط المنتج')), norm(c(r, 'رابط الأفلييت'))))}" {SPONSORED} data-store="jumia" data-model="{model.slug}" data-event="buy-click">اشترِ</a></td>
+<td><a class="buy-mini" href="{esc(jumia_url(norm(c(r, 'رابط المنتج')), norm(c(r, 'رابط الأفلييت'))))}" {SPONSORED} data-store="jumia" data-model="{model.slug}" data-event="buy-click">اشترِ الآن</a></td>
 </tr>"""
     # specs
     spec_rows = [
@@ -1132,6 +1184,57 @@ def build_brand(brand):
         f"{BASE_URL}/brand/{slug}/", body, json_ld=ld)
 
 
+
+
+def build_brands_index():
+    """Dedicated /brands/ page: stores section on top, then a professional
+    grid of ALL brands with their logos (Clearbit, text-tile fallback)."""
+    stores = get_stores()
+    store_cards = ""
+    for i, st in enumerate(stores):
+        fb_id = f"store-fb-{i}"
+        store_cards += (
+            f'<a class="store-card" href="{esc(st["url"])}" target="_blank" '
+            f'rel="sponsored noopener">'
+            f'<span class="brand-logo">'
+            f'{logo_img_html(st["logo"], st["name"], fb_id)}</span>'
+            f'<span class="brand-card-name">{esc(st["name"])}</span>'
+            f'<span class="brand-card-count">تسوّق الآن ←</span></a>')
+    stores_sec = ""
+    if store_cards:
+        stores_sec = (f'<div class="section-head"><h2>{sec_icon("tag")} '
+                      f'المتاجر</h2></div>'
+                      f'<p class="muted">تسوّق من أشهر متاجر الهواتف في مصر '
+                      f'— روابط مختارة من فريق {esc(SITE_NAME)}.</p>'
+                      f'<div class="store-grid">{store_cards}</div>')
+    cards = ""
+    for b in BRANDS:
+        count = sum(1 for m in MODELS if m.brand == b)
+        slug = BRAND_SLUGS[b]
+        fb_id = f"brand-fb-{slug}"
+        cards += (
+            f'<a class="brand-card" href="/brand/{slug}/">'
+            f'<span class="brand-logo">'
+            f'{logo_img_html(brand_logo_url(b), b, fb_id)}</span>'
+            f'<span class="brand-card-name">{esc(b)}</span>'
+            f'<span class="brand-card-count">{count} موديلاً</span></a>')
+    body = f"""<p class="muted"><a href="/">الرئيسية</a> › الماركات</p>
+<h1>تسوق حسب الماركة</h1>
+<p>كل ماركات الهواتف المتوفرة في مصر على {esc(SITE_NAME)} — اضغط على أي ماركة لعرض هواتفها وأسعارها في جوميا وأمازون ونون.</p>
+{stores_sec}
+<div class="section-head"><h2>{sec_icon("star")} كل الماركات ({len(BRANDS)})</h2></div>
+<div class="brand-logo-grid">{cards}</div>"""
+    ld = {"@context": "https://schema.org", "@type": "ItemList",
+          "name": f"ماركات الهواتف في مصر — {SITE_NAME}",
+          "itemListElement": [{"@type": "ListItem", "position": i + 1,
+                               "url": f"{BASE_URL}/brand/{BRAND_SLUGS[b]}/",
+                               "name": b}
+                              for i, b in enumerate(BRANDS)]}
+    return page_shell(
+        f"ماركات الهواتف في مصر — {SITE_NAME}",
+        f"تصفح كل ماركات الهواتف في مصر ({len(BRANDS)} ماركة): سامسونج وآيفون وشاومي وأوبو وغيرها، وقارن أسعارها في جوميا مصر وأمازون مصر ونون مصر.",
+        f"{BASE_URL}/brands/", body, json_ld=ld)
+
 # ----------------------------------------------------------------- coupons
 def build_coupons():
     data = load_json(DATA / "coupons.json")
@@ -1183,6 +1286,62 @@ def guide_candidates(criterion):
     return []
 
 
+GUIDE_TAGS = {
+    "under_10000": ["أقل من 10,000 جنيه", "هواتف اقتصادية", "دليل شراء"],
+    "battery": ["بطارية كبيرة", "عمر البطارية", "دليل شراء"],
+    "camera": ["كاميرا", "تصوير", "دليل شراء"],
+}
+
+
+def guide_tags(g):
+    """Tags for a guide: explicit 'tags' field if present, else derived
+    from its criterion (no invented content — only the guide's own data)."""
+    tags = g.get("tags") or []
+    if tags:
+        return [norm(t) for t in tags if norm(t)]
+    return GUIDE_TAGS.get(g.get("criterion", ""), ["دليل شراء"])
+
+
+def news_tags(p, model=None):
+    """Tags for a news post: explicit 'tags' field if present, else derived
+    from the linked model's brand + keywords in the title."""
+    tags = p.get("tags") or []
+    if tags:
+        return [norm(t) for t in tags if norm(t)]
+    out = []
+    if model:
+        out.append(model.brand)
+    title = p.get("title", "")
+    if any(w in title for w in ("انخفاض", "خصم", "تخفيض", "رخص")):
+        out.append("انخفاض الأسعار")
+    if any(w in title for w in ("إطلاق", "جديد", "وصل")):
+        out.append("إطلاق جديد")
+    out.append("أخبار")
+    return out
+
+
+def tag_chips(tags):
+    """Clickable tag chips (each links to a search for that tag)."""
+    if not tags:
+        return ""
+    chips = "".join(
+        f'<a class="tag-chip" href="/search/?q={quote_plus(t)}">{esc(t)}</a>'
+        for t in tags)
+    return f'<div class="tag-chips">{chips}</div>'
+
+
+def guide_hero_image(g):
+    """Header image for a guide: the first candidate phone's image
+    (local watermarked file if present, else its remote URL)."""
+    cands = guide_candidates(g.get("criterion", ""))
+    if not cands:
+        return "", ""
+    local, remote, _ph = resolve_model_image(cands[0])
+    src = local or remote or ""
+    abs_src = (BASE_URL + src) if src.startswith("/") else src
+    return src, abs_src
+
+
 def build_guide(g):
     cands = guide_candidates(g.get("criterion", ""))
     rows = ""
@@ -1200,26 +1359,68 @@ def build_guide(g):
     else:
         review_note = """<section class="card"><h2>رأي فريق عروض أونلاين — بانتظار المراجعة البشرية</h2>
 <p>[مسودة] لم تُضف المراجعة البشرية بعد لهذا الدليل: لماذا اخترنا هذه الهواتف؟ ما عيوب كل منها؟ ولمن يناسب كل هاتف؟ لن تُنشر هذه الصفحة لمحركات البحث قبل إكمال المراجعة.</p></section>"""
-    body = f"""<div class="draft-banner">{icon("alert")} مسودة — هذه الصفحة قيد المراجعة البشرية ولم تُنشر بعد لمحركات البحث. الأسعار والجداول مولّدة تلقائياً من بيانات الشيت بتاريخ {esc(g.get('date', TODAY))}.</div>
+    hero_src, hero_abs = guide_hero_image(g)
+    hero = ""
+    if hero_src:
+        hero = (f'<div class="article-hero"><img src="{esc(hero_src)}" '
+                f'alt="{esc(g["title"])}" loading="lazy"></div>')
+    else:
+        hero = (f'<div class="article-hero article-hero-fallback">'
+                f'<h1 style="margin:0">{esc(g["title"])}</h1></div>')
+    tags = guide_tags(g)
+    ld = {"@context": "https://schema.org", "@type": "Article",
+          "headline": g["title"],
+          "description": g.get("description", ""),
+          "datePublished": g.get("date", TODAY),
+          "dateModified": g.get("date", TODAY),
+          "author": {"@type": "Organization",
+                     "name": g.get("author", "فريق " + SITE_NAME)},
+          "publisher": {"@type": "Organization", "name": SITE_NAME,
+                        "logo": {"@type": "ImageObject",
+                                 "url": BASE_URL + "/assets/logo.png"}}}
+    if hero_abs:
+        ld["image"] = [hero_abs]
+    if tags:
+        ld["keywords"] = ", ".join(tags)
+    body = f"""{hero}
+<div class="draft-banner">{icon("alert")} مسودة — هذه الصفحة قيد المراجعة البشرية ولم تُنشر بعد لمحركات البحث. الأسعار والجداول مولّدة تلقائياً من بيانات الشيت بتاريخ {esc(g.get('date', TODAY))}.</div>
 <h1>{esc(g['title'])}</h1>
 <p class="muted">بقلم: {esc(g.get('author', 'فريق ' + SITE_NAME))} • التاريخ: {esc(g.get('date', TODAY))} • الحالة: مسودة</p>
+{tag_chips(tags)}
 <p>{esc(g.get('description', ''))}</p>
 {table}
 {review_note}
 <p><a href="/guides/">← كل أدلة الشراء</a></p>"""
     return page_shell(g["title"] + " | " + SITE_NAME,
                       g.get("description", ""), BASE_URL + "/guides/" + g["slug"] + "/",
-                      body, noindex=True)
+                      body, noindex=True, json_ld=ld,
+                      og_image=hero_abs or None)
 
 
 def build_guides_index(guides):
     items = ""
     for g in guides:
-        items += (f"<article class='card'><h2><a href='/guides/{g['slug']}/'>{esc(g['title'])}</a> "
-                  f"<span class='example-tag'>مسودة</span></h2><p>{esc(g.get('description', ''))}</p></article>")
+        hero_src, _abs = guide_hero_image(g)
+        tags = guide_tags(g)
+        img = (f'<a href="/guides/{g["slug"]}/"><img src="{esc(hero_src)}" '
+               f'alt="{esc(g["title"])}" loading="lazy"></a>'
+               if hero_src else
+               f'<a href="/guides/{g["slug"]}/"><div class="article-hero-fallback" '
+               f'style="height:180px;display:flex;align-items:center;justify-content:center">'
+               f'<strong>{esc(g["title"])}</strong></div></a>')
+        items += (f"<article class='article-card'>{img}"
+                  f"<div class='article-card-body'>"
+                  f"<h3><a href='/guides/{g['slug']}/'>{esc(g['title'])}</a> "
+                  f"<span class='example-tag'>مسودة</span></h3>"
+                  f"<p class='excerpt'>{esc(g.get('description', ''))}</p>"
+                  f"<p class='meta'>{esc(g.get('date', TODAY))} • "
+                  f"{esc(g.get('author', 'فريق ' + SITE_NAME))}</p>"
+                  f"{tag_chips(tags)}"
+                  f"<p><a href='/guides/{g['slug']}/'>اقرأ الدليل ←</a></p>"
+                  f"</div></article>")
     body = f"""<h1>أدلة الشراء</h1>
 <p>أدلة مبنية على أسعار حقيقية محدثة من المتاجر المصرية. الأدلة هنا مسودات قيد المراجعة البشرية قبل النشر.</p>
-{items}"""
+<div class="article-grid">{items}</div>"""
     return page_shell("أدلة الشراء | " + SITE_NAME,
                       "أدلة شراء الهواتف في مصر مبنية على أسعار حقيقية: أفضل هاتف تحت 10,000 جنيه، وأفضل بطارية، وأفضل كاميرا.",
                       BASE_URL + "/guides/", body, noindex=True)
@@ -1231,8 +1432,12 @@ def build_news_post(p, model=None):
     if model:
         _local, _remote, _ph = resolve_model_image(model)
         img = _local or _remote
+    if not img:
+        img = "/images/placeholder.jpg?v=2"
+    abs_img = BASE_URL + img if img.startswith("/") else img
     example = (' <span class="example-tag">خبر مثال — يُستبدل بخبر حقيقي</span>'
                if p.get("is_example") else "")
+    tags = news_tags(p, model)
     ld = {"@context": "https://schema.org", "@type": "NewsArticle",
           "headline": p["title"],
           "datePublished": p.get("date_published", TODAY),
@@ -1240,29 +1445,50 @@ def build_news_post(p, model=None):
           "author": {"@type": "Organization", "name": p.get("author", "فريق " + SITE_NAME)},
           "publisher": {"@type": "Organization", "name": SITE_NAME,
                         "logo": {"@type": "ImageObject", "url": BASE_URL + "/assets/logo.png"}},
-          "image": [BASE_URL + img] if img.startswith("/") else [img],
+          "image": [abs_img],
           "description": p.get("description", "")}
-    body = f"""<h1>{esc(p['title'])}{example}</h1>
+    if tags:
+        ld["keywords"] = ", ".join(tags)
+    hero = (f'<div class="article-hero"><img src="{esc(img)}" '
+            f'alt="{esc(p["title"])}" loading="lazy"></div>')
+    body = f"""{hero}
+<h1>{esc(p['title'])}{example}</h1>
 <p class="news-meta">بقلم: {esc(p.get('author', 'فريق ' + SITE_NAME))} • نُشر في: {esc(p.get('date_published', TODAY)[:10])}</p>
-{f'<p><img src="{esc(img)}" alt="{esc(p["title"])}" style="max-width:100%;height:auto" loading="lazy"></p>' if img else ''}
+{tag_chips(tags)}
 <p>{esc(p.get('body', ''))}</p>
 {f'<p><a class="btn" href="/mobiles/{model.slug}/">قارن سعر {esc(model.name_ar)} الآن</a></p>' if model else ''}
 <p><a href="/news/">← كل الأخبار</a></p>"""
     return page_shell(p["title"] + " | " + SITE_NAME,
                       p.get("description", ""), BASE_URL + "/news/" + p["slug"] + "/",
-                      body, json_ld=ld, og_image=(BASE_URL + img if img.startswith("/") else img))
+                      body, json_ld=ld, og_image=abs_img)
 
 
 def build_news_index(posts):
     items = ""
     for p in posts:
-        items += (f"<article><h3><a href='/news/{p['slug']}/'>{esc(p['title'])}</a>"
+        model = MODEL_BY_SLUG.get(p.get("model_slug", ""))
+        img = p.get("image", "")
+        if model:
+            _local, _remote, _ph = resolve_model_image(model)
+            img = _local or _remote
+        if not img:
+            img = "/images/placeholder.jpg?v=2"
+        tags = news_tags(p, model)
+        items += (f"<article class='article-card'>"
+                  f"<a href='/news/{p['slug']}/'><img src='{esc(img)}' "
+                  f"alt='{esc(p['title'])}' loading='lazy'></a>"
+                  f"<div class='article-card-body'>"
+                  f"<h3><a href='/news/{p['slug']}/'>{esc(p['title'])}</a>"
                   f"{' <span class=\"example-tag\">مثال</span>' if p.get('is_example') else ''}</h3>"
-                  f"<p class='news-meta'>{esc(p.get('date_published', TODAY)[:10])} • {esc(p.get('author', ''))}</p>"
-                  f"<p>{esc(p.get('description', ''))}</p></article>")
+                  f"<p class='excerpt'>{esc(p.get('description', ''))}</p>"
+                  f"<p class='meta'>{esc(p.get('date_published', TODAY)[:10])} • "
+                  f"{esc(p.get('author', ''))}</p>"
+                  f"{tag_chips(tags)}"
+                  f"<p><a href='/news/{p['slug']}/'>اقرأ الخبر ←</a></p>"
+                  f"</div></article>")
     body = f"""<h1>أخبار الهواتف والأسعار</h1>
 <p>إطلاق الهواتف الجديدة في مصر، وأكبر انخفاضات الأسعار — أخبار أصلية يراجعها فريق {SITE_NAME}.</p>
-<div class="news-list">{items}</div>"""
+<div class="article-grid">{items}</div>"""
     return page_shell("أخبار الهواتف والأسعار | " + SITE_NAME,
                       "أخبار إطلاق الهواتف الجديدة في مصر وأكبر انخفاضات الأسعار، من فريق عروض أونلاين.",
                       BASE_URL + "/news/", body)
@@ -1526,6 +1752,7 @@ def main():
         emit(f"mobiles/{m.slug}/index.html", build_product(m))
     for b in BRANDS:
         emit(f"brand/{BRAND_SLUGS[b]}/index.html", build_brand(b))
+    emit("brands/index.html", build_brands_index())
     emit("coupons/index.html", build_coupons())
     guides = load_json(DATA / "guides.json")["guides"]
     emit("guides/index.html", build_guides_index(guides))
