@@ -944,6 +944,11 @@ function renderSettingsForm(settings){
     var val = settings[f[0]]||"";
     return "<label for='set-"+f[0]+"'>"+f[1]+"</label><input type='text' id='set-"+f[0]+"' dir='ltr' value='"+esc(val)+"'>";
   }).join("");
+  var _layout = settings.home_layout || "classic";
+  var _opts = [["classic","كلاسيكي (الحالي)"],["rows","قوائم مدمجة (صفوف أفقية)"],["deals","العروض أولاً"]].map(function(o){
+    return "<option value='"+o[0]+"'"+(o[0]===_layout?" selected":"")+">"+o[1]+"</option>";
+  }).join("");
+  html += "<label for='set-home_layout'>تخطيط الصفحة الرئيسية</label><select id='set-home_layout'>"+_opts+"</select>";
   document.getElementById("settings-form").innerHTML = html +
     "<label for='set-sheet_url'>رابط الشيت (مصدر البيانات)</label><input type='text' id='set-sheet_url' dir='ltr' value='https://docs.google.com/spreadsheets/d/"+SHEET_ID+"'>";
   var ads = ["adsense_client","ads_top","ads_in_list","ads_in_product","ads_bottom"];
@@ -953,7 +958,7 @@ function renderSettingsForm(settings){
 }
 async function saveSettings(){
   var values = {};
-  document.querySelectorAll("#settings-form input, #ads-form textarea").forEach(function(el){
+  document.querySelectorAll("#settings-form input, #settings-form select, #ads-form textarea").forEach(function(el){
     values[el.id.replace("set-","")] = el.value;
   });
   var tag = values.amazon_associates_tag || "";

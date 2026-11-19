@@ -97,6 +97,17 @@ def refresh_from_sheet():
                         json.dumps({"values": values}, ensure_ascii=False),
                         encoding="utf-8")
                     refreshed = True
+                # Adopt the homepage layout chosen in the admin panel
+                # (Sheet tab "الإعدادات" -> settings.json -> build.py).
+                _hl = str((payload.get("settings") or {}).get(
+                    "home_layout", "") or "").strip().lower()
+                if _hl in ("classic", "rows", "deals"):
+                    if SETTINGS.get("home_layout", "classic") != _hl:
+                        SETTINGS["home_layout"] = _hl
+                        (BASE / "settings.json").write_text(
+                            json.dumps(SETTINGS, ensure_ascii=False, indent=2),
+                            encoding="utf-8")
+                        log("home-layout", f"adopted {_hl} from Sheet settings")
             except Exception as e:  # noqa: BLE001
                 LOG["errors"].append(f"apps script export: {e}")
     log("refresh-sheet", "refreshed" if refreshed else "kept existing exports")

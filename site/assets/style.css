@@ -411,3 +411,17 @@ html[data-theme="dark"] .install-result { color: #fff; }
 /* compare page: compact stacked buy buttons */
 .compare-buy { display: flex; flex-direction: column; gap: 6px; }
 .compare-buy .btn-buy { padding: 9px 10px; font-size: .9rem; margin: 0; }
+
+/* ---- تخطيطات الصفحة الرئيسية (home_layout) ---- */
+.row-scroll { display: flex; gap: 14px; overflow-x: auto; padding: 4px 2px 14px; margin: 18px 0; scroll-snap-type: x mandatory; scrollbar-width: thin; }
+.row-scroll .pcard { flex: 0 0 230px; scroll-snap-align: start; }
+.row-scroll .pcard img { height: 160px; }
+details.filters-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin: 22px 0 6px; box-shadow: var(--shadow); }
+details.filters-box summary { cursor: pointer; font-weight: 700; }
+details.filters-box .toolbar { margin: 10px 0 0; border: 0; box-shadow: none; padding: 0; background: transparent; }
+.grid-featured { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+.grid-featured .pcard img { height: 260px; }
+@media (max-width: 640px) {
+  .row-scroll .pcard { flex-basis: 200px; }
+  .grid-featured { grid-template-columns: 1fr; }
+}

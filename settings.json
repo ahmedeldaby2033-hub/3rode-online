@@ -2,6 +2,7 @@
   "site_name": "عروض أونلاين",
   "site_domain": "3rde.online",
   "site_slogan": "",
+  "home_layout": "classic",
   "contact_email": "3rdeonline@gmail.com",
   "currency": "EGP",
   "sync_frequency": "hourly",

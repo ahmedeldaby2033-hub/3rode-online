@@ -150,6 +150,9 @@ ANALYTICS = {
                                     or _AN.get("bing_verification", "")),
 }
 ADMIN_API_URL = SETTINGS.get("admin", {}).get("apps_script_url", "")
+HOME_LAYOUT = (SETTINGS.get("home_layout") or "classic").strip().lower()
+if HOME_LAYOUT not in ("classic", "rows", "deals"):
+    HOME_LAYOUT = "classic"
 ONESIGNAL_APP_ID = SETTINGS.get("notifications", {}).get("onesignal_app_id", "")
 AFF = SETTINGS.get("affiliate", {})
 AMAZON_TAG = (AFF.get("amazon_associates_tag") or "").strip()
@@ -531,15 +534,16 @@ def footer_html():
 
 
 def page_shell(title, desc, canonical, body, noindex=False, json_ld=None,
-               og_image=None, hero=None):
+               og_image=None, hero=None, body_class=""):
     ld = ""
     if json_ld:
         ld = ('<script type="application/ld+json">\n'
               + json.dumps(json_ld, ensure_ascii=False) + '\n</script>')
     hero_html = hero or ""
+    body_tag = '<body class="' + body_class + '">' if body_class else "<body>"
     return ("<!DOCTYPE html>\n<html lang=\"ar\" dir=\"rtl\">\n<head>\n"
             + head_html(title, desc, canonical, og_image, noindex)
-            + "\n" + ld + "\n</head>\n<body>\n"
+            + "\n" + ld + "\n</head>\n" + body_tag + "\n"
             + header_html() + "\n" + hero_html + "\n<main class=\"container wide\">\n"
             + body + "\n</main>\n" + footer_html() + "\n</body>\n</html>\n")
 
@@ -641,8 +645,7 @@ def build_index():
 <button class="btn" type="submit">بحث</button>
 </form>
 </div></section>"""
-    body = f"""{ad_slot("top")}
-<div class="toolbar" id="filters">
+    toolbar_html = f"""<div class="toolbar" id="filters">
 <input type="search" id="filter-q" placeholder="ابحث بالاسم أو الموديل…" aria-label="بحث سريع" style="flex:1;min-width:180px">
 <select id="filter-brand" aria-label="الماركة"><option value="">كل الماركات</option>{brands_opts}</select>
 <select id="filter-ram" aria-label="الرام"><option value="">كل الرامات</option>{ram_opts}</select>
@@ -652,22 +655,24 @@ def build_index():
 <label class="check"><input type="checkbox" id="filter-instock"> المتوفر فقط</label>
 <label class="check"><input type="checkbox" id="filter-favonly"> مفضلتي فقط</label>
 <select id="sort-by" aria-label="ترتيب النتائج"><option value="cheapest">الأرخص أولاً</option><option value="discount">الأكبر خصماً</option><option value="rating">الأعلى تقييماً</option><option value="latest">الأحدث تحديثاً</option></select>
-</div>
-<div class="muted" id="results-count">عرض {len(MODELS)} هاتفاً</div>
-<div class="chips" style="margin:10px 0">{brand_chips}</div>
-<div class="section-head"><h2>🔥 أكبر التخفيضات الآن</h2></div>
-<div class="grid">{''.join(card_html(m) for m in biggest)}</div>
-{ad_slot("in_list")}
-<div class="section-head"><h2>📉 أحدث انخفاضات الأسعار</h2></div>
-{drops_html}
-<div class="section-head"><h2>💰 أرخص الهواتف</h2></div>
-<div class="grid">{''.join(card_html(m) for m in cheapest)}</div>
-<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>
-<div class="grid" id="models-grid">{cards}</div>
-<div class="section-head" id="brands"><h2>تسوق حسب الماركة</h2></div>
-<div class="chips">{brand_cards}</div>
-{ad_slot("bottom")}
-<section class="card" style="margin-top:26px">
+</div>"""
+    count_html = f'<div class="muted" id="results-count">عرض {len(MODELS)} هاتفاً</div>'
+    chips_html = f'<div class="chips" style="margin:10px 0">{brand_chips}</div>'
+    biggest_grid = f'<div class="section-head"><h2>🔥 أكبر التخفيضات الآن</h2></div>\n<div class="grid">{"".join(card_html(m) for m in biggest)}</div>'
+    biggest_row = f'<div class="section-head"><h2>🔥 أكبر التخفيضات الآن</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in biggest)}</div>'
+    biggest_feat = f'<div class="section-head"><h2>🔥 أكبر التخفيضات الآن</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in biggest)}</div>'
+    drops_sec = f'<div class="section-head"><h2>📉 أحدث انخفاضات الأسعار</h2></div>\n{drops_html}'
+    _bym = {m.model: m for m in MODELS}
+    drops_models = [_bym[d["model"]] for d in drops if d["model"] in _bym]
+    drops_cards = (f'<div class="section-head"><h2>📉 أحدث انخفاضات الأسعار</h2></div>\n'
+                   f'<div class="grid grid-featured">{"".join(card_html(m) for m in drops_models)}</div>'
+                   if drops_models else drops_sec)
+    cheapest_grid = f'<div class="section-head"><h2>💰 أرخص الهواتف</h2></div>\n<div class="grid">{"".join(card_html(m) for m in cheapest)}</div>'
+    cheapest_row = f'<div class="section-head"><h2>💰 أرخص الهواتف</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in cheapest)}</div>'
+    all_grid = f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="grid" id="models-grid">{cards}</div>'
+    all_row = f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="row-scroll" id="models-grid">{cards}</div>'
+    brands_html = f'<div class="section-head" id="brands"><h2>تسوق حسب الماركة</h2></div>\n<div class="chips">{brand_cards}</div>'
+    request_html = """<section class="card" style="margin-top:26px">
 <h2>لم تجد منتج؟ اطلبه وسنضيفه</h2>
 <p>أخبرنا بالمنتج الذي تبحث عنه، وسنضيفه إلى المقارنة عند توفره.</p>
 <form id="request-form">
@@ -681,10 +686,29 @@ def build_index():
 </form>
 </section>
 <p style="text-align:center"><button class="btn btn-blue" id="pwa-install2" type="button" onclick="document.getElementById('pwa-install').click()">📲 ثبّت الموقع كتطبيق على هاتفك</button></p>"""
+    if HOME_LAYOUT == "rows":
+        # قوائم مدمجة: الفلاتر في لوحة قابلة للطي، والأقسام صفوف أفقية
+        body = (ad_slot("top")
+                + f'<details class="filters-box" open><summary>الفلاتر والترتيب</summary>{toolbar_html}</details>'
+                + count_html + chips_html + biggest_row + ad_slot("in_list")
+                + drops_sec + cheapest_row + all_row + brands_html
+                + ad_slot("bottom") + request_html)
+    elif HOME_LAYOUT == "deals":
+        # العروض أولاً: أكبر التخفيضات والانخفاضات ببطاقات كبيرة في الأعلى
+        body = (ad_slot("top") + toolbar_html + count_html + chips_html
+                + biggest_feat + ad_slot("in_list") + drops_cards
+                + cheapest_grid + all_grid + brands_html
+                + ad_slot("bottom") + request_html)
+    else:
+        # كلاسيكي: الترتيب الحالي كما هو
+        body = (ad_slot("top") + toolbar_html + count_html + chips_html
+                + biggest_grid + ad_slot("in_list") + drops_sec
+                + cheapest_grid + all_grid + brands_html
+                + ad_slot("bottom") + request_html)
     return page_shell(
         f"{SITE_NAME} | قارن أسعار الهواتف في مصر — جوميا وأمازون ونون",
         f"قارن أسعار {len(MODELS)} موديل هاتف في جوميا مصر وأمازون مصر ونون مصر، وتابع أكبر التخفيضات وأحدث انخفاضات الأسعار.",
-        BASE_URL + "/", body, hero=hero,
+        BASE_URL + "/", body, hero=hero, body_class=f"layout-{HOME_LAYOUT}",
         json_ld=[org_ld(), {"@context": "https://schema.org", "@type": "WebSite",
                              "name": SITE_NAME, "url": BASE_URL + "/",
                              "potentialAction": {"@type": "SearchAction",
