@@ -71,7 +71,8 @@ def refresh_from_sheet():
         sheet_id = m.group(1) if m else ""
     cli = pathlib.Path("/opt/hatch/bin/hatch_gws_cli")
     tabs = {"sheet1.json": "الورقة1", "summary.json": "ملخص",
-            "price_history.json": "سجل الأسعار", "duplicates.json": "المكرر فقط"}
+            "price_history.json": "سجل الأسعار", "duplicates.json": "المكرر فقط",
+            "coupons.json": "الكوبونات"}
     if cli.exists() and sheet_id:
         for fname, tab in tabs.items():
             try:
@@ -133,6 +134,72 @@ def refresh_from_sheet():
                 LOG["errors"].append(f"apps script export: {e}")
     log("refresh-sheet", "refreshed" if refreshed else "kept existing exports")
     return refreshed
+
+
+def sync_coupons_from_raw():
+    """Convert the Sheet's «الكوبونات» tab export into data/coupons.json
+    (the file build.py reads). The admin panel writes coupons to the
+    Sheet; without this step they would never reach the site.
+    Raw source: data/raw/coupons.json (CLI path) or data/raw/الكوبونات
+    (Apps Script export path, which files exports by tab name).
+    Keeps the existing file's note and per-id is_example flags."""
+    src = None
+    for cand in (RAW / "coupons.json", RAW / "الكوبونات"):
+        if cand.exists():
+            src = cand
+            break
+    if src is None:
+        return
+    try:
+        raw = json.loads(src.read_text(encoding="utf-8"))
+    except Exception as e:  # noqa: BLE001
+        LOG["errors"].append(f"coupons raw parse: {e}")
+        return
+    values = raw.get("values", []) if isinstance(raw, dict) else raw
+    if not isinstance(values, list) or len(values) < 2:
+        return
+    header = [str(h).strip() for h in values[0]]
+
+    def col(row, name, default=""):
+        try:
+            i = header.index(name)
+        except ValueError:
+            return default
+        return row[i] if i < len(row) else default
+
+    existing = {}
+    note = ("كوبونات تُدار من لوحة التحكم (تبويب الكوبونات في الشيت).")
+    cf = DATA / "coupons.json"
+    if cf.exists():
+        try:
+            old = json.loads(cf.read_text(encoding="utf-8"))
+            note = old.get("note", note)
+            for c in old.get("coupons", []):
+                existing[c.get("id")] = c
+        except Exception:  # noqa: BLE001
+            pass
+    coupons = []
+    for row in values[1:]:
+        cid = str(col(row, "id", "")).strip()
+        if not cid and not str(col(row, "code", "")).strip():
+            continue
+        act = col(row, "active", True)
+        active = act not in (False, "false", "FALSE", "0", "no", "No", "NO")
+        coupons.append({
+            "id": cid or ("cp-" + str(col(row, "code", "")).strip()),
+            "title": str(col(row, "title", "")).strip(),
+            "store": str(col(row, "store", "")).strip(),
+            "code": str(col(row, "code", "")).strip(),
+            "value": str(col(row, "value", "")).strip(),
+            "description": str(col(row, "description", "")).strip(),
+            "redirect_url": str(col(row, "redirect_url", "")).strip(),
+            "expires_at": str(col(row, "expires_at", "")).strip(),
+            "active": active,
+            "is_example": bool(existing.get(cid, {}).get("is_example", False)),
+        })
+    cf.write_text(json.dumps({"coupons": coupons, "note": note},
+                             ensure_ascii=False, indent=1), encoding="utf-8")
+    log("coupons", f"synced {len(coupons)} coupons from {src.name}")
 
 
 def _num(v, default=None):
@@ -241,6 +308,7 @@ def main():
     sys.path.insert(0, str(SCRIPTS))
     try:
         refresh_from_sheet()
+        sync_coupons_from_raw()
         changes = diff_prices()
         if changes:
             # append to the local price-history file (merged by build.py

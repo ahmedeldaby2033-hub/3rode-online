@@ -57,7 +57,7 @@ var SETTINGS_DEFAULTS = [
   ['onesignal_app_id', ''],
   ['telegram_bot', ''],
   ['telegram_channel', ''],
-  ['stores_json', '[{"name":"جوميا مصر","logo":"https://logo.clearbit.com/jumia.com.eg?size=128","url":"https://jforce.jumia.com.eg/s/C4i51XK"},{"name":"أمازون مصر","logo":"https://logo.clearbit.com/amazon.eg?size=128","url":"https://www.amazon.eg/?tag=amazon0c2aca6-21"},{"name":"نون مصر","logo":"https://logo.clearbit.com/noon.com?size=128","url":"https://www.noon.com/egypt-en/"}]']
+  ['stores_json', '[{"name":"جوميا مصر","logo":"/assets/store-logos/jumia.png","url":"https://jforce.jumia.com.eg/s/C4i51XK"},{"name":"أمازون مصر","logo":"/assets/store-logos/amazon.svg","url":"https://www.amazon.eg/?tag=amazon0c2aca6-21"},{"name":"نون مصر","logo":"/assets/store-logos/noon.svg","url":"https://www.noon.com/egypt-en/"}]']
 ];
 
 /* ------------------------------------------------------------ helpers */
@@ -80,7 +80,14 @@ function setupTabs() {
   SETTINGS_DEFAULTS.forEach(function (kv) {
     if (!keys[kv[0]]) st.appendRow(kv);
   });
-  sheet(SHEET_COUPONS, ['id', 'title', 'store', 'code', 'value', 'redirect_url', 'expires_at', 'active']);
+  sheet(SHEET_COUPONS, ['id', 'title', 'store', 'code', 'value', 'redirect_url', 'expires_at', 'active', 'description']);
+  // Existing coupon sheets created before the description column existed:
+  // append the 9th header cell so saveCoupon's 9-column writes line up.
+  (function () {
+    var cs = ss().getSheetByName(SHEET_COUPONS);
+    var hdr = cs.getRange(1, 1, 1, Math.max(cs.getLastColumn(), 1)).getValues()[0];
+    if (hdr[8] !== 'description') cs.getRange(1, 9).setValue('description');
+  })();
   sheet(SHEET_SYNCLOG, ['timestamp', 'action', 'details']);
   sheet(SHEET_CLICKS, ['timestamp', 'store', 'model', 'url']);
   sheet(SHEET_REPORTS, ['timestamp', 'model', 'correct_price', 'note']);
@@ -207,7 +214,7 @@ function doGet(e) {
     if (action === 'export') {  // used by scripts/sync.py (no token needed: read-only data)
       setupTabs();
       var tabs = {};
-      ['الورقة1', 'ملخص', 'سجل الأسعار', 'المكرر فقط'].forEach(function (name) {
+      ['الورقة1', 'ملخص', 'سجل الأسعار', 'المكرر فقط', 'الكوبونات'].forEach(function (name) {
         tabs[name] = ss().getSheetByName(name).getDataRange().getValues();
       });
       return jsonOut({ ok: true, tabs: tabs, settings: getSettings() });
@@ -402,11 +409,11 @@ function doPost(e) {
         var rows = s.getDataRange().getValues();
         for (i = 1; i < rows.length; i++) {
           if (rows[i][0] === c.id) {
-            s.getRange(i + 1, 1, 1, 8).setValues([[c.id, c.title, c.store, c.code, c.value, c.redirect_url, c.expires_at, c.active]]);
+            s.getRange(i + 1, 1, 1, 9).setValues([[c.id, c.title, c.store, c.code, c.value, c.redirect_url, c.expires_at, c.active, c.description || '']]);
             return jsonOut({ ok: true, updated: c.id });
           }
         }
-        s.appendRow([c.id || ('cp-' + Date.now()), c.title, c.store, c.code, c.value, c.redirect_url, c.expires_at, c.active !== false]);
+        s.appendRow([c.id || ('cp-' + Date.now()), c.title, c.store, c.code, c.value, c.redirect_url, c.expires_at, c.active !== false, c.description || '']);
         return jsonOut({ ok: true, added: true });
       }
       if (action === 'deleteCoupon') {

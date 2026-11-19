@@ -1,1 +1,29 @@
-{"coupons":[{"active":true,"code":"JUMIA-EXAMPLE","expires_at":"2026-12-31","id":"example-jumia-1","is_example":true,"redirect_url":"https://www.jumia.com.eg/ar/","store":"جوميا","title":"مثال: خصم على الهواتف في جوميا","value":"خصم 10% حتى 200 جنيه"},{"active":true,"code":"NOON-EXAMPLE","expires_at":"2026-12-31","id":"example-noon-1","is_example":true,"redirect_url":"https://www.noon.com/egypt-en/","store":"نون","title":"مثال: خصم على الهواتف في نون","value":"خصم 50 جنيهاً على أول طلب"}],"note":"كوبونات تُدار من لوحة التحكم (تبويب الكوبونات في الشيت). الكوبونان أدناه مثالان واضحان يجب استبدالهما بكوبونات حقيقية قبل الإطلاق. الضغط على الكوبون ينسخ الكود ويحوّل الزائر إلى موقع المتجر صاحب الخصم."}
+{
+ "coupons": [
+  {
+   "active": true,
+   "code": "JUMIA-EXAMPLE",
+   "expires_at": "2026-12-31",
+   "id": "example-jumia-1",
+   "is_example": true,
+   "redirect_url": "https://www.jumia.com.eg/ar/",
+   "store": "جوميا",
+   "title": "مثال: خصم على الهواتف في جوميا",
+   "value": "خصم 10% حتى 200 جنيه",
+   "description": "كوبون مثال: انسخ الكود واستخدمه عند إتمام الشراء في جوميا."
+  },
+  {
+   "active": true,
+   "code": "NOON-EXAMPLE",
+   "expires_at": "2026-12-31",
+   "id": "example-noon-1",
+   "is_example": true,
+   "redirect_url": "https://www.noon.com/egypt-en/",
+   "store": "نون",
+   "title": "مثال: خصم على الهواتف في نون",
+   "value": "خصم 50 جنيهاً على أول طلب",
+   "description": "كوبون مثال: انسخ الكود واستخدمه عند إتمام أول طلب في نون."
+  }
+ ],
+ "note": "كوبونات تُدار من لوحة التحكم (تبويب الكوبونات في الشيت). الكوبونان أدناه مثالان واضحان يجب استبدالهما بكوبونات حقيقية قبل الإطلاق. الضغط على الكوبون ينسخ الكود ويحوّل الزائر إلى موقع المتجر صاحب الخصم."
+}

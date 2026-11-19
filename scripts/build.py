@@ -403,20 +403,20 @@ BRAND_SLUGS = {b: slugify(b) for b in BRANDS}
 # ------------------------------------------- brand logos (Clearbit) + stores
 # Official domain per brand (lowercase key) for the Clearbit Logo API.
 # Brands NOT listed here (local/obscure) get a styled text tile instead.
-BRAND_DOMAINS = {
-    "samsung": "samsung.com", "apple": "apple.com", "xiaomi": "xiaomi.com",
-    "redmi": "mi.com", "oppo": "oppo.com", "vivo": "vivo.com",
-    "realme": "realme.com", "honor": "honor.com", "huawei": "huawei.com",
-    "infinix": "infinixmobility.com", "tecno": "tecno-mobile.com",
-    "itel": "itel-mobile.com", "nokia": "nokia.com", "motorola": "motorola.com",
-    "zte": "zte.com.cn", "micromax": "micromaxinfo.com",
+BRAND_LOGOS = {
+    "samsung": "samsung.svg", "apple": "apple.svg", "xiaomi": "xiaomi.svg",
+    "redmi": "redmi.svg", "oppo": "oppo.svg", "vivo": "vivo.svg",
+    "realme": "realme.svg", "honor": "honor.svg", "huawei": "huawei.svg",
+    "infinix": "infinix.svg", "tecno": "tecno.svg",
+    "itel": "itel.svg", "nokia": "nokia.svg", "motorola": "motorola.svg",
+    "zte": "zte.png", "micromax": "micromax.svg",
 }
 
 
 def brand_logo_url(brand):
-    """Clearbit logo URL for a brand, or None for local/obscure brands."""
-    domain = BRAND_DOMAINS.get(str(brand).strip().lower())
-    return f"https://logo.clearbit.com/{domain}?size=128" if domain else None
+    """Self-hosted local logo path for a brand, or None for local/obscure brands."""
+    f = BRAND_LOGOS.get(str(brand).strip().lower())
+    return f"/assets/brand-logos/{f}" if f else None
 
 
 def get_stores():
@@ -746,6 +746,7 @@ def build_index():
     hero = f"""<section class="{hero_cls}"><div class="container wide">
 <h1>{esc(SITE_NAME)}</h1>
 <p>قارن أسعار الهواتف في جوميا مصر وأمازون مصر ونون مصر، وتابع انخفاض الأسعار أولاً بأول.</p>
+<div class="hero-search-row">
 <form class="search-box" action="/search/" method="get" role="search">
 <input type="search" name="q" id="hero-q" placeholder="ابحث عن هاتف…" aria-label="ابحث عن هاتف">
 <button class="btn" type="submit">بحث</button>
@@ -753,6 +754,7 @@ def build_index():
 <div class="hero-deals">
 <a class="hero-deal-btn hero-deal-amazon" href="https://www.amazon.eg/deals?tag=amazon0c2aca6-21" target="_blank" rel="sponsored noopener">انقر للحصول على أفضل عروض أمازون مصر 2026</a>
 <a class="hero-deal-btn hero-deal-jumia" href="https://jforce.jumia.com.eg/s/C4i51XK" target="_blank" rel="sponsored noopener">انقر للحصول على أفضل عروض جوميا مصر 2026</a>
+</div>
 </div>
 <a class="request-banner" href="/#request-form">أخبرنا بطلبك في رسالة — يصلك أفضل خصم؟ <strong>اضغط هنا</strong></a>
 </div></section>"""
@@ -1320,36 +1322,112 @@ def build_deals_page():
 
 
 # ----------------------------------------------------------------- coupons
+# Store identity for coupon boxes: Arabic display name, local logo file,
+# and the shop-button colour class. Keys are the admin form values
+# (jumia/amazon/noon); STORE_ALIASES also accepts the Arabic names that
+# older rows in the Sheet / coupons.json may carry.
+STORE_META = {
+    "jumia": ("جوميا", "/assets/store-logos/jumia.png", "shop-jumia"),
+    "amazon": ("أمازون", "/assets/store-logos/amazon.svg", "shop-amazon"),
+    "noon": ("نون", "/assets/store-logos/noon.svg", "shop-noon"),
+}
+STORE_ALIASES = {"جوميا": "jumia", "أمازون": "amazon", "امازون": "amazon",
+                 "نون": "noon", "jumia": "jumia", "amazon": "amazon",
+                 "noon": "noon"}
+
+
+def store_home(key):
+    """Tracked homepage of a store (fallback when a coupon has no
+    redirect_url of its own)."""
+    if key == "jumia":
+        return jumia_home()
+    if key == "amazon":
+        return (f"https://www.amazon.eg/?tag={AMAZON_TAG}"
+                if AMAZON_TAG else "https://www.amazon.eg/")
+    if key == "noon":
+        return "https://www.noon.com/egypt-en/"
+    return ""
+
+
+def coupon_is_expired(expires_at):
+    """True when an expiry date (YYYY-MM-DD) has passed (today, Cairo
+    calendar date — the site's audience is in Egypt)."""
+    exp = (expires_at or "").strip()
+    if not exp:
+        return False
+    try:
+        d = datetime.strptime(exp[:10], "%Y-%m-%d").date()
+    except ValueError:
+        return False
+    return d < date.today()
+
+
 def build_coupons():
     data = load_json(DATA / "coupons.json")
     cards = ""
-    for cp in data.get("coupons", []):
+    ld_items = []
+    for pos, cp in enumerate(data.get("coupons", []), 1):
         if not cp.get("active", True):
             continue
-        store = cp.get("store", "")
-        redirect = cp.get("redirect_url", "")
-        if store == "جوميا":
+        key = STORE_ALIASES.get((cp.get("store") or "").strip().lower(), "")
+        name, logo, shop_cls = STORE_META.get(
+            key, (cp.get("store", ""), "", ""))
+        redirect = (cp.get("redirect_url") or "").strip()
+        if key == "jumia":
             # Jumia coupon -> the user's tracked Arabic homepage
             redirect = jumia_home()
-        example = (' <span class="example-tag">مثال — يُستبدل بكوبون حقيقي</span>'
+        elif not redirect:
+            redirect = store_home(key)
+        example = ('<p><span class="example-tag">مثال — يُستبدل بكوبون حقيقي</span></p>'
                    if cp.get("is_example") else "")
-        exp = cp.get("expires_at", "")
-        countdown = (f'<p>ينتهي في: <span class="countdown" data-countdown="{exp}">{exp}</span></p>'
-                     if exp else "")
-        cards += f"""<article class="coupon-card">
-<h3>{esc(cp.get('title', ''))}{example}</h3>
-<p>المتجر: <strong>{esc(store)}</strong> — {esc(cp.get('value', ''))}</p>
-<p><span class="coupon-code" dir="ltr">{esc(cp.get('code', ''))}</span></p>
-{countdown}
-<a class="btn" href="{esc(redirect)}" {SPONSORED} data-coupon="{esc(cp.get('code', ''))}" data-redirect="{esc(redirect)}" data-store="{esc(store)}">انسخ الكود وانتقل إلى {esc(store)}</a>
-<p class="muted">الكوبون خاص بالمتجر، وليس بموقعنا. الضغط ينسخ الكود ثم يحوّلك إلى موقع المتجر.</p>
+        exp = (cp.get("expires_at") or "").strip()
+        expired = coupon_is_expired(exp)
+        desc = (cp.get("description") or "").strip()
+        desc_html = (f'<p class="coupon-desc">{esc(desc)}</p>' if desc else "")
+        if expired:
+            exp_html = '<p class="coupon-expired-note">انتهى هذا الكوبون</p>'
+            copy_html = ('<button class="coupon-copy-btn" type="button" '
+                         'disabled>منتهي</button>')
+        else:
+            exp_html = (f'<p class="coupon-expiry">ينتهي في: '
+                        f'<span class="countdown" data-countdown="{esc(exp)}">'
+                        f'{esc(exp)}</span></p>' if exp else "")
+            copy_html = (f'<button class="coupon-copy-btn" type="button" '
+                         f'data-copy-code="{esc(cp.get("code", ""))}">'
+                         f'نسخ الكود</button>')
+        logo_html = (f'<img src="{esc(logo)}" alt="{esc(name)}" '
+                     f'loading="lazy" decoding="async">' if logo else
+                     f'<span class="coupon-logo-fallback">{esc(name[:1])}</span>')
+        box_cls = "coupon-box" + (" coupon-expired" if expired else "")
+        cards += f"""<article class="{box_cls}">
+<div class="coupon-box-head">
+<span class="coupon-logo">{logo_html}</span>
+<div class="coupon-box-titles"><div class="coupon-store">{esc(name)}</div>
+<h3>{esc(cp.get('title', ''))}</h3></div>
+<div class="coupon-value">{esc(cp.get('value', ''))}</div>
+</div>
+{example}{desc_html}
+<div class="coupon-code-row">
+<span class="coupon-code" dir="ltr">{esc(cp.get('code', ''))}</span>
+{copy_html}
+</div>
+{exp_html}
+<a class="btn coupon-shop-btn {shop_cls}" href="{esc(redirect)}" target="_blank" rel="sponsored noopener">تسوّق الآن في {esc(name)}</a>
+<p class="muted">الكوبون خاص بالمتجر، وليس بموقعنا. انسخ الكود ثم استخدمه عند الشراء في موقع المتجر.</p>
 </article>"""
-    body = f"""<section class="page-hero" style="margin:0 -18px 20px;padding:22px 18px"><h1 style="margin:0">كوبونات خصم الهواتف في مصر</h1>
-<p>انسخ الكود ثم انتقل إلى المتجر لاستخدامه عند الشراء.</p></section>
-{cards if cards else '<p>لا توجد كوبونات حالياً — تابعنا، نضيف كوبونات جديدة باستمرار.</p>'}"""
+        ld_items.append({"@type": "ListItem", "position": pos,
+                         "name": cp.get("title", ""),
+                         "description": cp.get("value", "")})
+    hero = """<section class="page-hero" style="margin:0 -18px 20px;padding:22px 18px"><h1 style="margin:0">كوبونات خصم الهواتف في مصر</h1>
+<p>انسخ الكود بضغطة واحدة، ثم انتقل إلى المتجر واستخدمه عند الشراء.</p></section>"""
+    body = hero + (f'<div class="coupons-grid">{cards}</div>' if cards else
+                   '<p>لا توجد كوبونات حالياً — تابعنا، نضيف كوبونات جديدة باستمرار.</p>')
+    json_ld = {"@context": "https://schema.org", "@type": "ItemList",
+               "name": "كوبونات خصم الهواتف في مصر",
+               "itemListElement": ld_items} if ld_items else None
     return page_shell("كوبونات خصم الهواتف في مصر | " + SITE_NAME,
-                      "أكواد خصم هواتف جوميا وأمازون ونون في مصر. انسخ الكود وانتقل إلى المتجر لاستخدامه.",
-                      BASE_URL + "/coupons/", body)
+                      "أكواد خصم هواتف جوميا وأمازون ونون في مصر. انسخ الكود بضغطة واحدة وانتقل إلى المتجر لاستخدامه.",
+                      BASE_URL + "/coupons/", body, json_ld=json_ld)
 
 
 # ------------------------------------------------------------------ guides
@@ -1815,6 +1893,9 @@ def main():
         shutil.copy2(BASE / "assets" / f, SITE / "assets" / f)
     # self-hosted Tajawal fonts (woff2)
     shutil.copytree(BASE / "assets" / "fonts", SITE / "assets" / "fonts", dirs_exist_ok=True)
+    # self-hosted brand + store logos (SVG/PNG)
+    shutil.copytree(BASE / "assets" / "brand-logos", SITE / "assets" / "brand-logos", dirs_exist_ok=True)
+    shutil.copytree(BASE / "assets" / "store-logos", SITE / "assets" / "store-logos", dirs_exist_ok=True)
     # restore preserved product images from the previous build
     if images_backup is not None:
         shutil.copytree(images_backup, SITE / "images", dirs_exist_ok=True)

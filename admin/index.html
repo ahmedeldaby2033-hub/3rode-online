@@ -330,6 +330,8 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
         <div><label for="cp-code">الكود</label><input type="text" id="cp-code" dir="ltr"></div>
         <div><label for="cp-value">القيمة</label><input type="text" id="cp-value"></div>
       </div>
+      <label for="cp-desc">الوصف / الشروط (اختياري — يظهر في صندوق الكوبون)</label>
+      <input type="text" id="cp-desc" placeholder="مثال: يسري على الهواتف فوق 5000 جنيه — حد أدنى للطلب">
       <label for="cp-url">رابط التوجيه (رابط المتجر مع التتبع)</label>
       <input type="url" id="cp-url" dir="ltr">
       <div class="row">
@@ -974,22 +976,25 @@ async function checkImages(){
 async function loadCoupons(){
   try{var d=await api("coupons");
     document.getElementById("coupons-table").innerHTML = d.rows.length>1 ?
-      "<table><tr><th>العنوان</th><th>المتجر</th><th>الكود</th><th>القيمة</th><th>ينتهي</th><th>مفعّل</th><th></th></tr>"+
-      d.rows.slice(1).map(function(r){return "<tr><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td dir='ltr'>"+esc(r[3])+"</td><td>"+esc(r[4])+"</td><td>"+esc(r[6])+"</td><td>"+(r[7]?"نعم":"لا")+"</td><td><button class='btn-ghost' onclick='fillCoupon("+JSON.stringify(r)+")'>تعديل</button> <button class='btn-danger' onclick='deleteCoupon("+JSON.stringify(r[0])+")'>حذف</button></td></tr>"}).join("")+"</table>" : "لا توجد كوبونات.";
+      "<table><tr><th>العنوان</th><th>المتجر</th><th>الكود</th><th>القيمة</th><th>الوصف</th><th>ينتهي</th><th>مفعّل</th><th></th></tr>"+
+      d.rows.slice(1).map(function(r){return "<tr><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td dir='ltr'>"+esc(r[3])+"</td><td>"+esc(r[4])+"</td><td>"+esc(r[8]||"")+"</td><td>"+esc(r[6])+"</td><td>"+(r[7]?"نعم":"لا")+"</td><td><button class='btn-ghost' onclick='fillCoupon("+JSON.stringify(r)+")'>تعديل</button> <button class='btn-danger' onclick='deleteCoupon("+JSON.stringify(r[0])+")'>حذف</button></td></tr>"}).join("")+"</table>" : "لا توجد كوبونات.";
   }catch(err){document.getElementById("coupons-table").innerHTML='<span class="error">'+err.message+"</span>"}
 }
 function fillCoupon(r){
+  var storeMap={"جوميا":"jumia","أمازون":"amazon","امازون":"amazon","نون":"noon"};
   document.getElementById("cp-id").value=r[0]; document.getElementById("cp-title").value=r[1];
-  document.getElementById("cp-store").value=r[2]; document.getElementById("cp-code").value=r[3];
+  document.getElementById("cp-store").value=storeMap[r[2]]||r[2]; document.getElementById("cp-code").value=r[3];
   document.getElementById("cp-value").value=r[4]; document.getElementById("cp-url").value=r[5];
   document.getElementById("cp-expires").value=r[6]; document.getElementById("cp-active").value=r[7]?"true":"false";
+  document.getElementById("cp-desc").value=r[8]||"";
 }
 async function saveCoupon(){
   var c={id:document.getElementById("cp-id").value||("cp-"+Date.now()),
     title:document.getElementById("cp-title").value, store:document.getElementById("cp-store").value,
     code:document.getElementById("cp-code").value, value:document.getElementById("cp-value").value,
     redirect_url:document.getElementById("cp-url").value, expires_at:document.getElementById("cp-expires").value,
-    active:document.getElementById("cp-active").value==="true"};
+    active:document.getElementById("cp-active").value==="true",
+    description:document.getElementById("cp-desc").value};
   try{await api("saveCoupon",{coupon:c}); toast("تم حفظ الكوبون"); loadCoupons();}
   catch(err){toast(err.message)}
 }
@@ -1034,9 +1039,9 @@ function renderSettingsForm(settings){
 }
 /* ---------------- stores (صفحة الماركات) ---------------- */
 var DEFAULT_STORES = [
-  {name:"جوميا مصر", logo:"https://logo.clearbit.com/jumia.com.eg?size=128", url:"https://jforce.jumia.com.eg/s/C4i51XK"},
-  {name:"أمازون مصر", logo:"https://logo.clearbit.com/amazon.eg?size=128", url:"https://www.amazon.eg/?tag=amazon0c2aca6-21"},
-  {name:"نون مصر", logo:"https://logo.clearbit.com/noon.com?size=128", url:"https://www.noon.com/egypt-en/"}
+  {name:"جوميا مصر", logo:"/assets/store-logos/jumia.png", url:"https://jforce.jumia.com.eg/s/C4i51XK"},
+  {name:"أمازون مصر", logo:"/assets/store-logos/amazon.svg", url:"https://www.amazon.eg/?tag=amazon0c2aca6-21"},
+  {name:"نون مصر", logo:"/assets/store-logos/noon.svg", url:"https://www.noon.com/egypt-en/"}
 ];
 function parseStores(raw){
   try{ var v = JSON.parse(raw||""); if(Array.isArray(v) && v.length) return v; }catch(e){}

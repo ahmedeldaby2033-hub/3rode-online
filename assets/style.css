@@ -230,6 +230,10 @@ html[data-theme="dark"] .product-img a { color: var(--blue); }
 .deals-filters {
   background: var(--card); border: 1px solid var(--border); border-radius: 14px;
   padding: 16px 18px; margin: 18px 0 6px; box-shadow: var(--shadow);
+  border-top: 4px solid var(--orange);
+}
+@media (min-width: 641px) {
+  .deals-filters { position: sticky; top: 76px; z-index: 40; }
 }
 .deals-filters-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
 .deals-filters-head h2 { margin: 0; font-size: 1.15rem; }
@@ -242,14 +246,18 @@ html[data-theme="dark"] .product-img a { color: var(--blue); }
 .deals-filters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
 .deals-filters .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .deals-filters .field-search { grid-column: 1 / -1; }
-.deals-filters .field label { font-weight: 700; font-size: .88rem; }
+.deals-filters .field label { font-weight: 700; font-size: .88rem; color: var(--muted); }
 .deals-filters .field input, .deals-filters .field select {
-  width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px;
-  background: var(--card); color: var(--text); font-family: inherit; font-size: .95rem;
+  width: 100%; padding: 11px 12px; border: 1px solid var(--border); border-radius: 10px;
+  background: var(--bg); color: var(--text); font-family: inherit; font-size: .95rem;
 }
-.deals-filters .field input:focus, .deals-filters .field select:focus { outline: 2px solid var(--blue); outline-offset: 1px; border-color: var(--blue); }
+.deals-filters .field input:focus, .deals-filters .field select:focus { outline: 2px solid var(--blue); outline-offset: 1px; border-color: var(--blue); background: var(--card); }
 .deals-filters-checks { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
-.deals-filters-checks #results-count { margin-inline-start: auto; font-weight: 700; }
+.deals-filters-checks #results-count {
+  margin-inline-start: auto; font-weight: 800; font-size: .92rem;
+  background: #fff3e0; color: #9a3412; border-radius: 999px; padding: 5px 14px;
+}
+html[data-theme="dark"] .deals-filters-checks #results-count { background: #3a2a12; color: #fdba74; }
 .chip {
   display: inline-block; padding: 7px 14px; border-radius: 999px;
   border: 1px solid var(--border); background: var(--card); color: var(--text);
@@ -382,6 +390,64 @@ html[data-theme="dark"] .cookie-banner { background: #16283d; }
 .toast.show { display: block; }
 
 /* coupon */
+/* --- صناديق الكوبونات (صفحة /coupons/) --- */
+.coupons-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin: 18px 0; }
+.coupon-box {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px 20px;
+  display: flex; flex-direction: column; gap: 12px;
+  box-shadow: 0 2px 10px rgba(2, 20, 50, .06);
+  position: relative; overflow: hidden;
+}
+.coupon-box::before {
+  content: ""; position: absolute; inset-inline-start: 0; top: 0; bottom: 0;
+  width: 5px; background: linear-gradient(180deg, var(--orange), #ea580c);
+}
+.coupon-box-head { display: flex; align-items: center; gap: 12px; }
+.coupon-logo { display: flex; align-items: center; justify-content: center; width: 64px; height: 40px; flex: none; }
+.coupon-logo img { max-width: 64px; max-height: 40px; object-fit: contain; }
+.coupon-logo-fallback {
+  display: flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: #e8f0fe; color: var(--blue); font-weight: 800; font-size: 1.2rem;
+}
+.coupon-box-titles { flex: 1; min-width: 0; }
+.coupon-store { font-size: .85rem; font-weight: 700; color: var(--muted); }
+.coupon-box-titles h3 { margin: 2px 0 0; font-size: 1.05rem; line-height: 1.4; }
+.coupon-value {
+  flex: none; font-size: 1.35rem; font-weight: 800; line-height: 1.2;
+  color: #ea580c; background: #fff3e0; border-radius: 10px; padding: 6px 12px;
+  max-width: 45%; text-align: center;
+}
+html[data-theme="dark"] .coupon-value { background: #3a2a12; color: #ffb74d; }
+.coupon-desc { margin: 0; color: var(--muted); font-size: .95rem; line-height: 1.6; }
+.coupon-code-row { display: flex; gap: 8px; align-items: stretch; }
+.coupon-code {
+  flex: 1; font-size: 1.25rem; font-weight: 800; letter-spacing: 1px;
+  color: var(--blue-dark); background: #fff7e6;
+  border: 1px dashed var(--orange); border-radius: 8px;
+  padding: 10px 12px; display: flex; align-items: center; justify-content: center;
+  text-align: center; min-width: 0; overflow-wrap: anywhere;
+}
+html[data-theme="dark"] .coupon-code { color: #ffb347; background: #2a2113; }
+.coupon-copy-btn {
+  flex: none; border: 0; border-radius: 8px; cursor: pointer;
+  background: linear-gradient(180deg, #3b82f6, #1d4ed8); color: #fff;
+  font-family: inherit; font-weight: 800; font-size: .95rem; padding: 10px 16px;
+  box-shadow: 0 2px 8px rgba(29, 78, 216, .30);
+  transition: filter .15s ease, transform .15s ease;
+}
+.coupon-copy-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.coupon-copy-btn:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; transform: none; }
+.coupon-expiry { margin: 0; font-size: .92rem; color: var(--muted); }
+.coupon-expired-note { margin: 0; font-weight: 800; color: var(--red); }
+.coupon-shop-btn { margin-top: 2px; }
+.coupon-shop-btn.shop-jumia { background: linear-gradient(180deg, #f68b1e, #e07b00); }
+.coupon-shop-btn.shop-amazon { background: linear-gradient(180deg, #232f3e, #131921); }
+.coupon-shop-btn.shop-noon { background: linear-gradient(180deg, #ffe14d, #f5c518); color: #222 !important; }
+.coupon-box.coupon-expired { opacity: .6; }
+.coupon-box.coupon-expired .coupon-logo img { filter: grayscale(1); }
+.coupon-box.coupon-expired::before { background: #94a3b8; }
 .coupon-card {
   background: var(--card); border: 1px dashed var(--orange); border-radius: var(--radius);
   padding: 18px 20px; margin: 14px 0;
@@ -565,13 +631,17 @@ html[data-theme="dark"] .card h2 { background: #1b3049; }
   transition: filter .15s ease, transform .15s ease;
 }
 .buy-mini:hover { text-decoration: none; filter: brightness(1.1); transform: translateY(-1px); }
-/* --- زرّا عروض أمازون وجوميا 2026 بجانب البحث --- */
+/* --- صف البحث: صندوق البحث + زرّا عروض أمازون وجوميا في نفس الصف --- */
+.hero-search-row { display: flex; gap: 10px; align-items: stretch; flex-wrap: wrap; }
+.hero-search-row .search-box { flex: 1 1 300px; max-width: none; margin: 0; }
+.hero-search-row .hero-deals { flex: 1 1 300px; margin-top: 0; }
 .hero-deals { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
 .hero-deal-btn {
-  flex: 1 1 220px; text-align: center; font-weight: 800; font-size: .95rem;
+  flex: 1 1 200px; text-align: center; font-weight: 800; font-size: .95rem;
   padding: 12px 14px; border-radius: 12px; color: #fff !important;
   box-shadow: 0 4px 14px rgba(2, 20, 50, .25);
   transition: transform .18s ease, filter .18s ease;
+  display: flex; align-items: center; justify-content: center;
 }
 .hero-deal-btn:hover { text-decoration: none; transform: translateY(-1px); filter: brightness(1.1); }
 .hero-deal-amazon { background: linear-gradient(180deg, #232f3e, #131921); }

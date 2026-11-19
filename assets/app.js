@@ -196,6 +196,23 @@
     } else { toast('الكود: ' + code); go(); }
   });
 
+  /* ---------- coupons: copy code only (no redirect) ---------- */
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-copy-code]');
+    if (!b || b.disabled) return;
+    var code = b.getAttribute('data-copy-code') || '';
+    if (!code) return;
+    var done = function () {
+      toast('تم نسخ الكود: ' + code);
+      var old = b.textContent;
+      b.textContent = 'تم النسخ ✓';
+      setTimeout(function () { b.textContent = old; }, 2000);
+    };
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(code).then(done, function () { toast('الكود: ' + code); });
+    } else { toast('الكود: ' + code); }
+  });
+
   /* ---------- countdown timers ---------- */
   $all('[data-countdown]').forEach(function (el) {
     var end = new Date(el.getAttribute('data-countdown') + 'T23:59:59+02:00').getTime();
