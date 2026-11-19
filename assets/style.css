@@ -425,3 +425,49 @@ details.filters-box .toolbar { margin: 10px 0 0; border: 0; box-shadow: none; pa
   .row-scroll .pcard { flex-basis: 200px; }
   .grid-featured { grid-template-columns: 1fr; }
 }
+
+/* ---- سمات ألوان التخطيطات (theme-*) ---- */
+body.theme-ocean { --blue: #0e7490; --blue-dark: #164e63; --orange: #f97316; }
+body.theme-slate { --blue: #475569; --blue-dark: #1e293b; --orange: #f59e0b; }
+body.theme-gold { --bg: #101828; --card: #1a2436; --text: #f1f5f9; --muted: #94a3b8; --border: #2d3f57; --blue: #d4af37; --blue-dark: #0f172a; --orange: #f59e0b; }
+body.theme-forest { --blue: #15803d; --blue-dark: #14532d; --orange: #ea580c; }
+body.theme-royal { --blue: #7c3aed; --blue-dark: #4c1d95; --orange: #db2777; }
+body.theme-sunset { --blue: #ea580c; --blue-dark: #7c2d12; --orange: #dc2626; }
+body.theme-minimal { --blue: #334155; --blue-dark: #0f172a; --orange: #64748b; --bg: #ffffff; }
+body.theme-rose { --blue: #db2777; --blue-dark: #831843; --orange: #f97316; }
+body.theme-teal { --blue: #0d9488; --blue-dark: #134e4a; --orange: #f59e0b; }
+body.theme-indigo { --blue: #4f46e5; --blue-dark: #312e81; --orange: #f97316; }
+
+/* ---- بطاقات أفقية مدمجة (cards-list) ---- */
+.cards-list { display: flex; flex-direction: column; gap: 12px; margin: 18px 0; }
+.cards-list .pcard { flex-direction: row; align-items: stretch; }
+.cards-list .pcard > a { flex: 0 0 150px; display: flex; }
+.cards-list .pcard img { width: 150px; height: 100%; min-height: 150px; object-fit: contain; }
+.cards-list .pcard-body { padding: 12px 14px; }
+@media (max-width: 640px) {
+  .cards-list .pcard > a { flex-basis: 110px; }
+  .cards-list .pcard img { width: 110px; min-height: 110px; }
+}
+
+/* ---- بلاطات الماركات ---- */
+.brand-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin: 18px 0; }
+.brand-tiles .chip { display: flex; align-items: center; justify-content: center; padding: 24px 10px; font-size: 1.05rem; }
+
+/* ---- هيرو مدمج ---- */
+.hero-compact { padding: 22px 0 20px; }
+.hero-compact h1 { font-size: 1.4rem; }
+.hero-compact p { margin-bottom: 10px; }
+
+/* ---- شريط فلاتر ثابت (sunset / quick) ---- */
+@media (min-width: 641px) {
+  body.layout-sunset .toolbar, body.layout-quick .toolbar { position: sticky; top: 76px; z-index: 40; }
+}
+
+/* ---- زر العودة للأعلى ---- */
+#to-top { position: fixed; bottom: 22px; inset-inline-start: 22px; z-index: 60; width: 46px; height: 46px; border-radius: 50%; border: 0; background: var(--blue); color: #fff; font-size: 1.3rem; font-weight: 800; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.25); opacity: 0; pointer-events: none; transition: opacity .2s; }
+#to-top.show { opacity: 1; pointer-events: auto; }
+#to-top:hover { background: var(--blue-dark); }
+
+/* ---- إصلاح نصوص السمة الذهبية الداكنة (blue-dark كنص على خلفية داكنة) ---- */
+body.theme-gold .section-head h2, body.theme-gold .card h2, body.theme-gold .card h3 { color: #f1f5f9; }
+body.theme-gold .price { color: #ffd97a; }

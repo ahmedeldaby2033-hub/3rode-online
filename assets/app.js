@@ -281,6 +281,17 @@
     });
   }
 
+  /* ---------- back-to-top button ---------- */
+  var toTop = document.getElementById('to-top');
+  if (toTop) {
+    window.addEventListener('scroll', function () {
+      toTop.classList.toggle('show', window.scrollY > 600);
+    }, { passive: true });
+    toTop.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
   /* ---------- push notifications (OneSignal placeholder) ---------- */
   if (CFG.onesignalAppId) {
     var s = document.createElement('script');

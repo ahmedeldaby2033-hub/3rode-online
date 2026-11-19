@@ -101,7 +101,9 @@ def refresh_from_sheet():
                 # (Sheet tab "الإعدادات" -> settings.json -> build.py).
                 _hl = str((payload.get("settings") or {}).get(
                     "home_layout", "") or "").strip().lower()
-                if _hl in ("classic", "rows", "deals"):
+                if _hl in ("classic", "rows", "deals", "store", "compact",
+                          "luxury", "forest", "royal", "sunset", "minimal",
+                          "showcase", "fullrows", "quick"):
                     if SETTINGS.get("home_layout", "classic") != _hl:
                         SETTINGS["home_layout"] = _hl
                         (BASE / "settings.json").write_text(

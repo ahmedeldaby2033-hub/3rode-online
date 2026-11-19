@@ -150,9 +150,19 @@ ANALYTICS = {
                                     or _AN.get("bing_verification", "")),
 }
 ADMIN_API_URL = SETTINGS.get("admin", {}).get("apps_script_url", "")
+HOME_LAYOUTS = {
+    "classic": ("الكلاسيكي", ""), "rows": ("القوائم المدمجة", ""),
+    "deals": ("العروض أولاً", ""),
+    "store": ("متجر", "ocean"), "compact": ("مدمج", "slate"),
+    "luxury": ("فاخر داكن", "gold"), "forest": ("أخضر", "forest"),
+    "royal": ("ملكي", "royal"), "sunset": ("غروب", "sunset"),
+    "minimal": ("بسيط", "minimal"), "showcase": ("عرض كبير", "rose"),
+    "fullrows": ("صفوف كاملة", "teal"), "quick": ("سريع", "indigo"),
+}
 HOME_LAYOUT = (SETTINGS.get("home_layout") or "classic").strip().lower()
-if HOME_LAYOUT not in ("classic", "rows", "deals"):
+if HOME_LAYOUT not in HOME_LAYOUTS:
     HOME_LAYOUT = "classic"
+HOME_THEME = HOME_LAYOUTS[HOME_LAYOUT][1]
 ONESIGNAL_APP_ID = SETTINGS.get("notifications", {}).get("onesignal_app_id", "")
 AFF = SETTINGS.get("affiliate", {})
 AMAZON_TAG = (AFF.get("amazon_associates_tag") or "").strip()
@@ -528,6 +538,7 @@ def footer_html():
 </div></footer>
 <div class="compare-bar" id="compare-bar"><span id="compare-list"></span><button class="btn" id="compare-go" type="button">عرض المقارنة</button><button class="clear" id="compare-clear" type="button">مسح</button></div>
 <div class="cookie-banner" id="cookie-banner"><div class="container wide">نستخدم ملفات تعريف الارتباط لتحسين تجربتك وعرض إعلانات مناسبة. <a href="/cookies/">اقرأ سياسة ملفات تعريف الارتباط</a>. <button class="btn" id="cookie-ok" type="button">موافق</button></div></div>
+<button id="to-top" type="button" aria-label="العودة للأعلى">↑</button>
 <div class="toast" id="toast" role="status"></div>
 <script>window.SITE_CONFIG = {json.dumps({"adminApiUrl": ADMIN_API_URL, "onesignalAppId": ONESIGNAL_APP_ID, "contactEmail": EMAIL}, ensure_ascii=False)};</script>
 <script src="/assets/app.js" defer></script>"""
@@ -594,7 +605,7 @@ def card_html(m):
     g5 = " • يدعم 5G" if m.g5 else ""
     search_text = f"{m.name_en} {m.name_ar} {m.brand} {m.model}".lower()
     return f"""<article class="pcard" data-slug="{m.slug}" data-brand="{esc(m.brand)}" data-price="{m.cheapest_price:g}" data-discount="{m.discount}" data-rating="{m.rating or 0}" data-ram="{esc(m.ram)}" data-storage="{esc(m.storage)}" data-g5="{1 if m.g5 else 0}" data-instock="{1 if m.in_stock else 0}" data-updated="{m.last_update}" data-search="{esc(search_text)}">
-<a href="/mobiles/{m.slug}/"><img src="{esc(img)}" alt="هاتف {esc(m.name_ar)} {esc(m.storage)} / {esc(m.ram)}" loading="lazy" width="500" height="500"></a>
+<a href="/mobiles/{m.slug}/"><img src="{esc(img)}" alt="هاتف {esc(m.name_ar)} {esc(m.storage)} / {esc(m.ram)}" loading="lazy" decoding="async" width="500" height="500"></a>
 <div class="pcard-body">
 <h3><a href="/mobiles/{m.slug}/">{esc(m.name_ar)}</a></h3>
 <div class="brand-line">{esc(m.brand)} {esc(m.model)} • {esc(m.storage)} / {esc(m.ram)}{g5}</div>
@@ -637,7 +648,10 @@ def build_index():
         f'<a class="chip" href="/brand/{BRAND_SLUGS[b]}/">{esc(b)} ({sum(1 for m in MODELS if m.brand == b)})</a>'
         for b in BRANDS)
     cards = "".join(card_html(m) for m in MODELS)
-    hero = f"""<section class="hero-search"><div class="container wide">
+    hero_cls = ("hero-search hero-compact"
+                if HOME_LAYOUT in ("compact", "luxury", "minimal")
+                else "hero-search")
+    hero = f"""<section class="{hero_cls}"><div class="container wide">
 <h1>{esc(SITE_NAME)}</h1>
 <p>قارن أسعار الهواتف في جوميا مصر وأمازون مصر ونون مصر، وتابع انخفاض الأسعار أولاً بأول.</p>
 <form class="search-box" action="/search/" method="get" role="search">
@@ -672,6 +686,15 @@ def build_index():
     all_grid = f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="grid" id="models-grid">{cards}</div>'
     all_row = f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="row-scroll" id="models-grid">{cards}</div>'
     brands_html = f'<div class="section-head" id="brands"><h2>تسوق حسب الماركة</h2></div>\n<div class="chips">{brand_cards}</div>'
+    brands_tiles = f'<div class="section-head" id="brands"><h2>تسوق حسب الماركة</h2></div>\n<div class="brand-tiles">{brand_cards}</div>'
+    biggest_list = f'<div class="section-head"><h2>🔥 أكبر التخفيضات الآن</h2></div>\n<div class="cards-list">{"".join(card_html(m) for m in biggest)}</div>'
+    cheapest_list = f'<div class="section-head"><h2>💰 أرخص الهواتف</h2></div>\n<div class="cards-list">{"".join(card_html(m) for m in cheapest)}</div>'
+    cheapest_feat = f'<div class="section-head"><h2>💰 أرخص الهواتف</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in cheapest)}</div>'
+    all_list = f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="cards-list" id="models-grid">{cards}</div>'
+    all_feat = f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="grid grid-featured" id="models-grid">{cards}</div>'
+    drops_row = (f'<div class="section-head"><h2>📉 أحدث انخفاضات الأسعار</h2></div>\n'
+                 f'<div class="row-scroll">{"".join(card_html(m) for m in drops_models)}</div>'
+                 if drops_models else drops_sec)
     request_html = """<section class="card" style="margin-top:26px">
 <h2>لم تجد منتج؟ اطلبه وسنضيفه</h2>
 <p>أخبرنا بالمنتج الذي تبحث عنه، وسنضيفه إلى المقارنة عند توفره.</p>
@@ -699,21 +722,96 @@ def build_index():
                 + biggest_feat + ad_slot("in_list") + drops_cards
                 + cheapest_grid + all_grid + brands_html
                 + ad_slot("bottom") + request_html)
+    elif HOME_LAYOUT == "store":
+        # متجر: الماركات أولاً كبلاطات كبيرة، ثم العروض
+        body = (ad_slot("top") + toolbar_html + brands_tiles
+                + biggest_grid + ad_slot("in_list") + drops_cards
+                + cheapest_grid + all_grid
+                + ad_slot("bottom") + request_html)
+    elif HOME_LAYOUT == "compact":
+        # مدمج: بطاقات أفقية مدمجة في كل الأقسام
+        body = (ad_slot("top") + toolbar_html + count_html + chips_html
+                + all_list + biggest_list + cheapest_list + brands_html
+                + ad_slot("bottom") + request_html)
+    elif HOME_LAYOUT == "luxury":
+        # فاخر داكن: بطاقات كبيرة بهيرو مدمج
+        body = (ad_slot("top") + toolbar_html + count_html + chips_html
+                + biggest_feat + ad_slot("in_list") + drops_cards
+                + cheapest_grid + all_grid + brands_html
+                + ad_slot("bottom") + request_html)
+    elif HOME_LAYOUT == "forest":
+        # أخضر: الأرخص أولاً
+        body = (ad_slot("top") + toolbar_html + count_html + chips_html
+                + cheapest_grid + biggest_grid + ad_slot("in_list") + drops_sec
+                + all_grid + brands_html + ad_slot("bottom") + request_html)
+    elif HOME_LAYOUT == "royal":
+        # ملكي: أحدث الانخفاضات أولاً كبطاقات
+        body = (ad_slot("top") + toolbar_html + count_html + chips_html
+                + drops_cards + biggest_feat + cheapest_grid + all_grid
+                + brands_html + ad_slot("bottom") + request_html)
+    elif HOME_LAYOUT == "sunset":
+        # غروب: شريط فلاتر ثابت وأكبر التخفيضات ببطاقات كبيرة
+        body = (ad_slot("top") + toolbar_html + count_html + chips_html
+                + biggest_feat + ad_slot("in_list") + drops_sec
+                + cheapest_grid + all_grid + brands_html
+                + ad_slot("bottom") + request_html)
+    elif HOME_LAYOUT == "minimal":
+        # بسيط: هيرو مدمج، كل الهواتف أولاً، بدون أقسام إضافية
+        body = (ad_slot("top") + toolbar_html + count_html
+                + all_grid + biggest_grid + brands_html
+                + ad_slot("bottom") + request_html)
+    elif HOME_LAYOUT == "showcase":
+        # عرض كبير: كل الأقسام ببطاقات كبيرة والماركات بلاطات
+        body = (ad_slot("top") + toolbar_html + count_html + chips_html
+                + biggest_feat + ad_slot("in_list") + drops_cards
+                + cheapest_feat + all_feat + brands_tiles
+                + ad_slot("bottom") + request_html)
+    elif HOME_LAYOUT == "fullrows":
+        # صفوف كاملة: كل الأقسام صفوف أفقية
+        body = (ad_slot("top")
+                + f'<details class="filters-box" open><summary>الفلاتر والترتيب</summary>{toolbar_html}</details>'
+                + count_html + chips_html + biggest_row + ad_slot("in_list")
+                + drops_row + cheapest_row + all_row + brands_html
+                + ad_slot("bottom") + request_html)
+    elif HOME_LAYOUT == "quick":
+        # سريع: شريط فلاتر ثابت وكل الهواتف أولاً ببطاقات مدمجة
+        body = (ad_slot("top") + toolbar_html + count_html + chips_html
+                + all_list + biggest_grid + cheapest_grid + brands_html
+                + ad_slot("bottom") + request_html)
     else:
         # كلاسيكي: الترتيب الحالي كما هو
         body = (ad_slot("top") + toolbar_html + count_html + chips_html
                 + biggest_grid + ad_slot("in_list") + drops_sec
                 + cheapest_grid + all_grid + brands_html
                 + ad_slot("bottom") + request_html)
+    faq_ld = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
+        {"@type": "Question", "name": "كيف أقارن أسعار الهواتف في مصر؟",
+         "acceptedAnswer": {"@type": "Answer", "text": "اختر الهاتف من القائمة وستظهر أسعاره في جوميا مصر وأمازون مصر ونون مصر مرتبة من الأرخص، مع تاريخ السعر ونسبة الخصم."}},
+        {"@type": "Question", "name": "هل الأسعار على الموقع محدثة؟",
+         "acceptedAnswer": {"@type": "Answer", "text": "نعم، تُحدَّث الأسعار كل ساعة من المتاجر، ويظهر تاريخ آخر تحديث على كل منتج."}},
+        {"@type": "Question", "name": "كيف أعرف أن الخصم حقيقي؟",
+         "acceptedAnswer": {"@type": "Answer", "text": "نعرض السعر الحالي بجانب السعر القديم وسجل الأسعار، فيمكنك التحقق من الانخفاض بنفسك قبل الشراء."}},
+    ]}
+    itemlist_ld = {"@context": "https://schema.org", "@type": "ItemList",
+                   "name": "أكبر التخفيضات على الهواتف",
+                   "itemListElement": [
+                       {"@type": "ListItem", "position": i + 1,
+                        "item": {"@type": "Product", "name": m.name_ar,
+                                 "url": BASE_URL + f"/mobiles/{m.slug}/",
+                                 "offers": {"@type": "Offer", "price": m.cheapest_price,
+                                            "priceCurrency": "EGP"}}}
+                       for i, m in enumerate(biggest)]}
+    body_cls = f"layout-{HOME_LAYOUT}" + (f" theme-{HOME_THEME}" if HOME_THEME else "")
     return page_shell(
         f"{SITE_NAME} | قارن أسعار الهواتف في مصر — جوميا وأمازون ونون",
         f"قارن أسعار {len(MODELS)} موديل هاتف في جوميا مصر وأمازون مصر ونون مصر، وتابع أكبر التخفيضات وأحدث انخفاضات الأسعار.",
-        BASE_URL + "/", body, hero=hero, body_class=f"layout-{HOME_LAYOUT}",
+        BASE_URL + "/", body, hero=hero, body_class=body_cls,
         json_ld=[org_ld(), {"@context": "https://schema.org", "@type": "WebSite",
                              "name": SITE_NAME, "url": BASE_URL + "/",
                              "potentialAction": {"@type": "SearchAction",
                                                "target": BASE_URL + "/search/?q={search_term_string}",
-                                               "query-input": "required name=search_term_string"}}])
+                                               "query-input": "required name=search_term_string"}},
+                 faq_ld, itemlist_ld])
 
 
 # ----------------------------------------------------------------- product
