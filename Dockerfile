@@ -1,4 +1,4 @@
-# 3rode.online — static site on nginx (Coolify / any Docker host)
+# 3rde.online — static site on nginx (Coolify / any Docker host)
 FROM nginx:alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY site/ /usr/share/nginx/html/

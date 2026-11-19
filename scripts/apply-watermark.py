@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Watermark setup for 3rode.online (عروض أونلاين).
+"""Watermark setup for 3rde.online (عروض أونلاين).
 
 Source logo: assets/logo.png — the second upload
 (Glossy_Arabic_Online_Shopping_Logo.png), 2132x737 RGBA, natively
@@ -9,7 +9,7 @@ grey checkerboard and was only usable after background removal
 
 Three watermark styles are produced from the same logo:
   A) full logo, bottom corner (default)
-  B) "3rode.online" text only, centred in a dark strip at the bottom
+  B) "3rde.online" text only, centred in a dark strip at the bottom
   C) cart icon only, bottom corner
 
 The hourly sync will call apply_to_product() for every downloaded
@@ -33,7 +33,7 @@ SAMPLES = BASE / "watermark-samples"
 # ---------------------------------------------------------------- config
 # Width of the watermark as a fraction of the product-image width.
 FULL_WIDTH_FRAC = 0.25     # style A: full logo
-TEXT_WIDTH_FRAC = 0.62     # style B: "3rode.online" text in the strip
+TEXT_WIDTH_FRAC = 0.62     # style B: "3rde.online" text in the strip
 ICON_WIDTH_FRAC = 0.15     # style C: cart icon
 OPACITY = 0.92             # watermark opacity (1.0 = fully opaque)
 PADDING_FRAC = 0.04        # padding from the image edge, as fraction of width
@@ -66,7 +66,7 @@ def build_assets() -> dict:
     full = trim(logo)
     full.save(ASSETS / "watermark-full.png")
 
-    # "3rode.online" text lives in the lower band of the logo.
+    # "3rde.online" text lives in the lower band of the logo.
     w, h = logo.size
     text = trim(logo.crop((int(w * 0.32), int(h * 0.60), w, h)))
     text.save(ASSETS / "watermark-text.png")

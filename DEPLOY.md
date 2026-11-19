@@ -1,4 +1,4 @@
-# النشر — عروض أونلاين 3rode.online
+# النشر — عروض أونلاين 3rde.online
 
 > **الطريقة الأساسية الآن: Coolify على VPS أوراكل — راجع `docs/coolify-deploy.md`.**
 > الأقسام 1–3 أدناه للاستضافة المشتركة (cPanel) كمرجع بديل فقط.
@@ -11,9 +11,9 @@
 2. ارفع محتوى مجلد `site/` **كاملاً** إلى `public_html/` (المجلد العام للنطاق).
 3. ارفع `admin/index.html` إلى `public_html/admin/` (لوحة التحكم — راجع `admin/SETUP.md` لإعداد Apps Script أولاً).
 4. تأكد من وجود `site/.htaccess` إن أردت إعادة توجيه www ← بدون www (اختياري).
-5. فعّل شهادة SSL مجانية (Let's Encrypt) من cPanel للنطاق `3rode.online` — الموقع كله `https://`.
+5. فعّل شهادة SSL مجانية (Let's Encrypt) من cPanel للنطاق `3rde.online` — الموقع كله `https://`.
 
-## 2 — ربط النطاق 3rode.online
+## 2 — ربط النطاق 3rde.online
 
 النطاق مملوك لك أصلاً (تم التأكيد 2026-11-19) ولم يُوجَّه بعد إلى الاستضافة.
 - من لوحة تحكم مسجّل النطاق: غيّر **Nameservers** إلى نيم سيرفرات الاستضافة (تجدها في بريد الترحيب من شركة الاستضافة أو في cPanel ← Server Information)، أو
@@ -34,10 +34,10 @@
 
 ## 4 — محركات البحث (SEO)
 
-1. **Google Search Console:** أضف الموقع `https://3rode.online/`، وثّق الملكية، ثم أرسل `https://3rode.online/sitemap.xml`.
+1. **Google Search Console:** أضف الموقع `https://3rde.online/`، وثّق الملكية، ثم أرسل `https://3rde.online/sitemap.xml`.
 2. **Bing Webmaster Tools:** نفس الخطوة (يغطي Bing وYahoo وDuckDuckGo وEcosia)، وأرسل نفس الخريطة.
-3. **Google Publisher Center:** سجّل الموقع وأضف قسم الأخبار `https://3rode.online/news/` (صفحات المنتجات لا تدخل Google News أبداً — الأخبار فقط، بمراجعة بشرية وصور 1200px).
-4. **Google News sitemap:** أُرسل مع الخريطة الرئيسية: `https://3rode.online/news-sitemap.xml`.
+3. **Google Publisher Center:** سجّل الموقع وأضف قسم الأخبار `https://3rde.online/news/` (صفحات المنتجات لا تدخل Google News أبداً — الأخبار فقط، بمراجعة بشرية وصور 1200px).
+4. **Google News sitemap:** أُرسل مع الخريطة الرئيسية: `https://3rde.online/news-sitemap.xml`.
 5. راقب Core Web Vitals في Search Console خلال أول شهر.
 
 ## 5 — تفعيل الأفلييت (قبل الإطلاق — اختبر رابطاً واحداً من كل متجر)

@@ -48,8 +48,8 @@ section.tab.active{display:block}
 </head>
 <body>
 <header>
-  <h1>لوحة تحكم — عروض أونلاين <span style="font-weight:400">3rode.online</span></h1>
-  <span><a href="https://3rode.online/" target="_blank" rel="noopener">عرض الموقع ↗</a> &nbsp;·&nbsp; <a href="https://docs.google.com/spreadsheets/d/1VeOXP8ly-W0dwT0QQK9kqf9z_834zok9ekIqGjfPNdE" target="_blank" rel="noopener">فتح الشيت ↗</a> &nbsp;·&nbsp; <button class="btn-ghost" id="logout-btn" style="display:none" onclick="logout()">تسجيل الخروج</button></span>
+  <h1>لوحة تحكم — عروض أونلاين <span style="font-weight:400">3rde.online</span></h1>
+  <span><a href="https://3rde.online/" target="_blank" rel="noopener">عرض الموقع ↗</a> &nbsp;·&nbsp; <a href="https://docs.google.com/spreadsheets/d/1VeOXP8ly-W0dwT0QQK9kqf9z_834zok9ekIqGjfPNdE" target="_blank" rel="noopener">فتح الشيت ↗</a> &nbsp;·&nbsp; <button class="btn-ghost" id="logout-btn" style="display:none" onclick="logout()">تسجيل الخروج</button></span>
 </header>
 <main>
 
@@ -340,23 +340,23 @@ async function api(action, body){
 
 /* ---- admin login: username/password (default admin/admin) ----
    The password is stored as a SHA-256 hash in this browser only
-   (localStorage key ro3de_admin_pass_hash). First run seeds the
+   (localStorage key r3de_admin_pass_hash). First run seeds the
    default password "admin" — change it from the Settings tab.
    This is a light gate on a static site, not server-side auth:
    for full protection enable Basic Auth on /admin/ in Coolify. */
 var ADMIN_USER = "admin";
 async function hashPass(s){
   try{
-    var buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("ro3de-admin::" + s));
+    var buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("r3de-admin::" + s));
     return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2, "0"); }).join("");
   }catch(e){
     var h = 0; for(var i = 0; i < s.length; i++){ h = ((h << 5) - h + s.charCodeAt(i)) | 0; }
     return "fallback-" + h;
   }
 }
-function storedPassHash(){ return localStorage.getItem("ro3de_admin_pass_hash") || ""; }
+function storedPassHash(){ return localStorage.getItem("r3de_admin_pass_hash") || ""; }
 async function ensureDefaultPass(){
-  if(!storedPassHash()) localStorage.setItem("ro3de_admin_pass_hash", await hashPass("admin"));
+  if(!storedPassHash()) localStorage.setItem("r3de_admin_pass_hash", await hashPass("admin"));
 }
 function enterAdmin(){
   document.getElementById("login-card").style.display = "none";
@@ -364,7 +364,7 @@ function enterAdmin(){
   document.getElementById("logout-btn").style.display = "";
 }
 function logout(){
-  sessionStorage.removeItem("ro3de_admin_session");
+  sessionStorage.removeItem("r3de_admin_session");
   sessionStorage.removeItem("admin_token");
   location.reload();
 }
@@ -376,7 +376,7 @@ async function changePassword(){
   if(await hashPass(cur) !== storedPassHash()){ msg.innerHTML = '<span class="error">كلمة المرور الحالية غير صحيحة.</span>'; return; }
   if(nw.length < 6){ msg.innerHTML = '<span class="error">كلمة المرور الجديدة قصيرة — 6 أحرف على الأقل.</span>'; return; }
   if(nw !== cf){ msg.innerHTML = '<span class="error">تأكيد كلمة المرور لا يطابق الجديدة.</span>'; return; }
-  localStorage.setItem("ro3de_admin_pass_hash", await hashPass(nw));
+  localStorage.setItem("r3de_admin_pass_hash", await hashPass(nw));
   document.getElementById("pw-current").value = "";
   document.getElementById("pw-new").value = "";
   document.getElementById("pw-confirm").value = "";
@@ -407,7 +407,7 @@ async function login(){
   }
   token = document.getElementById("token-input").value.trim();
   if(token) sessionStorage.setItem("admin_token", token);
-  sessionStorage.setItem("ro3de_admin_session", "1");
+  sessionStorage.setItem("r3de_admin_session", "1");
   enterAdmin();
   toast("تم تسجيل الدخول");
   try{ await loadBackend(); }
@@ -682,7 +682,7 @@ document.getElementById('amazon-url').addEventListener('input', function (e) {
 
 if(token){document.getElementById("token-input").value=token;}
 // restore session: the username/password login lasts for the browser session
-if(sessionStorage.getItem("ro3de_admin_session") === "1"){
+if(sessionStorage.getItem("r3de_admin_session") === "1"){
   enterAdmin();
   loadBackend().catch(function(){
     document.getElementById("overview-stats").innerHTML =

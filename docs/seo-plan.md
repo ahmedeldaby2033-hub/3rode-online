@@ -1,4 +1,4 @@
-# خطة تحسين محركات البحث (SEO) — عروض أونلاين 3rode.online
+# خطة تحسين محركات البحث (SEO) — عروض أونلاين 3rde.online
 
 > أولوية قصوى للمستخدم (2026-11-19): جلب الزيارات من **جميع** محركات البحث،
 > والموقع يجب أن يكون صديقاً لمحركات البحث **بدون أي مشاكل**.
@@ -17,12 +17,12 @@
 ## 2) الروابط (URLs)
 
 - روابط نظيفة وقصيرة، بالإنجليزية (أفضل للفهرسة والمشاركة)، مثال:
-  - الصفحة الرئيسية: `https://3rode.online/`
-  - صفحة منتج: `https://3rode.online/mobiles/oppo-a6/`
-  - صفحة ماركة: `https://3rode.online/brand/samsung/`
-  - دليل شراء: `https://3rode.online/guides/best-phones-under-10000/`
-  - كوبونات: `https://3rode.online/coupons/`
-  - مقارنة: `https://3rode.online/compare/?m=oppo-a6,samsung-a16` (لا تُفهرس)
+  - الصفحة الرئيسية: `https://3rde.online/`
+  - صفحة منتج: `https://3rde.online/mobiles/oppo-a6/`
+  - صفحة ماركة: `https://3rde.online/brand/samsung/`
+  - دليل شراء: `https://3rde.online/guides/best-phones-under-10000/`
+  - كوبونات: `https://3rde.online/coupons/`
+  - مقارنة: `https://3rde.online/compare/?m=oppo-a6,samsung-a16` (لا تُفهرس)
 - **صفحة واحدة لكل موديل**: العروض المكررة لنفس الموديل تظهر داخل صفحة
   الموديل الواحدة، ولا تُنشأ صفحة لكل عرض (تجنّب المحتوى المكرر).
 - لا معلمات (parameters) في روابط الصفحات المفهرسة. روابط الفلاتر والبحث

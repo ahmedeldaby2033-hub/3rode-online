@@ -1,4 +1,4 @@
-/* عروض أونلاين 3rode.online — shared stylesheet (RTL, Arabic) */
+/* عروض أونلاين 3rde.online — shared stylesheet (RTL, Arabic) */
 :root {
   --blue: #0b5ed7;
   --blue-dark: #0a2540;
@@ -188,13 +188,19 @@ html[data-theme="dark"] .btn-buy { filter: brightness(1.05); }
 .hero-stats b { font-size: 1.15rem; }
 
 .toolbar {
-  display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+  display: flex; gap: 8px; flex-wrap: nowrap; align-items: center;
   margin: 22px 0 6px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 8px 10px; box-shadow: var(--shadow);
+  overflow-x: auto; scrollbar-width: thin;
 }
-.toolbar select, .toolbar input[type="number"] {
-  padding: 9px 11px; border: 1px solid var(--border); border-radius: 10px;
-  font-family: inherit; font-size: .95rem; background: var(--card); color: var(--text);
+.toolbar select, .toolbar input[type="number"], .toolbar input[type="search"] {
+  width: auto; flex: 0 0 auto; min-width: 0;
+  padding: 7px 10px; border: 1px solid var(--border); border-radius: 9px;
+  font-family: inherit; font-size: .88rem; background: var(--card); color: var(--text);
 }
+.toolbar input[type="search"] { flex: 1 1 150px; min-width: 140px; }
+.toolbar .check { white-space: nowrap; font-size: .88rem; }
 .chip {
   display: inline-block; padding: 7px 14px; border-radius: 999px;
   border: 1px solid var(--border); background: var(--card); color: var(--text);

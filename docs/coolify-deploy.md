@@ -21,7 +21,7 @@
 cd 3rode-online
 git init
 git add .
-git commit -m "3rode.online — initial site (76 models, 169 offers)"
+git commit -m "3rde.online — initial site (76 models, 169 offers)"
 git branch -M main
 git remote add origin https://github.com/<YOUR-USER>/3rode-online.git
 git push -u origin main
@@ -36,7 +36,7 @@ git push -u origin main
 1. Coolify ← **New Resource ← Application ← GitHub** (أو Public Repository) ← اختر مستودع `3rode-online`.
 2. **Build Pack: Dockerfile** — ملف `Dockerfile` في جذر المشروع (موجود، يستخدم `nginx:alpine` ويقدّم `site/` + لوحة التحكم `admin/index.html`).
 3. **Port: 80**.
-4. **Domains:** أضف `3rode.online` (و `www.3rode.online` إن أردت — اختياري).
+4. **Domains:** أضف `3rde.online` (و `www.3rde.online` إن أردت — اختياري).
 5. اضغط **Deploy**.
 6. Coolify يصدر **شهادة SSL مجانية (Let's Encrypt)** تلقائياً للنطاق ويجدّدها بنفسه.
 
@@ -46,10 +46,10 @@ git push -u origin main
 
 | السجل | القيمة |
 |---|---|
-| A — `3rode.online` | IP العام للـ VPS |
+| A — `3rde.online` | IP العام للـ VPS |
 | A — `www` (اختياري) | نفس IP الـ VPS |
 
-- الانتشار قد يستغرق حتى 24 ساعة. تحقق بـ `ping 3rode.online`.
+- الانتشار قد يستغرق حتى 24 ساعة. تحقق بـ `ping 3rde.online`.
 - لا تغيّر الـ Nameservers — سجل A يكفي مع Coolify.
 
 ## 4 — فعّل تصدير الشيت أولاً (مهم للمزامنة)
@@ -78,8 +78,8 @@ git clone https://github.com/<YOUR-USER>/3rode-online.git /opt/3rode-online
 python3 -m pip install pillow
 
 # 3) هوية git للالتزامات التلقائية
-git config --global user.name "3rode-sync"
-git config --global user.email "da3m@3rode.online"
+git config --global user.name "3rde-sync"
+git config --global user.email "da3m@3rde.online"
 
 # 4) اجعل السكربت قابلاً للتنفيذ وجرّبه مرة يدوياً
 chmod +x /opt/3rode-online/scripts/vps-sync.sh
@@ -103,10 +103,10 @@ crontab -e
 
 ## 6 — تحقّق بعد النشر
 
-- افتح `https://3rode.online/` — الصفحة الرئيسية تعمل.
+- افتح `https://3rde.online/` — الصفحة الرئيسية تعمل.
 - افتح صفحة منتج (مثلاً `/mobiles/oppo-a6-128gb-4gb/`) — 3 أزرار شراء،
   زر جوميا يحمل `utm_source=JFORCE`، وزر أمازون يحمل الوسام `amazon0c2aca6-21`.
-- لوحة التحكم: `https://3rode.online/admin/` (تحتاج إعداد Apps Script من `admin/SETUP.md`).
+- لوحة التحكم: `https://3rde.online/admin/` (تحتاج إعداد Apps Script من `admin/SETUP.md`).
 - أكمل أقسام 4–7 في `DEPLOY.md`: Search Console + Bing + Publisher Center + الأفلييت + AdSense.
 
 ## 7 — استكشاف الأخطاء

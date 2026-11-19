@@ -1,5 +1,5 @@
 /**
- * عروض أونلاين 3rode.online — Admin backend (Google Apps Script)
+ * عروض أونلاين 3rde.online — Admin backend (Google Apps Script)
  *
  * Binds to the Google Sheet (the single source of truth). The static site
  * is generated from this sheet; this script is the ONLY writer to the
@@ -22,7 +22,7 @@
  *   الأدلة (Guides) · الأخبار (News)
  */
 
-var ADMIN_EMAIL = 'da3m@3rode.online';
+var ADMIN_EMAIL = 'da3m@3rde.online';
 var SHEET_PRODUCTS = 'الورقة1';
 var SHEET_HISTORY = 'سجل الأسعار';
 var SHEET_SETTINGS = 'الإعدادات';
@@ -36,8 +36,8 @@ var SHEET_NEWS = 'الأخبار';
 
 var SETTINGS_DEFAULTS = [
   ['site_name', 'عروض أونلاين'],
-  ['site_domain', '3rode.online'],
-  ['contact_email', 'da3m@3rode.online'],
+  ['site_domain', '3rde.online'],
+  ['contact_email', 'da3m@3rde.online'],
   ['currency', 'EGP'],
   ['sync_frequency', 'hourly'],
   ['amazon_associates_tag', 'amazon0c2aca6-21'],
@@ -374,7 +374,7 @@ function weeklyReport() {
   clicks.forEach(function (r) { byModel[r[2]] = (byModel[r[2]] || 0) + 1; });
   var top = Object.keys(byModel).sort(function (a, b) { return byModel[b] - byModel[a]; }).slice(0, 5);
   var lines = [
-    'التقرير الأسبوعي — عروض أونلاين 3rode.online',
+    'التقرير الأسبوعي — عروض أونلاين 3rde.online',
     '',
     'نقرات أزرار الشراء هذا الأسبوع: ' + clicks.length,
     'أكثر المنتجات نقراً:',

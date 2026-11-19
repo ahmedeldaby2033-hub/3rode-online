@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Sync helpers for 3rode.online — approved audit fixes, applied 2026-11-19.
+"""Sync helpers for 3rde.online — approved audit fixes, applied 2026-11-19.
 
 Fixes implemented here (see docs/audit.md):
   ت-3  Price history is recorded ONLY when the price actually changes
@@ -252,14 +252,14 @@ if __name__ == "__main__":
     ams = build_amazon_search_url("OPPO A6", "amazon0c2aca6-21")
     assert ams == "https://www.amazon.eg/s?k=OPPO+A6&tag=amazon0c2aca6-21", ams
     print("Amazon auto-search link OK:", ams)
-    assert build_amazon_product_url("B0CX123456", "3rode-21") == \
-        "https://www.amazon.eg/dp/B0CX123456/?tag=3rode-21"
-    assert build_amazon_search_url("OPPO A6", "3rode-21") == \
-        "https://www.amazon.eg/s?k=OPPO+A6&tag=3rode-21"
-    assert amazon_tag_is_valid("3rode-21") is True
-    assert amazon_tag_is_valid("3rode-20") is False  # US tag: earns nothing on .eg
+    assert build_amazon_product_url("B0CX123456", "3rde-21") == \
+        "https://www.amazon.eg/dp/B0CX123456/?tag=3rde-21"
+    assert build_amazon_search_url("OPPO A6", "3rde-21") == \
+        "https://www.amazon.eg/s?k=OPPO+A6&tag=3rde-21"
+    assert amazon_tag_is_valid("3rde-21") is True
+    assert amazon_tag_is_valid("3rde-20") is False  # US tag: earns nothing on .eg
     try:
-        build_amazon_product_url("B0CX123456", "3rode-20")
+        build_amazon_product_url("B0CX123456", "3rde-20")
         raise AssertionError("a -20 tag must be rejected")
     except ValueError as e:
         print("Amazon -20 tag rejected OK:", e)

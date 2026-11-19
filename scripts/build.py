@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Static site generator for 3rode.online (عروض أونلاين).
+"""Static site generator for 3rde.online (عروض أونلاين).
 
 Reads data/raw/*.json (exported from the Google Sheet — the single source
 of truth) + data/coupons.json + data/guides.json + data/news.json +
@@ -125,7 +125,7 @@ def check_no_forbidden(text, where):
 # objects). Normalize here so the generator works with both.
 SETTINGS = load_json(BASE / "settings.json")
 SITE_NAME = SETTINGS["site_name"]
-DOMAIN = SETTINGS.get("domain") or SETTINGS.get("site_domain", "3rode.online")
+DOMAIN = SETTINGS.get("domain") or SETTINGS.get("site_domain", "3rde.online")
 BASE_URL = (SETTINGS.get("base_url") or f"https://{DOMAIN}").rstrip("/")
 EMAIL = SETTINGS["contact_email"]
 
@@ -490,7 +490,8 @@ def head_html(title, desc, canonical, og_image=None, noindex=False,
 <meta property="og:title" content="{esc(title)}">
 <meta property="og:description" content="{esc(desc)}">
 <meta property="og:url" content="{esc(canonical)}">
-{og}<link rel="icon" href="/assets/logo.png">
+{og}<link rel="icon" href="/assets/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/assets/icon-192.png">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0b5ed7">
 <link rel="stylesheet" href="/assets/style.css">
@@ -1285,7 +1286,7 @@ def write_manifest():
                   {"src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png"}],
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     (SITE / "sw.js").write_text(
-        "const CACHE='ro3de-v1';const CORE=['/','/assets/style.css','/assets/app.js',"
+        "const CACHE='r3de-v1';const CORE=['/','/assets/style.css','/assets/app.js',"
         "'/assets/logo.png','/assets/icon-192.png','/assets/icon-512.png'];\n"
         "self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});\n"
         "self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});\n"
@@ -1305,7 +1306,7 @@ def main():
     images_backup = None
     if (SITE / "images").exists():
         import tempfile
-        images_backup = Path(tempfile.mkdtemp(prefix="ro3de-images-")) / "images"
+        images_backup = Path(tempfile.mkdtemp(prefix="r3de-images-")) / "images"
         shutil.copytree(SITE / "images", images_backup)
     if SITE.exists():
         shutil.rmtree(SITE)
@@ -1323,7 +1324,7 @@ def main():
     (SITE / "images" / "originals").mkdir(parents=True)
 
     # assets (copy, don't regenerate)
-    for f in ["style.css", "app.js", "logo.png", "icon-192.png", "icon-512.png"]:
+    for f in ["style.css", "app.js", "logo.png", "icon-192.png", "icon-512.png", "favicon.png"]:
         shutil.copy2(BASE / "assets" / f, SITE / "assets" / f)
     # restore preserved product images from the previous build
     if images_backup is not None:

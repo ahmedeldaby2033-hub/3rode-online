@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Hourly sync for 3rode.online (عروض أونلاين).
+"""Hourly sync for 3rde.online (عروض أونلاين).
 
 What it does, in order:
   1. Refresh data/raw/*.json from the Google Sheet when possible

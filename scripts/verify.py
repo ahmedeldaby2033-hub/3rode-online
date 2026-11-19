@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verification for the 3rode.online build (run after scripts/build.py).
+"""Verification for the 3rde.online build (run after scripts/build.py).
 
 Checks (all must pass):
   1. Every generated HTML page parses (tag balance).
@@ -216,7 +216,7 @@ def main():
         check((SITE / name / "index.html").exists(), f"policy page missing: {name}")
     for f in [SITE / "privacy" / "index.html"]:
         t = f.read_text(encoding="utf-8")
-        check("da3m@3rode.online" in t, "contact email missing from policy page")
+        check("da3m@3rde.online" in t, "contact email missing from policy page")
 
     # required files
     for rel in ["robots.txt", "sitemap.xml", "news-sitemap.xml", "manifest.json",

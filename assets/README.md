@@ -1,4 +1,4 @@
-# عروض أونلاين — 3rode.online — assets
+# عروض أونلاين — 3rde.online — assets
 
 Prepared 2026-11-19 (research stage, before build go-ahead).
 
@@ -29,14 +29,14 @@ Prepared 2026-11-19 (research stage, before build go-ahead).
   position bottom-right (changeable in settings later).
 - Watermark assets (all built from `logo.png`):
   `watermark-full.png` (whole logo), `watermark-text.png`
-  ("3rode.online" text only), `watermark-icon.png` (cart with % tag only).
+  ("3rde.online" text only), `watermark-icon.png` (cart with % tag only).
 - Demos (real product photo: OPPO A6 from the sheet's Mobizil image,
   500×500): `../watermark-samples/demo-A-full-logo.jpg`,
   `demo-B-text-strip.jpg`, `demo-C-cart-icon.jpg`. Visually verified
   2026-11-19: no grey box on any style; A is small and legible in the
   bottom-right corner; B's dark strip is the most visible but covers the
   bottom ~12% of the product photo; C is the most discreet.
-- **Style chosen by the user 2026-11-19: B** — "3rode.online" text in a
+- **Style chosen by the user 2026-11-19: B** — "3rde.online" text in a
   dark strip at the bottom. The script default is now B; the strip was
   refined the same day (slimmer bar, text widened to 62% of image width)
   and the final demo re-verified visually.
@@ -46,6 +46,6 @@ Prepared 2026-11-19 (research stage, before build go-ahead).
   User has not yet answered: keep the W, or replace it with a generic cart
   icon. A W-free variant needs redrawing/inpainting — not done here.
 - Build go-ahead itself is still pending (asked in main chat 2026-11-19).
-- Domain 3rode.online: no live site found in web search 2026-11-19;
+- Domain 3rde.online: no live site found in web search 2026-11-19;
   registration status was NOT verified — check at the registrar before
   assuming it is owned/available.

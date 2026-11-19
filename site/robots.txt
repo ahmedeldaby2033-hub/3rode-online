@@ -4,4 +4,4 @@ Disallow: /admin/
 Disallow: /search/
 Disallow: /compare/
 Disallow: /guides/
-Sitemap: https://3rode.online/sitemap.xml
+Sitemap: https://3rde.online/sitemap.xml

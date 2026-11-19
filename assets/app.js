@@ -1,4 +1,4 @@
-/* عروض أونلاين 3rode.online — client-side behaviour (vanilla JS, deferred).
+/* عروض أونلاين 3rde.online — client-side behaviour (vanilla JS, deferred).
    All catalogue content is rendered server-side in static HTML; this file
    only adds interaction: filters, sorting, favorites, compare, dark mode,
    installments, sharing, coupons, cookie consent, click tracking.
@@ -28,19 +28,19 @@
   /* ---------- dark mode ---------- */
   var themeBtn = $('#theme-toggle');
   var savedTheme = null;
-  try { savedTheme = localStorage.getItem('ro3de-theme'); } catch (e) {}
+  try { savedTheme = localStorage.getItem('r3de-theme'); } catch (e) {}
   if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
   if (themeBtn) themeBtn.addEventListener('click', function () {
     var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
-    try { localStorage.setItem('ro3de-theme', next); } catch (e) {}
+    try { localStorage.setItem('r3de-theme', next); } catch (e) {}
     themeBtn.textContent = next === 'dark' ? '☀️ الوضع النهاري' : '🌙 الوضع الليلي';
   });
 
   /* ---------- favorites (no registration, localStorage) ---------- */
   var favs = {};
-  try { favs = JSON.parse(localStorage.getItem('ro3de-favs') || '{}'); } catch (e) { favs = {}; }
-  function saveFavs() { try { localStorage.setItem('ro3de-favs', JSON.stringify(favs)); } catch (e) {} }
+  try { favs = JSON.parse(localStorage.getItem('r3de-favs') || '{}'); } catch (e) { favs = {}; }
+  function saveFavs() { try { localStorage.setItem('r3de-favs', JSON.stringify(favs)); } catch (e) {} }
   function refreshFavButtons() {
     $all('[data-fav]').forEach(function (b) {
       var on = !!favs[b.getAttribute('data-fav')];
@@ -60,9 +60,9 @@
 
   /* ---------- compare (2–3 phones) ---------- */
   var cmp = [];
-  try { cmp = JSON.parse(localStorage.getItem('ro3de-compare') || '[]'); } catch (e) { cmp = []; }
+  try { cmp = JSON.parse(localStorage.getItem('r3de-compare') || '[]'); } catch (e) { cmp = []; }
   var bar = $('#compare-bar'), barList = $('#compare-list');
-  function saveCmp() { try { localStorage.setItem('ro3de-compare', JSON.stringify(cmp)); } catch (e) {} }
+  function saveCmp() { try { localStorage.setItem('r3de-compare', JSON.stringify(cmp)); } catch (e) {} }
   function refreshCmpBar() {
     if (!bar) return;
     if (!cmp.length) { bar.classList.remove('show'); return; }
@@ -252,11 +252,11 @@
   /* ---------- cookie consent ---------- */
   var banner = $('#cookie-banner');
   var consent = null;
-  try { consent = localStorage.getItem('ro3de-consent'); } catch (e) {}
+  try { consent = localStorage.getItem('r3de-consent'); } catch (e) {}
   if (banner && !consent) banner.classList.add('show');
   var okBtn = $('#cookie-ok');
   if (okBtn) okBtn.addEventListener('click', function () {
-    try { localStorage.setItem('ro3de-consent', 'yes'); } catch (e) {}
+    try { localStorage.setItem('r3de-consent', 'yes'); } catch (e) {}
     banner.classList.remove('show');
   });
 
