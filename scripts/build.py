@@ -511,8 +511,6 @@ def head_html(title, desc, canonical, og_image=None, noindex=False,
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0b5ed7">
 <link rel="stylesheet" href="/assets/style.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
 {verif}{ga}{extra}"""
 
 
@@ -688,10 +686,10 @@ def build_index():
                    if drops_models else drops_sec)
     cheapest_grid = f'<div class="section-head"><h2>💰 أرخص الهواتف</h2></div>\n<div class="grid">{"".join(card_html(m) for m in cheapest)}</div>'
     cheapest_row = f'<div class="section-head"><h2>💰 أرخص الهواتف</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in cheapest)}</div>'
-    latest_grid = f'<div class="section-head"><h2>🆕 أحدث الهواتف</h2></div>\n<div class="grid">{"".join(card_html(m) for m in latest)}</div>'
-    latest_row = f'<div class="section-head"><h2>🆕 أحدث الهواتف</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in latest)}</div>'
-    latest_feat = f'<div class="section-head"><h2>🆕 أحدث الهواتف</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in latest)}</div>'
-    latest_list = f'<div class="section-head"><h2>🆕 أحدث الهواتف</h2></div>\n<div class="cards-list">{"".join(card_html(m) for m in latest)}</div>'
+    latest_grid = f'<div class="section-head"><h2>🆕 أحدث المنتجات</h2></div>\n<div class="grid">{"".join(card_html(m) for m in latest)}</div>'
+    latest_row = f'<div class="section-head"><h2>🆕 أحدث المنتجات</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in latest)}</div>'
+    latest_feat = f'<div class="section-head"><h2>🆕 أحدث المنتجات</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in latest)}</div>'
+    latest_list = f'<div class="section-head"><h2>🆕 أحدث المنتجات</h2></div>\n<div class="cards-list">{"".join(card_html(m) for m in latest)}</div>'
     all_grid = latest_grid + f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="grid" id="models-grid">{cards}</div>'
     all_row = latest_row + f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="row-scroll" id="models-grid">{cards}</div>'
     brands_html = f'<div class="section-head" id="brands"><h2>تسوق حسب الماركة</h2></div>\n<div class="chips">{brand_cards}</div>'
@@ -1467,6 +1465,8 @@ def main():
     # assets (copy, don't regenerate)
     for f in ["style.css", "app.js", "logo.png", "icon-192.png", "icon-512.png", "favicon.png"]:
         shutil.copy2(BASE / "assets" / f, SITE / "assets" / f)
+    # self-hosted Tajawal fonts (woff2)
+    shutil.copytree(BASE / "assets" / "fonts", SITE / "assets" / "fonts", dirs_exist_ok=True)
     # restore preserved product images from the previous build
     if images_backup is not None:
         shutil.copytree(images_backup, SITE / "images", dirs_exist_ok=True)
