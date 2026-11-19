@@ -177,6 +177,15 @@ html[data-theme="dark"] .site-header,
 html[data-theme="dark"] .site-footer { background: #0a1725; }
 html[data-theme="dark"] .page-hero { filter: brightness(.92); }
 html[data-theme="dark"] .btn-buy { filter: brightness(1.05); }
+/* ---- إصلاح تباين الوضع الليلي (نص داكن على خلفية داكنة) ---- */
+html[data-theme="dark"] .card h2,
+html[data-theme="dark"] .card h3 { color: #f1f5f9; }
+html[data-theme="dark"] .note { background: #241d0d; border-color: #6b5518; color: #f5e6b8; }
+html[data-theme="dark"] .note strong { color: #ffd97a; }
+html[data-theme="dark"] table.data th { background: #1b3049; color: #fff; }
+html[data-theme="dark"] input[type="text"], html[data-theme="dark"] input[type="email"],
+html[data-theme="dark"] input[type="number"], html[data-theme="dark"] input[type="tel"],
+html[data-theme="dark"] textarea, html[data-theme="dark"] select { background: #16283d; color: var(--text); }
 
 .wide { max-width: 1180px; }
 .hero-search {
@@ -478,3 +487,34 @@ body.theme-indigo { --blue: #4f46e5; --blue-dark: #312e81; --orange: #f97316; }
 /* ---- إصلاح نصوص السمة الذهبية الداكنة (blue-dark كنص على خلفية داكنة) ---- */
 body.theme-gold .section-head h2, body.theme-gold .card h2, body.theme-gold .card h3 { color: #f1f5f9; }
 body.theme-gold .price { color: #ffd97a; }
+
+/* ================== احترافية الألوان والأيقونات (2026-11-19) ================== */
+/* --- أيقونات SVG مدمجة: حجم موحد، لون يتبع النص، محاذاة عمودية --- */
+.ic { display: inline-block; width: 1.15em; height: 1.15em; vertical-align: -0.18em; flex: none; }
+.ic svg { display: block; width: 100%; height: 100%; }
+.sec-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 10px; margin-inline-end: 2px;
+  background: linear-gradient(135deg, var(--blue), #0a7cff);
+  color: #fff; box-shadow: 0 2px 8px rgba(11, 94, 215, .35);
+  vertical-align: -8px;
+}
+.sec-icon .ic { width: 19px; height: 19px; vertical-align: 0; }
+.sec-icon.warm { background: linear-gradient(135deg, #fb923c, #ea580c); box-shadow: 0 2px 8px rgba(234, 88, 12, .35); }
+.sec-icon.green { background: linear-gradient(135deg, #22c55e, #15803d); box-shadow: 0 2px 8px rgba(21, 128, 61, .35); }
+.sec-icon.rose { background: linear-gradient(135deg, #f43f5e, #be123c); box-shadow: 0 2px 8px rgba(190, 18, 60, .35); }
+.section-head h2 { display: flex; align-items: center; gap: 10px; }
+/* --- أزرار الماركات: لمسة احترافية (لون فقط، دون تغيير السلوك) --- */
+.chip { transition: border-color .15s ease, background .15s ease, transform .15s ease, box-shadow .15s ease; }
+.chip:hover { border-color: var(--blue); box-shadow: 0 2px 10px rgba(11, 94, 215, .18); transform: translateY(-1px); }
+.chip.on { box-shadow: 0 2px 10px rgba(11, 94, 215, .35); }
+.brand-tiles .chip:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
+/* --- جدول العروض: شارة «الأرخص» بأيقونة بدل الإيموجي --- */
+.best-badge { display: inline-flex; align-items: center; gap: 5px; font-weight: 800; color: #b45309; }
+html[data-theme="dark"] .best-badge { color: #fbbf24; }
+.best-badge .ic { width: 1em; height: 1em; vertical-align: -0.12em; }
+/* --- أزرار الأيقونات في الهيدر --- */
+.nav-toggle .ic, .theme-toggle .ic { width: 1.15em; height: 1.15em; vertical-align: -0.18em; }
+/* --- لوحة ألوان داكنة أعمق وأكثر اتساقاً --- */
+html[data-theme="dark"] { --bg: #0b1420; --card: #121e2e; --border: #22364d; --muted: #a6b7cb; }
+html[data-theme="dark"] .pcard img, html[data-theme="dark"] .product-img { background: #fff; }
