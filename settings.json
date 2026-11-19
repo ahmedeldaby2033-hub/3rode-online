@@ -39,5 +39,22 @@
   "notifications": {
     "onesignal_app_id": "",
     "telegram_bot": ""
-  }
+  },
+  "stores": [
+    {
+      "name": "جوميا مصر",
+      "logo": "https://logo.clearbit.com/jumia.com.eg?size=128",
+      "url": "https://jforce.jumia.com.eg/s/C4i51XK"
+    },
+    {
+      "name": "أمازون مصر",
+      "logo": "https://logo.clearbit.com/amazon.eg?size=128",
+      "url": "https://www.amazon.eg/?tag=amazon0c2aca6-21"
+    },
+    {
+      "name": "نون مصر",
+      "logo": "https://logo.clearbit.com/noon.com?size=128",
+      "url": "https://www.noon.com/egypt-en/"
+    }
+  ]
 }

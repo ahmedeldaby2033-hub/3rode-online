@@ -110,6 +110,25 @@ def refresh_from_sheet():
                             json.dumps(SETTINGS, ensure_ascii=False, indent=2),
                             encoding="utf-8")
                         log("home-layout", f"adopted {_hl} from Sheet settings")
+                # Adopt the stores chosen in the admin panel
+                # (Sheet tab "الإعدادات" -> settings.json -> build.py).
+                _stores_raw = str((payload.get("settings") or {}).get(
+                    "stores_json", "") or "").strip()
+                if _stores_raw:
+                    try:
+                        _stores = json.loads(_stores_raw)
+                        if (isinstance(_stores, list)
+                                and SETTINGS.get("stores") != _stores):
+                            SETTINGS["stores"] = _stores
+                            (BASE / "settings.json").write_text(
+                                json.dumps(SETTINGS, ensure_ascii=False,
+                                           indent=2),
+                                encoding="utf-8")
+                            log("stores",
+                                f"adopted {len(_stores)} stores from "
+                                "Sheet settings")
+                    except Exception:
+                        pass
             except Exception as e:  # noqa: BLE001
                 LOG["errors"].append(f"apps script export: {e}")
     log("refresh-sheet", "refreshed" if refreshed else "kept existing exports")
