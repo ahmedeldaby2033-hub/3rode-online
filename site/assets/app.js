@@ -234,6 +234,10 @@
     postToAdmin('requestProduct', {
       model: $('#request-model').value || '',
       budget: $('#request-budget').value || '',
+      // The backend stores the contact value in the Requests sheet's
+      // contact column (body.email); send the WhatsApp number there
+      // (and as whatsapp for forward-compatibility).
+      email: $('#request-whatsapp').value || '',
       whatsapp: $('#request-whatsapp').value || ''
     }, 'شكراً! سجلنا طلبك وسنضيف المنتج عند توفره.');
     reqForm.reset();

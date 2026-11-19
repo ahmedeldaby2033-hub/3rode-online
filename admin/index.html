@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/assets/favicon.png">
 <title>لوحة تحكم — عروض أونلاين</title>
 <style>
 :root{--bg:#f4f6fb;--surface:#fff;--text:#101828;--muted:#667085;--border:#e4e7ec;--accent:#0b3d91;--green:#067647;--red:#b42318;--amber:#b54708}
@@ -44,6 +45,12 @@ section.tab.active{display:block}
 #toast{position:fixed;bottom:20px;right:20px;background:#101828;color:#fff;padding:12px 18px;border-radius:10px;display:none;z-index:99}
 .error{color:var(--red);font-weight:600}
 .ok{color:var(--green);font-weight:600}
+.stat-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+.stat{background:#f9fafb;border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.stat-num{font-size:26px;font-weight:800;color:var(--accent)}
+.stat-label{color:var(--muted);font-size:13px;margin-top:2px}
+.warn-banner{background:#fef0c7;border:1px solid #fdb022;color:#7a3c06;border-radius:10px;padding:12px 14px;margin-bottom:16px}
+.steps li{margin-bottom:8px;line-height:1.7}
 </style>
 </head>
 <body>
@@ -53,11 +60,13 @@ section.tab.active{display:block}
 </header>
 <main>
 
-<!-- ============ CONFIG: paste the Apps Script web app URL here ============ -->
+<!-- ============ CONFIG: Apps Script web app URL ============
+     الطريقة المفضلة الآن: الصق الرابط من تبويب «الإعداد والربط» داخل اللوحة
+     (يُحفظ في متصفحك). السطر أدناه احتياطي فقط لمن يريد تثبيت الرابط في الملف. ============ -->
 <script>
 var APPS_SCRIPT_URL = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE"; // مثال: https://script.google.com/macros/s/AKfy.../exec
 var SHEET_ID = "1VeOXP8ly-W0dwT0QQK9kqf9z_834zok9ekIqGjfPNdE";
-var token = sessionStorage.getItem("admin_token") || "";
+var token = sessionStorage.getItem("admin_token") || localStorage.getItem("r3de_admin_token") || "";
 // window.SETTINGS is filled from the backend after login; the store-search
 // buttons below read it at CLICK time (not at page load).
 window.SETTINGS = { amazon_associates_tag: "amazon0c2aca6-21", jumia_tracking_params: {} };
@@ -65,7 +74,7 @@ window.SETTINGS = { amazon_associates_tag: "amazon0c2aca6-21", jumia_tracking_pa
 
 <div class="card" id="login-card">
   <h2>تسجيل الدخول</h2>
-  <p class="hint">بيانات الدخول الافتراضية: اسم المستخدم <b>admin</b> وكلمة المرور <b>admin</b> — غيّر كلمة المرور من تبويب «الإعدادات والإعلانات» بعد الدخول. رمز Apps Script اختياري هنا، ويُفعّل ربط الشيت فقط بعد نشر Apps Script.</p>
+  <p class="hint">بيانات الدخول الافتراضية: اسم المستخدم <b>admin</b> وكلمة المرور <b>admin</b> — غيّر كلمة المرور من تبويب «الإعدادات والإعلانات» بعد الدخول. رمز Apps Script اختياري هنا، ويُفعّل ربط الشيت فقط بعد نشر Apps Script — والربط نفسه يتم من تبويب «الإعداد والربط» بعد الدخول (لا حاجة لتعديل الملف).</p>
   <div class="row">
     <div><label for="login-user">اسم المستخدم</label>
     <input type="text" id="login-user" dir="ltr" value="admin" autocomplete="username"></div>
@@ -81,9 +90,12 @@ window.SETTINGS = { amazon_associates_tag: "amazon0c2aca6-21", jumia_tracking_pa
 </div>
 
 <div id="admin" style="display:none">
+  <div id="default-pass-banner" class="warn-banner" style="display:none">⚠️ كلمة مرور لوحة التحكم ما زالت الافتراضية (<b>admin</b>). غيّرها الآن من تبويب «الإعدادات والإعلانات» ← «تغيير كلمة مرور لوحة التحكم». <button class="btn-ghost" onclick="showTab(event,'tab-settings')">تغيير كلمة المرور</button></div>
   <div class="tabs">
-    <button class="active" onclick="showTab(event,'tab-overview')">نظرة عامة</button>
+    <button class="active" onclick="showTab(event,'tab-setup')">الإعداد والربط</button>
+    <button onclick="showTab(event,'tab-overview')">نظرة عامة</button>
     <button onclick="showTab(event,'tab-products')">المنتجات</button>
+    <button onclick="showTab(event,'tab-inbox')">الطلبات والبلاغات</button>
     <button onclick="showTab(event,'tab-coupons')">الكوبونات</button>
     <button onclick="showTab(event,'tab-settings')">الإعدادات والإعلانات</button>
     <button onclick="showTab(event,'tab-guides')">الأدلة</button>
@@ -91,8 +103,34 @@ window.SETTINGS = { amazon_associates_tag: "amazon0c2aca6-21", jumia_tracking_pa
     <button onclick="showTab(event,'tab-logs')">سجل المزامنة والأسعار</button>
   </div>
 
-  <section class="tab active" id="tab-overview">
+  <section class="tab active" id="tab-setup">
+    <div class="card"><h2>الإعداد والربط — Apps Script</h2>
+      <p>حالة الاتصال: <b id="conn-status">غير معروف</b> &nbsp; <button class="btn-ghost" onclick="testConnection()">اختبار الاتصال</button></p>
+      <p class="hint">ما هو رابط Apps Script؟ هو عنوان تطبيق الويب الخاص بملف <b>Code.gs</b> المربوط بالشيت — اللوحة تتحدث مع الشيت من خلاله (قراءة وكتابة المنتجات والكوبونات والإعدادات، واستقبال الطلبات والبلاغات). بدونه تعمل اللوحة في وضع العرض فقط وتظهر رسالة «ألصق رابط تطبيق Apps Script أولاً».</p>
+      <h3>خطوات الحصول عليه (مرة واحدة — نحو 5 دقائق)</h3>
+      <ol class="steps">
+        <li>افتح <a href="https://docs.google.com/spreadsheets/d/1VeOXP8ly-W0dwT0QQK9kqf9z_834zok9ekIqGjfPNdE" target="_blank" rel="noopener">الشيت</a> ← من القائمة <b>Extensions ← Apps Script</b> (الإضافات ← برمجة التطبيقات).</li>
+        <li>احذف محتوى ملف <b>Code.gs</b> الافتراضي، والصق محتوى ملف <a href="https://github.com/ahmedeldaby2033-hub/3rode-online/blob/main/admin/Code.gs" target="_blank" rel="noopener">admin/Code.gs من GitHub</a> كاملاً، ثم احفظ (Ctrl+S).</li>
+        <li>في المحرر: <b>Project Settings ← Script Properties ← Add script property</b> — الاسم <code>ADMIN_TOKEN</code> والقيمة كلمة سر قوية من اختيارك. هذا هو «رمز المدير».</li>
+        <li>في المحرر، اختر الدالة <b>setupTabs</b> من قائمة الدوال واضغط <b>Run</b> ووافق على الأذونات — سيُنشئ التبويبات الإضافية في الشيت (الإعدادات، الكوبونات، سجل المزامنة، النقرات، البلاغات، الطلبات، الأدلة، الأخبار).</li>
+        <li><b>Deploy ← New deployment ← Web app</b> — التنفيذ باسمك (Me) والوصول للجميع (Anyone) — ثم انسخ الرابط الذي ينتهي بـ <code>/exec</code> والصقه في الخانة بالأسفل.</li>
+      </ol>
+      <div class="row">
+        <div><label for="setup-url">رابط تطبيق Apps Script (ينتهي بـ /exec)</label>
+        <input type="url" id="setup-url" dir="ltr" placeholder="https://script.google.com/macros/s/AKfy.../exec"></div>
+        <div><label for="setup-token">رمز المدير ADMIN_TOKEN</label>
+        <input type="text" id="setup-token" dir="ltr" placeholder="ADMIN_TOKEN" autocomplete="off"></div>
+      </div>
+      <p><button class="btn-green" onclick="saveConnection()">حفظ واختبار الاتصال</button>
+      <button class="btn-ghost" onclick="openCodeGs()">فتح كود Code.gs (للنسخ)</button></p>
+      <p id="setup-msg"></p>
+      <p class="hint">يُحفظ الرابط والرمز في هذا المتصفح فقط (localStorage) — لا يُرفعان مع ملفات الموقع ولا يراهما أي زائر. إن غيّرت المتصفح أو الجهاز أعد لصقهما هنا.</p>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-overview">
     <div class="card"><h2>نظرة عامة</h2>
+      <div class="stat-cards" id="stat-cards"></div>
       <p id="overview-stats">جارٍ التحميل…</p>
       <p><button class="btn" onclick="syncNow()">مزامنة الآن (طلب تحديث)</button>
       <button class="btn-ghost" onclick="loadOverview()">تحديث الأرقام</button></p>
@@ -109,7 +147,8 @@ window.SETTINGS = { amazon_associates_tag: "amazon0c2aca6-21", jumia_tracking_pa
         <div><label for="prod-brand">العلامة</label><select id="prod-brand"><option value="">كل العلامات</option></select></div>
       </div>
       <p><button class="btn" onclick="loadProducts()">بحث</button>
-      <button class="btn-ghost" onclick="newProduct()">+ إضافة منتج جديد</button></p>
+      <button class="btn-ghost" onclick="newProduct()">+ إضافة منتج جديد</button>
+      <button class="btn-ghost" onclick="exportProductsCSV()">تصدير CSV</button></p>
       <div id="products-table">—</div>
     </div>
 
@@ -226,6 +265,18 @@ window.SETTINGS = { amazon_associates_tag: "amazon0c2aca6-21", jumia_tracking_pa
     </div>
   </section>
 
+  <section class="tab" id="tab-inbox">
+    <div class="card"><h2>طلبات منتجات غير موجودة</h2>
+      <p><input type="text" id="inbox-q" placeholder="بحث بالمنتج أو رقم التواصل…" oninput="renderInbox()">
+      <label style="display:inline;font-weight:400"><input type="checkbox" id="inbox-show-handled" onchange="renderInbox()"> إظهار المعالَجة</label></p>
+      <div id="inbox-requests">—</div>
+    </div>
+    <div class="card"><h2>بلاغات أسعار خاطئة</h2>
+      <div id="inbox-reports">—</div>
+      <p><button class="btn-ghost" onclick="loadInbox()">تحديث القائمتين</button></p>
+    </div>
+  </section>
+
   <section class="tab" id="tab-coupons">
     <div class="card"><h2>الكوبونات</h2>
       <div id="coupons-table">—</div>
@@ -325,11 +376,18 @@ window.SETTINGS = { amazon_associates_tag: "amazon0c2aca6-21", jumia_tracking_pa
 <script>
 function toast(msg){var t=document.getElementById("toast");t.textContent=msg;t.style.display="block";setTimeout(function(){t.style.display="none"},3000)}
 function showTab(ev,id){document.querySelectorAll(".tabs button").forEach(function(b){b.classList.remove("active")});ev.target.classList.add("active");document.querySelectorAll("section.tab").forEach(function(s){s.classList.remove("active")});document.getElementById(id).classList.add("active");
-  if(id==="tab-coupons")loadCoupons(); if(id==="tab-guides")loadGuides(); if(id==="tab-news")loadNews(); if(id==="tab-logs")loadLogs();}
+  if(id==="tab-coupons")loadCoupons(); if(id==="tab-guides")loadGuides(); if(id==="tab-news")loadNews(); if(id==="tab-logs")loadLogs(); if(id==="tab-inbox")loadInbox(); if(id==="tab-setup")renderSetupStatus();}
 
+function getAppsScriptUrl(){
+  var s = "";
+  try{ s = localStorage.getItem("r3de_apps_script_url") || ""; }catch(e){}
+  if(s) return s;
+  return (typeof APPS_SCRIPT_URL !== "undefined") ? APPS_SCRIPT_URL : "";
+}
 async function api(action, body){
-  if(APPS_SCRIPT_URL.indexOf("PASTE_YOUR")===0){throw new Error("ألصق رابط تطبيق Apps Script أولاً في أعلى الملف (APPS_SCRIPT_URL)")}
-  var url = APPS_SCRIPT_URL + "?action=" + encodeURIComponent(action) + "&token=" + encodeURIComponent(token);
+  var base = getAppsScriptUrl();
+  if(!base || base.indexOf("PASTE_YOUR")===0){throw new Error("لم يتم ربط Apps Script بعد — افتح تبويب «الإعداد والربط» والصق رابط تطبيق الويب (ينتهي بـ /exec) ثم اضغط «حفظ واختبار الاتصال»")}
+  var url = base + "?action=" + encodeURIComponent(action) + "&token=" + encodeURIComponent(token);
   var opts = {method: body ? "POST" : "GET", redirect: "follow"};
   if(body){opts.headers = {"Content-Type":"text/plain;charset=utf-8"}; opts.body = JSON.stringify(body);}
   var res = await fetch(url, opts);
@@ -362,6 +420,14 @@ function enterAdmin(){
   document.getElementById("login-card").style.display = "none";
   document.getElementById("admin").style.display = "block";
   document.getElementById("logout-btn").style.display = "";
+  renderSetupStatus();
+  checkDefaultPass();
+}
+async function checkDefaultPass(){
+  var banner = document.getElementById("default-pass-banner");
+  try{
+    banner.style.display = (storedPassHash() === await hashPass("admin")) ? "block" : "none";
+  }catch(e){ banner.style.display = "none"; }
 }
 function logout(){
   sessionStorage.removeItem("r3de_admin_session");
@@ -413,12 +479,53 @@ async function login(){
   try{ await loadBackend(); }
   catch(err){
     document.getElementById("overview-stats").innerHTML =
-      "لوحة التحكم تعمل دون اتصال بالشيت حالياً — انشر Apps Script وألصق رابطه أعلى الملف لتفعيل المزامنة والإعدادات.";
+      "لوحة التحكم تعمل دون اتصال بالشيت حالياً — انشر Apps Script واربطه من تبويب «الإعداد والربط» لتفعيل المزامنة والإعدادات.";
     document.getElementById("settings-form").innerHTML = "غير متاحة قبل ربط Apps Script.";
   }
 }
 
 function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;")}
+
+/* ---------------- setup & connection ---------------- */
+function setupFields(){
+  try{
+    document.getElementById("setup-url").value = localStorage.getItem("r3de_apps_script_url") || "";
+    document.getElementById("setup-token").value = localStorage.getItem("r3de_admin_token") || token || "";
+  }catch(e){}
+}
+function renderSetupStatus(){
+  setupFields();
+  var u = getAppsScriptUrl();
+  document.getElementById("conn-status").textContent =
+    (!u || u.indexOf("PASTE_YOUR")===0) ? "غير مرتبط بعد" : "مرتبط: " + u.slice(0, 60) + "…";
+}
+function openCodeGs(){ window.open("https://github.com/ahmedeldaby2033-hub/3rode-online/blob/main/admin/Code.gs", "_blank"); }
+async function testConnection(){
+  var msg = document.getElementById("setup-msg");
+  try{
+    var s = await api("settings");
+    document.getElementById("conn-status").innerHTML = '<span class="ok">متصل ✓ — الموقع: ' + esc((s.settings && s.settings.site_name) || "عروض أونلاين") + '</span>';
+    msg.innerHTML = '<span class="ok">تم الاتصال بنجاح. المنتجات والكوبونات والإعدادات والسجلات مفعّلة الآن.</span>';
+    loadBackend();
+  }catch(err){
+    document.getElementById("conn-status").innerHTML = '<span class="error">غير متصل</span>';
+    msg.innerHTML = '<span class="error">' + esc(err.message) + '</span>';
+  }
+}
+async function saveConnection(){
+  var url = document.getElementById("setup-url").value.trim();
+  var tk = document.getElementById("setup-token").value.trim();
+  var msg = document.getElementById("setup-msg");
+  if(!url || url.indexOf("https://script.google.com/macros/s/") !== 0 || url.indexOf("/exec") === -1){
+    msg.innerHTML = '<span class="error">الصق رابط تطبيق ويب صحيحاً يبدأ بـ https://script.google.com/macros/s/ وينتهي بـ /exec</span>';
+    return;
+  }
+  try{
+    localStorage.setItem("r3de_apps_script_url", url);
+    if(tk){ localStorage.setItem("r3de_admin_token", tk); token = tk; sessionStorage.setItem("admin_token", tk); }
+  }catch(e){}
+  testConnection();
+}
 
 /* ---------------- overview ---------------- */
 async function loadOverview(){
@@ -426,6 +533,22 @@ async function loadOverview(){
     var clicks = await api("clicks");
     var reports = await api("reports");
     var requests = await api("requests");
+    var prod = await api("products");
+    var models = {}, brands = {};
+    (prod.rows || []).forEach(function(r){ models[r[2]+"|"+r[3]+"|"+r[13]+"|"+r[14]] = 1; brands[r[2]] = 1; });
+    var pendingReq = requests.rows.filter(function(r){ return !isHandled("req", r); }).length;
+    var pendingRep = reports.rows.filter(function(r){ return !isHandled("rep", r); }).length;
+    var cards = [
+      ["الموديلات", Object.keys(models).length],
+      ["عروض الأسعار", prod.total],
+      ["الماركات", Object.keys(brands).length],
+      ["نقرات الشراء", clicks.total],
+      ["طلبات بانتظار المعالجة", pendingReq],
+      ["بلاغات بانتظار المعالجة", pendingRep]
+    ];
+    document.getElementById("stat-cards").innerHTML = cards.map(function(c){
+      return '<div class="stat"><div class="stat-num">'+c[1]+'</div><div class="stat-label">'+c[0]+'</div></div>';
+    }).join("");
     var top = Object.keys(clicks.byModel||{}).sort(function(a,b){return clicks.byModel[b]-clicks.byModel[a]}).slice(0,5);
     document.getElementById("overview-stats").innerHTML =
       "نقرات أزرار الشراء (كل الفترة): <b>"+clicks.total+"</b> — جوميا: <b>"+(clicks.byStore["جوميا"]||0)+
@@ -434,19 +557,80 @@ async function loadOverview(){
     document.getElementById("reports-list").innerHTML = reports.rows.length ?
       "<table><tr><th>التاريخ</th><th>الموديل</th><th>السعر الصحيح</th><th>ملاحظة</th></tr>"+reports.rows.slice(0,10).map(function(r){return "<tr><td>"+esc(r[0])+"</td><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td>"+esc(r[3])+"</td></tr>"}).join("")+"</table>" : "لا توجد بلاغات.";
     document.getElementById("requests-list").innerHTML = requests.rows.length ?
-      "<table><tr><th>التاريخ</th><th>الموديل</th><th>الميزانية</th><th>البريد</th></tr>"+requests.rows.slice(0,10).map(function(r){return "<tr><td>"+esc(r[0])+"</td><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td>"+esc(r[3])+"</td></tr>"}).join("")+"</table>" : "لا توجد طلبات.";
+      "<table><tr><th>التاريخ</th><th>الموديل</th><th>الميزانية</th><th>تواصل</th></tr>"+requests.rows.slice(0,10).map(function(r){return "<tr><td>"+esc(r[0])+"</td><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td>"+esc(r[3])+"</td></tr>"}).join("")+"</table>" : "لا توجد طلبات.";
   }catch(err){document.getElementById("overview-stats").innerHTML='<span class="error">'+err.message+"</span>"}
 }
 async function syncNow(){try{var r=await api("syncNow",{});toast("تم تسجيل طلب المزامنة")}catch(err){toast(err.message)}}
 
+/* ---------------- inbox: requests & reports ---------------- */
+var INBOX_DATA = {requests: [], reports: []};
+function handledKey(kind, r){ return kind + "|" + (r[0] || "") + "|" + (r[1] || ""); }
+function handledSet(kind){
+  try{ return JSON.parse(localStorage.getItem("r3de_handled_" + kind) || "[]"); }catch(e){ return []; }
+}
+function isHandled(kind, r){ return handledSet(kind).indexOf(handledKey(kind, r)) !== -1; }
+function toggleHandled(kind, idx){
+  var rows = kind === "req" ? INBOX_DATA.requests : INBOX_DATA.reports;
+  var r = rows[idx]; if(!r) return;
+  var key = handledKey(kind, r);
+  var s = handledSet(kind);
+  var i = s.indexOf(key);
+  if(i === -1) s.push(key); else s.splice(i, 1);
+  try{ localStorage.setItem("r3de_handled_" + kind, JSON.stringify(s)); }catch(e){}
+  renderInbox(); loadOverview();
+}
+async function loadInbox(){
+  try{
+    var rq = await api("requests"); var rp = await api("reports");
+    INBOX_DATA.requests = rq.rows || []; INBOX_DATA.reports = rp.rows || [];
+    renderInbox();
+  }catch(err){
+    document.getElementById("inbox-requests").innerHTML = '<span class="error">' + esc(err.message) + '</span>';
+  }
+}
+function renderInbox(){
+  var q = (document.getElementById("inbox-q").value || "").toLowerCase();
+  var showHandled = document.getElementById("inbox-show-handled").checked;
+  function table(rows, kind, cols){
+    var kept = [];
+    rows.forEach(function(r, i){
+      if(!showHandled && isHandled(kind, r)) return;
+      if(q && (String(r[1] || "") + " " + String(r[3] || "")).toLowerCase().indexOf(q) === -1) return;
+      kept.push([r, i]);
+    });
+    if(!kept.length) return "لا توجد عناصر مطابقة.";
+    return "<table><tr>" + cols.map(function(c){ return "<th>" + c + "</th>"; }).join("") + "<th></th></tr>" +
+      kept.map(function(pair){
+        var r = pair[0], i = pair[1];
+        return "<tr><td>" + esc(r[0]) + "</td><td>" + esc(r[1]) + "</td><td>" + esc(r[2]) + "</td><td>" + esc(r[3]) + "</td><td><button class='btn-ghost' onclick='toggleHandled(\"" + kind + "\"," + i + ")'>" + (isHandled(kind, r) ? "إعادة" : "تمت المعالجة ✓") + "</button></td></tr>";
+      }).join("") + "</table>";
+  }
+  document.getElementById("inbox-requests").innerHTML = table(INBOX_DATA.requests, "req", ["التاريخ", "المنتج", "الميزانية", "تواصل (واتساب)"]);
+  document.getElementById("inbox-reports").innerHTML = table(INBOX_DATA.reports, "rep", ["التاريخ", "الموديل", "السعر الصحيح", "ملاحظة"]);
+}
+
 /* ---------------- products ---------------- */
 var HEADERS = [];
+var LAST_PRODUCTS = [];
+function csvCell(v){ v = String(v == null ? "" : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+function exportProductsCSV(){
+  if(!LAST_PRODUCTS.length){ toast("ابحث أولاً لتحميل المنتجات"); return; }
+  var lines = [];
+  if(HEADERS.length) lines.push(HEADERS.map(csvCell).join(","));
+  LAST_PRODUCTS.forEach(function(r){ lines.push(r.map(csvCell).join(",")); });
+  var blob = new Blob(["\ufeff" + lines.join("\n")], {type: "text/csv;charset=utf-8"});
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "products-3rde.csv"; a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+  toast("تم تنزيل ملف CSV");
+}
 async function loadProducts(){
   try{
     var q = document.getElementById("prod-search").value;
     var brand = document.getElementById("prod-brand").value;
     var d = await api("products&q="+encodeURIComponent(q)+"&brand="+encodeURIComponent(brand));
     HEADERS = d.headers;
+    LAST_PRODUCTS = d.rows || [];
     var brands = [...new Set(HEADERS ? [] : [])];
     var sel = document.getElementById("prod-brand");
     if(sel.options.length<=1){
@@ -457,8 +641,8 @@ async function loadProducts(){
         var o3=o.cloneNode(true);document.getElementById("brands-list").appendChild(o3);});
     }
     document.getElementById("products-table").innerHTML =
-      "<p>النتائج: <b>"+d.total+"</b></p><table><tr><th>المنتج</th><th>العلامة</th><th>السعر</th><th>المتجر</th><th></th></tr>"+
-      d.rows.map(function(r){return "<tr><td>"+esc(r[0])+"</td><td>"+esc(r[2])+"</td><td>"+esc(r[7])+"</td><td>"+esc(r[5])+"</td><td><button class='btn-ghost' onclick='editProduct("+JSON.stringify(r[4])+')\'>تعديل</button></td></tr>'}).join("")+"</table>";
+      "<p>النتائج: <b>"+d.total+"</b></p><table><tr><th>المنتج</th><th>العلامة</th><th>السعر</th><th>المتجر</th><th>آخر تحديث</th><th></th></tr>"+
+      d.rows.map(function(r){return "<tr><td>"+esc(r[0])+"</td><td>"+esc(r[2])+"</td><td>"+esc(r[7])+"</td><td>"+esc(r[5])+"</td><td>"+esc(r[25])+"</td><td><button class='btn-ghost' onclick='editProduct("+JSON.stringify(r[4])+')\'>تعديل</button></td></tr>'}).join("")+"</table>";
   }catch(err){document.getElementById("products-table").innerHTML='<span class="error">'+err.message+"</span>"}
 }
 function hideProductForm(){document.getElementById("product-form-card").style.display="none"}
@@ -686,7 +870,7 @@ if(sessionStorage.getItem("r3de_admin_session") === "1"){
   enterAdmin();
   loadBackend().catch(function(){
     document.getElementById("overview-stats").innerHTML =
-      "لوحة التحكم تعمل دون اتصال بالشيت حالياً — انشر Apps Script وألصق رابطه أعلى الملف لتفعيل المزامنة والإعدادات.";
+      "لوحة التحكم تعمل دون اتصال بالشيت حالياً — انشر Apps Script واربطه من تبويب «الإعداد والربط» لتفعيل المزامنة والإعدادات.";
     document.getElementById("settings-form").innerHTML = "غير متاحة قبل ربط Apps Script.";
   });
 }
