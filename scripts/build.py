@@ -76,6 +76,45 @@ def esc(s):
     return html.escape(str(s or ""), quote=True)
 
 
+# ------------------------------------------------------------------ icons
+# Professional inline SVG icons (Lucide-style, stroke=currentColor) replacing
+# emoji in headings and buttons. `icon("flame")` -> <span class="ic">...</span>.
+# `sec_icon("flame", "warm")` -> the tinted square chip used in <h2> headings.
+_ICON_PATHS = {
+    # 4-point sparkle (new / latest)
+    "sparkle": '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" fill="currentColor" stroke="none"/>',
+    # flame (hottest deals)
+    "flame": '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+    # price drops
+    "trending-down": '<polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/>',
+    # cheapest (price tag)
+    "tag": '<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/>',
+    # nav menu
+    "menu": '<line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/>',
+    # dark mode toggle
+    "moon": '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+    # install app
+    "download": '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>',
+    # cheapest store badge
+    "trophy": '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
+    # draft warning
+    "alert": '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+}
+
+
+def icon(name):
+    return (f'<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+            f'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+            f'{_ICON_PATHS[name]}</svg></span>')
+
+
+def sec_icon(name, tone=""):
+    cls = "sec-icon" + (f" {tone}" if tone else "")
+    return (f'<span class="{cls}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+            f'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+            f'{_ICON_PATHS[name]}</svg></span>')
+
+
 AR_DIGITS = "٠١٢٣٤٥٦٧٨٩"
 
 
@@ -517,12 +556,12 @@ def head_html(title, desc, canonical, og_image=None, noindex=False,
 def header_html():
     return f"""<header class="site-header"><div class="container wide">
 <a class="brand" href="/"><img src="/assets/logo.png" alt="{esc(SITE_NAME)} {DOMAIN}" width="160" height="55"><span class="brand-name">{esc(SITE_NAME)}</span></a>
-<button id="nav-toggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav">☰ القائمة</button>
+<button id="nav-toggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav">{icon("menu")} القائمة</button>
 <nav class="main-nav" id="main-nav">
 <a href="/">الرئيسية</a><a href="/coupons/">الكوبونات</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/#brands">الماركات</a><a href="/about/">من نحن</a>
 </nav>
-<button id="theme-toggle" class="theme-toggle" type="button">🌙 الوضع الليلي</button>
-<button id="pwa-install" class="theme-toggle" type="button" style="display:none">📲 ثبّت التطبيق</button>
+<button id="theme-toggle" class="theme-toggle" type="button">{icon("moon")} الوضع الليلي</button>
+<button id="pwa-install" class="theme-toggle" type="button" style="display:none">{icon("download")} ثبّت التطبيق</button>
 </div></header>"""
 
 
@@ -675,31 +714,31 @@ def build_index():
 </div>"""
     count_html = f'<div class="muted" id="results-count">عرض {len(MODELS)} هاتفاً</div>'
     chips_html = f'<div class="chips" style="margin:10px 0">{brand_chips}</div>'
-    biggest_grid = f'<div class="section-head"><h2>🔥 أكبر التخفيضات الآن</h2></div>\n<div class="grid">{"".join(card_html(m) for m in biggest)}</div>'
-    biggest_row = f'<div class="section-head"><h2>🔥 أكبر التخفيضات الآن</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in biggest)}</div>'
-    biggest_feat = f'<div class="section-head"><h2>🔥 أكبر التخفيضات الآن</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in biggest)}</div>'
-    drops_sec = f'<div class="section-head"><h2>📉 أحدث انخفاضات الأسعار</h2></div>\n{drops_html}'
+    biggest_grid = f'<div class="section-head"><h2>{sec_icon("flame", "warm")} أكبر التخفيضات الآن</h2></div>\n<div class="grid">{"".join(card_html(m) for m in biggest)}</div>'
+    biggest_row = f'<div class="section-head"><h2>{sec_icon("flame", "warm")} أكبر التخفيضات الآن</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in biggest)}</div>'
+    biggest_feat = f'<div class="section-head"><h2>{sec_icon("flame", "warm")} أكبر التخفيضات الآن</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in biggest)}</div>'
+    drops_sec = f'<div class="section-head"><h2>{sec_icon("trending-down", "green")} أحدث انخفاضات الأسعار</h2></div>\n{drops_html}'
     _bym = {m.model: m for m in MODELS}
     drops_models = [_bym[d["model"]] for d in drops if d["model"] in _bym]
-    drops_cards = (f'<div class="section-head"><h2>📉 أحدث انخفاضات الأسعار</h2></div>\n'
+    drops_cards = (f'<div class="section-head"><h2>{sec_icon("trending-down", "green")} أحدث انخفاضات الأسعار</h2></div>\n'
                    f'<div class="grid grid-featured">{"".join(card_html(m) for m in drops_models)}</div>'
                    if drops_models else drops_sec)
-    cheapest_grid = f'<div class="section-head"><h2>💰 أرخص الهواتف</h2></div>\n<div class="grid">{"".join(card_html(m) for m in cheapest)}</div>'
-    cheapest_row = f'<div class="section-head"><h2>💰 أرخص الهواتف</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in cheapest)}</div>'
-    latest_grid = f'<div class="section-head"><h2>🆕 أحدث المنتجات</h2></div>\n<div class="grid">{"".join(card_html(m) for m in latest)}</div>'
-    latest_row = f'<div class="section-head"><h2>🆕 أحدث المنتجات</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in latest)}</div>'
-    latest_feat = f'<div class="section-head"><h2>🆕 أحدث المنتجات</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in latest)}</div>'
-    latest_list = f'<div class="section-head"><h2>🆕 أحدث المنتجات</h2></div>\n<div class="cards-list">{"".join(card_html(m) for m in latest)}</div>'
+    cheapest_grid = f'<div class="section-head"><h2>{sec_icon("tag", "rose")} أرخص الهواتف</h2></div>\n<div class="grid">{"".join(card_html(m) for m in cheapest)}</div>'
+    cheapest_row = f'<div class="section-head"><h2>{sec_icon("tag", "rose")} أرخص الهواتف</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in cheapest)}</div>'
+    latest_grid = f'<div class="section-head"><h2>{sec_icon("sparkle")} أحدث المنتجات</h2></div>\n<div class="grid">{"".join(card_html(m) for m in latest)}</div>'
+    latest_row = f'<div class="section-head"><h2>{sec_icon("sparkle")} أحدث المنتجات</h2></div>\n<div class="row-scroll">{"".join(card_html(m) for m in latest)}</div>'
+    latest_feat = f'<div class="section-head"><h2>{sec_icon("sparkle")} أحدث المنتجات</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in latest)}</div>'
+    latest_list = f'<div class="section-head"><h2>{sec_icon("sparkle")} أحدث المنتجات</h2></div>\n<div class="cards-list">{"".join(card_html(m) for m in latest)}</div>'
     all_grid = latest_grid + f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="grid" id="models-grid">{cards}</div>'
     all_row = latest_row + f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="row-scroll" id="models-grid">{cards}</div>'
     brands_html = f'<div class="section-head" id="brands"><h2>تسوق حسب الماركة</h2></div>\n<div class="chips">{brand_cards}</div>'
     brands_tiles = f'<div class="section-head" id="brands"><h2>تسوق حسب الماركة</h2></div>\n<div class="brand-tiles">{brand_cards}</div>'
-    biggest_list = f'<div class="section-head"><h2>🔥 أكبر التخفيضات الآن</h2></div>\n<div class="cards-list">{"".join(card_html(m) for m in biggest)}</div>'
-    cheapest_list = f'<div class="section-head"><h2>💰 أرخص الهواتف</h2></div>\n<div class="cards-list">{"".join(card_html(m) for m in cheapest)}</div>'
-    cheapest_feat = f'<div class="section-head"><h2>💰 أرخص الهواتف</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in cheapest)}</div>'
+    biggest_list = f'<div class="section-head"><h2>{sec_icon("flame", "warm")} أكبر التخفيضات الآن</h2></div>\n<div class="cards-list">{"".join(card_html(m) for m in biggest)}</div>'
+    cheapest_list = f'<div class="section-head"><h2>{sec_icon("tag", "rose")} أرخص الهواتف</h2></div>\n<div class="cards-list">{"".join(card_html(m) for m in cheapest)}</div>'
+    cheapest_feat = f'<div class="section-head"><h2>{sec_icon("tag", "rose")} أرخص الهواتف</h2></div>\n<div class="grid grid-featured">{"".join(card_html(m) for m in cheapest)}</div>'
     all_list = latest_list + f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="cards-list" id="models-grid">{cards}</div>'
     all_feat = latest_feat + f'<div class="section-head" id="models"><h2>كل الهواتف ({len(MODELS)})</h2></div>\n<div class="grid grid-featured" id="models-grid">{cards}</div>'
-    drops_row = (f'<div class="section-head"><h2>📉 أحدث انخفاضات الأسعار</h2></div>\n'
+    drops_row = (f'<div class="section-head"><h2>{sec_icon("trending-down", "green")} أحدث انخفاضات الأسعار</h2></div>\n'
                  f'<div class="row-scroll">{"".join(card_html(m) for m in drops_models)}</div>'
                  if drops_models else drops_sec)
     request_html = """<section class="card" style="margin-top:26px">
@@ -715,7 +754,7 @@ def build_index():
 <button class="btn" type="submit">أرسل الطلب</button>
 </form>
 </section>
-<p style="text-align:center"><button class="btn btn-blue" id="pwa-install2" type="button" onclick="document.getElementById('pwa-install').click()">📲 ثبّت الموقع كتطبيق على هاتفك</button></p>"""
+<p style="text-align:center"><button class="btn btn-blue" id="pwa-install2" type="button" onclick="document.getElementById('pwa-install').click()">{icon("download")} ثبّت الموقع كتطبيق على هاتفك</button></p>"""
     if HOME_LAYOUT == "rows":
         # قوائم مدمجة: كل الهواتف أولاً كصف أفقي، والفلاتر في لوحة قابلة للطي
         body = (ad_slot("top")
@@ -898,7 +937,7 @@ def build_product(model):
         rating = num(c(r, "التقييم"))
         rc = int(num(c(r, "عدد التقييمات"), 0) or 0)
         rows_html += f"""<tr class="{'best-row' if i == 0 else ''}">
-<td>{'🥇 الأرخص' if i == 0 else ''} {esc(norm(c(r, 'المتجر (جوميا / أمازون)')))}</td>
+<td>{('<span class="best-badge">' + icon("trophy") + ' الأرخص</span>') if i == 0 else ''} {esc(norm(c(r, 'المتجر (جوميا / أمازون)')))}</td>
 <td>{esc(norm(c(r, 'البائع')))}</td>
 <td><strong>{fmt_price(price)} جنيه</strong></td>
 <td>{fmt_price(old) + ' جنيه' if old else '—'}</td>
@@ -1162,7 +1201,7 @@ def build_guide(g):
     else:
         review_note = """<section class="card"><h2>رأي فريق عروض أونلاين — بانتظار المراجعة البشرية</h2>
 <p>[مسودة] لم تُضف المراجعة البشرية بعد لهذا الدليل: لماذا اخترنا هذه الهواتف؟ ما عيوب كل منها؟ ولمن يناسب كل هاتف؟ لن تُنشر هذه الصفحة لمحركات البحث قبل إكمال المراجعة.</p></section>"""
-    body = f"""<div class="draft-banner">⚠️ مسودة — هذه الصفحة قيد المراجعة البشرية ولم تُنشر بعد لمحركات البحث. الأسعار والجداول مولّدة تلقائياً من بيانات الشيت بتاريخ {esc(g.get('date', TODAY))}.</div>
+    body = f"""<div class="draft-banner">{icon("alert")} مسودة — هذه الصفحة قيد المراجعة البشرية ولم تُنشر بعد لمحركات البحث. الأسعار والجداول مولّدة تلقائياً من بيانات الشيت بتاريخ {esc(g.get('date', TODAY))}.</div>
 <h1>{esc(g['title'])}</h1>
 <p class="muted">بقلم: {esc(g.get('author', 'فريق ' + SITE_NAME))} • التاريخ: {esc(g.get('date', TODAY))} • الحالة: مسودة</p>
 <p>{esc(g.get('description', ''))}</p>

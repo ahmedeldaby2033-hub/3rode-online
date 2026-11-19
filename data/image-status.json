@@ -973,22 +973,49 @@
   "note": "downloaded + watermarked A"
  },
  "sunelan-s8-32mb-32mb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-19",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://eg.jumia.is/unsafe/fit-in/520x520/filters:fill(white)/product/07/8772531/1.jpg?6429",
+  "note": "downloaded + watermarked A"
+ },
+ "nokia-130-4mb": {
+  "local": true,
+  "working_url": "https://mobilemaya.net/wp-content/uploads/2025/06/Dark-Blue-7757.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "micromax-x701": {
+  "local": true,
+  "working_url": "https://kimostore.net/cdn/shop/files/MicromaxX701DualSIM_40MB56MBRam2.4Inch2G_-Black_3.png?v=1787743398&width=533",
+  "note": "downloaded + watermarked A"
+ },
+ "nokia-108-32mb-16mb": {
+  "local": true,
+  "working_url": "https://www.yugatech.com/wp-content/uploads/2024/10/nokia-108-4G-2024-cyan.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "itel-it5032": {
+  "local": true,
+  "working_url": "https://images.priceoye.pk/itel-it5032-pakistan-priceoye-0axvt.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "nokia-125": {
+  "local": true,
+  "working_url": "https://yaranstore.ir/uploads/products/05e47a.jpg?m=thumb&w=1280&h=800&q=high",
+  "note": "downloaded + watermarked A"
  },
  "itel-neo-r60-128mb-64mb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-19",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://down-ph.img.susercontent.com/file/ph-11134207-7rasm-m5e51d5xl1u632",
+  "note": "downloaded + watermarked A"
  },
  "zte-nubia-a36-64gb-6gb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-19",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://images.othoba.com/images/thumbs/1303780_zte-nubia-a36-4gb-ram-64gb-rom-multicolor-best-price.webp",
+  "note": "downloaded + watermarked A"
+ },
+ "honor-t10-64gb-4gb": {
+  "local": true,
+  "working_url": "https://www.computron.com.ec/wp-content/uploads/2026/10/HONOR-T10-SL-4-1000x1000.webp",
+  "note": "downloaded + watermarked A"
  },
  "vivo-y05e-64gb-4gb": {
   "local": true,
@@ -996,74 +1023,34 @@
   "note": "downloaded + watermarked A"
  },
  "tecno-spark-40-pro-256gb-8gb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-19",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://d13pvy8xd75yde.cloudfront.net/global/spark-40-pro/KM6%20%E9%92%9B.png",
+  "note": "downloaded + watermarked A"
  },
  "tecno-camon-40-256gb-8gb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-19",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
- },
- "motorola-moto-g56-5g-256gb-12gb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-19",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://api2.zoomit.ir/media/67cfda32f16cde3c10e0c4f9",
+  "note": "downloaded + watermarked A"
  },
  "samsung-galaxy-a27-128gb-6gb": {
   "local": true,
   "working_url": "https://mobizil.com/wp-content/uploads/2026/06/Samsung-Galaxy-A27.jpg",
   "note": "downloaded + watermarked A"
  },
+ "motorola-moto-g56-5g-256gb-12gb": {
+  "local": true,
+  "working_url": "https://americanas.vtexassets.com/arquivos/ids/32685230-540-auto/MOTOROLAMOTOG565G256GBGRAFITE.webp?v=638971785668830000&quality=9",
+  "note": "downloaded + watermarked A"
+ },
  "tecno-camon-40-pro-5g-256gb-12gb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-19",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://www.ufoelektronika.com/image/cache/catalog/product/TECNO-CAMON-40-2-1000x1000.jpg",
+  "note": "downloaded + watermarked A"
  },
  "apple-iphone-12-128gb-4gb": {
   "local": true,
   "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2020/10/Apple-iPhone-12.jpg",
   "note": "downloaded + watermarked A"
- },
- "nokia-130-4mb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-19",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
- },
- "micromax-x701": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-19",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
- },
- "nokia-108-32mb-16mb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-19",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
- },
- "itel-it5032": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-19",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
- },
- "nokia-125": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-19",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
- },
- "honor-t10-64gb-4gb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-19",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
  },
  "apple-iphone-12-pro-128gb-6gb": {
   "local": true,
@@ -1071,10 +1058,9 @@
   "note": "downloaded + watermarked A"
  },
  "apple-iphone-13-pro-max-128gb-6gb": {
-  "local": false,
-  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2021/09/iPhone-13-Pro-Max-1.jpg",
-  "tried_at": "2026-11-19",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://media.cdn.kaufland.de/product-images/original/3a24986b1f3582869bd524cdb6074e6a.jpg",
+  "note": "downloaded + watermarked A"
  },
  "apple-iphone-15-pro-max-256gb-8gb": {
   "local": true,
