@@ -84,7 +84,7 @@ def ensure_repo(job):
         os.makedirs(WORKDIR, exist_ok=True)
         log(job, "استنساخ المستودع لأول مرة…")
         r = run(["git", "clone", "--branch", REPO_BRANCH, REPO_URL, WORKDIR],
-                timeout=300)
+                env=env, timeout=300)
         if r.returncode != 0:
             raise RuntimeError("git clone failed: " + r.stderr[-500:])
     else:
