@@ -8,7 +8,7 @@
 #
 # Requires on the VPS: git, python3, Pillow (pip install pillow),
 # and a git identity:  git config --global user.name "3rde-sync"
-#                      git config --global user.email "da3m@3rde.online"
+#                      git config --global user.email "3rdeonline@gmail.com"
 # Install as a cron job (crontab -e):
 #   0 * * * *  /opt/3rode-online/scripts/vps-sync.sh
 set -e

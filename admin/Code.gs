@@ -22,7 +22,7 @@
  *   الأدلة (Guides) · الأخبار (News)
  */
 
-var ADMIN_EMAIL = 'da3m@3rde.online';
+var ADMIN_EMAIL = '3rdeonline@gmail.com';
 var SHEET_PRODUCTS = 'الورقة1';
 var SHEET_HISTORY = 'سجل الأسعار';
 var SHEET_SETTINGS = 'الإعدادات';
@@ -37,7 +37,7 @@ var SHEET_NEWS = 'الأخبار';
 var SETTINGS_DEFAULTS = [
   ['site_name', 'عروض أونلاين'],
   ['site_domain', '3rde.online'],
-  ['contact_email', 'da3m@3rde.online'],
+  ['contact_email', '3rdeonline@gmail.com'],
   ['currency', 'EGP'],
   ['sync_frequency', 'hourly'],
   ['amazon_associates_tag', 'amazon0c2aca6-21'],

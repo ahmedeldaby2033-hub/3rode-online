@@ -79,7 +79,7 @@ python3 -m pip install pillow
 
 # 3) هوية git للالتزامات التلقائية
 git config --global user.name "3rde-sync"
-git config --global user.email "da3m@3rde.online"
+git config --global user.email "3rdeonline@gmail.com"
 
 # 4) اجعل السكربت قابلاً للتنفيذ وجرّبه مرة يدوياً
 chmod +x /opt/3rode-online/scripts/vps-sync.sh
