@@ -906,5 +906,50 @@
   "local": true,
   "working_url": "https://img-prd-pim.poorvika.com/product/nokia-106-2023-single-sim-black-front-backv-iew.png",
   "note": "web image search + watermark A"
+ },
+ "oppo-a6x-64gb-4gb-2": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/12/Oppo-A6x-4G-1.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "redmi-redmi-15c-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/08/Xiaomi-Redmi-15C-4G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "redmi-redmi-17-256gb-6gb": {
+  "local": true,
+  "working_url": "https://mobizil.com/wp-content/uploads/2026/08/Xiaomi-Redmi-17-4G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "vivo-y31d-128gb-8gb": {
+  "local": true,
+  "working_url": "https://mobizil.com/wp-content/uploads/2026/02/Vivo-Y31d-4G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "samsung-galaxy-a26-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/03/Samsung-Galaxy-A26.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "vivo-v60-lite-256gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/09/Vivo-V60-Lite-4G.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "xiaomi-15t-512gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2025/09/Xiaomi-15T-1.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "xiaomi-17t-256gb-12gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2026/06/Xiaomi-17T.jpg",
+  "note": "downloaded + watermarked A"
+ },
+ "apple-iphone-16-plus-128gb-8gb": {
+  "local": true,
+  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2024/09/iPhone-16-Plus-1.jpg",
+  "note": "downloaded + watermarked A"
  }
 }
