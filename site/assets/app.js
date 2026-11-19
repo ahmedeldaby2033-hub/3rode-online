@@ -159,7 +159,7 @@
     }).sort(function (a, b) { return a.price - b.price; }).slice(0, 12);
     if (!list.length) { out.innerHTML = '<p>لا توجد هواتف مطابقة لهذه الميزانية حالياً. جرّب رفع الحد الأقصى أو إلغاء شرط الرام.</p>'; return; }
     out.innerHTML = '<div class="grid">' + list.map(function (p) {
-      return '<article class="pcard"><div class="pcard-body"><h3><a href="/mobiles/' + p.slug + '/">' + p.name + '</a></h3>' +
+      return '<article class="pcard"><a href="/mobiles/' + p.slug + '/"><img src="' + (p.image || '/images/placeholder.jpg') + '" alt="هاتف ' + p.name + '" loading="lazy" width="500" height="500"></a><div class="pcard-body"><h3><a href="/mobiles/' + p.slug + '/">' + p.name + '</a></h3>' +
         '<div class="price-row"><span class="price">' + p.price.toLocaleString('en-US') + ' جنيه</span></div>' +
         '<div class="brand-line">' + p.brand + ' • ' + p.storage + ' / ' + p.ram + '</div>' +
         '<div class="actions"><a class="btn-mini btn-prices" href="/mobiles/' + p.slug + '/">عرض السعر والمقارنة</a></div></div></article>';
