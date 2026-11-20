@@ -220,11 +220,17 @@
     // افتح تبويب المتجر فوراً ضمن إيماءة النقر نفسها — window.open داخل
     // setTimeout يحجبه مانع النوافذ المنبثقة في المتصفح.
     if (redirect) { try { window.open(redirect, '_blank', 'noopener'); } catch (err) {} }
+    // غيّر نص زر الانتقال فقط — تغيير textContent على البطاقة كاملة
+    // يمسح محتواها (الزر والكود) نهائياً ولا يعود.
+    var card = b.closest('.coupon-box');
+    var btn = card ? card.querySelector('.coupon-go-btn') : null;
     var done = function () {
       toast('تم نسخ الكود: ' + code);
-      var old = b.textContent;
-      b.textContent = 'تم النسخ ✓ — جارٍ التحويل…';
-      setTimeout(function () { b.textContent = old; }, 2000);
+      if (btn) {
+        var old = btn.textContent;
+        btn.textContent = 'تم النسخ ✓ — جارٍ التحويل…';
+        setTimeout(function () { btn.textContent = old; }, 2000);
+      }
     };
     if (navigator.clipboard) {
       navigator.clipboard.writeText(code).then(done, function () { toast('الكود: ' + code); });
