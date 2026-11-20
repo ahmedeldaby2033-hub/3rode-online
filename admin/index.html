@@ -589,15 +589,24 @@ async function loadOverview(){
     var clicks = await api("clicks");
     var reports = await api("reports");
     var requests = await api("requests");
-    var prod = await api("products");
-    var models = {}, brands = {};
-    (prod.rows || []).forEach(function(r){ models[r[2]+"|"+r[3]+"|"+r[13]+"|"+r[14]] = 1; brands[r[2]] = 1; });
+    // العدّادات من الشيت كاملاً عبر stats (لا من أول 200 صف فقط — كان يعرض 12 موديلاً / 5 ماركات بدل 308 / 32).
+    // إن لم يكن Code.gs المحدَّث منشوراً بعد (لا يوجد إجراء stats)، نرجع للعدّ من أول 200 صف.
+    var modelCount = 0, offerCount = 0, brandCount = 0;
+    try{
+      var st = await api("stats");
+      modelCount = st.models; offerCount = st.offers; brandCount = st.brands;
+    }catch(e){
+      var prod = await api("products");
+      var models = {}, brands = {};
+      (prod.rows || []).forEach(function(r){ models[r[2]+"|"+r[3]+"|"+r[13]+"|"+r[14]] = 1; brands[r[2]] = 1; });
+      modelCount = Object.keys(models).length; offerCount = prod.total; brandCount = Object.keys(brands).length;
+    }
     var pendingReq = requests.rows.filter(function(r){ return !isHandled("req", r); }).length;
     var pendingRep = reports.rows.filter(function(r){ return !isHandled("rep", r); }).length;
     var cards = [
-      ["الموديلات", Object.keys(models).length],
-      ["عروض الأسعار", prod.total],
-      ["الماركات", Object.keys(brands).length],
+      ["الموديلات", modelCount],
+      ["عروض الأسعار", offerCount],
+      ["الماركات", brandCount],
       ["نقرات الشراء", clicks.total],
       ["طلبات بانتظار المعالجة", pendingReq],
       ["بلاغات بانتظار المعالجة", pendingRep]
@@ -996,8 +1005,12 @@ function fillCoupon(r){
   document.getElementById("cp-desc").value=r[8]||"";
 }
 async function saveCoupon(){
+  // القائمة المنسدلة تستخدم مفاتيح إنجليزية (jumia/amazon/noon)؛ أعدها إلى العربية قبل الحفظ
+  // حتى لا يُحفظ المتجر بالإنجليزية في الشيت عند كل تعديل.
+  var storeEn = document.getElementById("cp-store").value;
+  var storeAr = {"jumia":"جوميا","amazon":"أمازون","noon":"نون"}[storeEn] || storeEn;
   var c={id:document.getElementById("cp-id").value||("cp-"+Date.now()),
-    title:document.getElementById("cp-title").value, store:document.getElementById("cp-store").value,
+    title:document.getElementById("cp-title").value, store:storeAr,
     code:document.getElementById("cp-code").value, value:document.getElementById("cp-value").value,
     redirect_url:document.getElementById("cp-url").value, expires_at:document.getElementById("cp-expires").value,
     active:document.getElementById("cp-active").value==="true",

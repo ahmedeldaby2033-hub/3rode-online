@@ -210,22 +210,21 @@
     } else { toast('الكود: ' + code); go(); }
   });
 
-  /* ---------- coupons: copy code only (no redirect) ---------- */
+  /* ---------- coupons: copy code + open store in a new tab ---------- */
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-copy-code]');
     if (!b || b.disabled) return;
     var code = b.getAttribute('data-copy-code') || '';
     if (!code) return;
     var redirect = b.getAttribute('data-redirect') || '';
+    // افتح تبويب المتجر فوراً ضمن إيماءة النقر نفسها — window.open داخل
+    // setTimeout يحجبه مانع النوافذ المنبثقة في المتصفح.
+    if (redirect) { try { window.open(redirect, '_blank', 'noopener'); } catch (err) {} }
     var done = function () {
       toast('تم نسخ الكود: ' + code);
       var old = b.textContent;
       b.textContent = 'تم النسخ ✓ — جارٍ التحويل…';
       setTimeout(function () { b.textContent = old; }, 2000);
-      // بعد النسخ: التحويل إلى صفحة المتجر في تبويب جديد
-      if (redirect) {
-        setTimeout(function () { window.open(redirect, '_blank', 'noopener'); }, 700);
-      }
     };
     if (navigator.clipboard) {
       navigator.clipboard.writeText(code).then(done, function () { toast('الكود: ' + code); });

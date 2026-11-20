@@ -254,6 +254,20 @@ function doGet(e) {
       });
       return jsonOut({ ok: true, headers: values[0], rows: rows.slice(0, 200), total: rows.length });
     }
+    if (action === 'stats') {
+      // عدّادات نظرة عامة من الشيت كاملاً (لا من أول 200 صف فقط):
+      // الموديلات = قيم مميزة (ماركة|موديل|تخزين|رام)، الماركات = قيم مميزة، العروض = عدد الصفوف.
+      var pv = ss().getSheetByName(SHEET_PRODUCTS).getDataRange().getValues();
+      var models = {}, brands = {}, offers = 0;
+      for (var si = 1; si < pv.length; si++) {
+        var pr = pv[si];
+        if (!pr[0]) continue;
+        offers++;
+        models[pr[2] + '|' + pr[3] + '|' + pr[13] + '|' + pr[14]] = 1;
+        brands[pr[2]] = 1;
+      }
+      return jsonOut({ ok: true, models: Object.keys(models).length, brands: Object.keys(brands).length, offers: offers });
+    }
     if (action === 'syncLog') {
       var log = sheet(SHEET_SYNCLOG).getDataRange().getValues().slice(1).slice(-100).reverse();
       return jsonOut({ ok: true, rows: log });

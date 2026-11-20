@@ -1456,7 +1456,10 @@ def build_coupons():
                      f'loading="lazy" decoding="async">' if logo else
                      f'<span class="coupon-logo-fallback">{esc(name[:1])}</span>')
         box_cls = "coupon-box" + (" coupon-expired" if expired else "")
-        cards += f"""<article class="{box_cls}">
+        # البطاقة كلها قابلة للنقر (إن لم يكن الكوبون منتهياً): نسخ الكود + فتح المتجر في تبويب جديد
+        # (closest() يلتقط أقرب عنصر — الكود/الزر الداخليان أولاً، ثم البطاقة).
+        card_click = (f' data-copy-code="{esc(cp.get("code", ""))}" data-redirect="{esc(redirect)}" style="cursor:pointer" title="اضغط لنسخ الكود والانتقال إلى المتجر"' if not expired else "")
+        cards += f"""<article class="{box_cls}"{card_click}>
 <div class="coupon-box-head">
 <span class="coupon-logo">{logo_html}</span>
 <div class="coupon-box-titles"><div class="coupon-store">{esc(name)}</div>
