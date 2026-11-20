@@ -1,975 +1,1363 @@
 {
  "https://3rde.online/": {
-  "hash": "e912a3e0033d43085a942a2f1b5e4cc7dae7f90072ec6eaca62797ed166f4107",
-  "lastmod": "2026-11-19"
+  "hash": "444b1072b3913421ffbe840540b707050615c47040bddc4dd176dd45f5d3e12e",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/sunelan-s8-32mb-32mb/": {
-  "hash": "a5ce142c126868c4ab6db4c93e9d307ec2fabb7533a398fcfd52b900743fdecc",
+  "hash": "ebc29178fe5040281aa0606c61b2f941bbfea4c45482c0f9aba6d537ccb3ff76",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/nokia-106/": {
+  "hash": "75e4944ddd9ca6193c80c6ad408cd43e5b42a6f6cc400976b2d6df18dcb21df7",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/nokia-105/": {
-  "hash": "d8f18a81f76c23a327253179fe89c6763a915a6b04a450de58e234b95b1e93a8",
+  "hash": "92166f212b39dae16713e6f5cbb104052c3b6354fa9c158e5765fe2307439339",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/generic-105/": {
+  "hash": "9b762ee87442b9bbbc3e85498edc38c5d2fa6127e0e93b09b9096e35560fbfca",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/nokia-130-4mb/": {
-  "hash": "97bbed1b8902fb403a7e2b5f978fb2132692f5108c3823c625cf65b0f03ff3e5",
+  "hash": "b92862ecd14577e527cfd24b1babe9ec59319e110abb6ed9ccc5b1c451d4ee64",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/girasole-g20/": {
+  "hash": "32a28aab9f4c6981d0c7655b0b2e9878f72fe437f6c43b6214919308c5807b89",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/sary-s101/": {
+  "hash": "ac6b1d9462d12b7b94db3a2bfc867932ff36c8fddbcd8199154c87bec05321ca",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/girasole-g30/": {
-  "hash": "ccc659320316e777804fc85ba3d320d7abdcc011cae4167b8eb4087f9666c3fb",
+  "hash": "7db99cce57af2fc79ca795e51a37b5c258008cbc356bcfc18e2a738e8bd5fc0a",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/micromax-x412/": {
+  "hash": "62b0d5e1e6c483a00b76ff3daa047e6801dc65d7792a5f9ddacbe66f2605022f",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/pluzz-hero-600s-24mb/": {
-  "hash": "3137902d8f485612009e4d714c86458f0168a21f4011f7038c07972f44eec5e1",
+  "hash": "ee1afa4a1928fddab650ca5b0a76aba4985ac1fea900724ad880ea3e099ef2b5",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/pluzz-hero-32mb/": {
+  "hash": "53c6d033affc3d3498f42b88fb71d0ecabc7215dfab6c32c8d561bcc8438d80a",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/micromax-x415/": {
+  "hash": "1adecb7268f29743f7dff53df41b72bc7f1dbd14e41e23bdcc58bf539b544d01",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/sunelan-s550-64mb-32mb/": {
+  "hash": "4591c91576d8ada99389049bd4b01678d2a54fc3a9a8d54ec382aab34d642c2c",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/sunelan-s550/": {
+  "hash": "b1cf699de54b5f777a284473fd40c441afada6f0a1cd81fc016ca8c25ca6ae73",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/sary-s101-32gb/": {
-  "hash": "787eaa4a8489a8ce0bb1dcd04c5b9c102a354b81682c421866bc4d28960cc9fd",
+  "hash": "7be6d010ee78c67099bba7935ace0a2385dcad0f3a83b40cbe462cfafc1e5283",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/micromax-x412-32mb/": {
-  "hash": "81a0ed118ba501eec0c066c7ec756f0a8fa31c310a884164d20d5d91047ec608",
+  "hash": "c11bcf1335d575d189c84e9ce9ff4a6cb83889b3d1bc42ed90fad604229c774e",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/link-n105/": {
+  "hash": "ea83373cdccc5c8d584d69adcf30761d3d404be80883e13925355f2754da17db",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/nokia-1208/": {
+  "hash": "5bc25a3a874faf37647e5dd4b714b28b1068691a49529f675f6e74a55d464e45",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/nokia-106-4mb/": {
-  "hash": "424a4ebb12d73f46b1a1bebccbecc70a10ec13ed238beae706f810f1cb44b8ec",
+  "hash": "624be87e46bdebfffd32ec20becae0317718b99c48ec698fc22b42baa88ed75e",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/link-n110/": {
+  "hash": "6c18c92394b4ebfba399878335d91e6c947553b27f910f2dc8f1a7e3fd746236",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/generic-enes/": {
-  "hash": "604722c0ea7a6c0fcd8e5b586a2e63d4a5da1035dccfc753bbcb8414cc5881e0",
+  "hash": "efa253f7ce26c817aabbf8ac3bfd3f6f982210b5c57296ad11845e08cd39b03c",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/itel-2165-32mb-32mb/": {
-  "hash": "5247fe44fba96cc1df9a189788f912d734c215df86716492c91eab6131f21b9c",
+  "hash": "ad84c3a801c0614a1aee639f3c8373630e4a0dc8896517bcad45f216e5255bd9",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/girasole-g30-32gb-32mb/": {
-  "hash": "77683e725aa83812390b672d7ce3fd647b90c4acd68e5180eb734e7f32a4e86d",
+  "hash": "7a71d8f67e0b0c83750e54d924899710fe690d75df10102aced9d57fd9999360",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/nokia-130-8mb-4mb/": {
+  "hash": "03b540a6d66c8ac6e4bc46d956ca58e7c1be72d4045dd64c646f3eb00a91a9be",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/itel-2165/": {
+  "hash": "0842883c9ee9fee256264c9e9f9b836f3d37c15750d3e0c9c326ee2c79895fcd",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/enes-a2/": {
+  "hash": "739cbcdbaf5afebb99b0ea3f36898ebb8004d06f1e3235c7a2bc0187d2c5cff9",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/sunelan-miracle-50/": {
+  "hash": "bd88123bfac15a3ea43f45b2e7a8220c0eb6e20b41954c42b20f003d8d1ca371",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/micromax-x415-32mb/": {
-  "hash": "03c4af28eabdcf181e48efcaead116511a9a2fbda850687cd36d6576d18ab8ab",
+  "hash": "096961751b08d67f183540c7b33d806849cee63a61def3e699ac7319fae0cb3b",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/sary-s201/": {
-  "hash": "0f9af087616998db47a629dac6e9302f56ce2ca84cebb4c4c8b4e30f05f019eb",
+  "hash": "f8b986edf2b837abc343ec9bd33246dfa4a01d55bc9c43c114bb0494a0eefa34",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/micromax-x701/": {
-  "hash": "fa0a68359b2b97651cef7c2449890d5d600a8746aaf2ecb67c3f9de4a77f8c1b",
+ "https://3rde.online/mobiles/iku-s1-mini-32mb-32mb/": {
+  "hash": "c37453e5e8f369d965e94ad05d2373e8ad58d2285d3c3ebbe61f9dd0ecd74277",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/nokia-150/": {
-  "hash": "8b333b3ca7fe8bbfe5f4541463af33ea57392cd4a34b8e5f4b1a5b227eb0302b",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/nokia-5310-16mb-8mb/": {
-  "hash": "94d66feeb3f41efe894a92216858e4c348569b2b22cb71c89f18b70444467e12",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/nokia-108-32mb-16mb/": {
-  "hash": "5a6562ede55e8ebc2a32add47c5ce9d5007d6abe9e2960b2ec9c82cd50de6002",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/itel-it5032/": {
-  "hash": "ebd86ac741e4c6e70cd1d41a43df785908c6f757157e0794b6ec268e927be951",
+ "https://3rde.online/mobiles/iku-s1-32mb-32mb/": {
+  "hash": "de2ac43831935f1ab2cd2fc0495dd1fe6bfbf302670d96612e6caa6d9f8a6c97",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/nokia-125-4mb-4mb/": {
-  "hash": "694e3f42beeb73947773b2a4fdc8798e6fe3e5f91abfeb0108d91bad7763a4a8",
+  "hash": "c7fc90be8ceb659e69bb72284ed08e79760c43239f4ebbfb677e2504e337ef38",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/micromax-x701/": {
+  "hash": "af1df6be8ee0b68f7a8a9b3675f3144c82dd3b58e19a32cd96723d1d20e3aa8b",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/enes-a8/": {
+  "hash": "6bd005fe5446b0c02dd13982fd4e4aaeaa452454753c279c12388b2f1f66cb3a",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/iku-s3/": {
+  "hash": "ba8843e75d95e5f34d5e7c990bcf8730d4968c45e6b4895d42f31475536892d6",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/nokia-150/": {
+  "hash": "f08f25970c1699298443e7a79c405949e6382215dae569e3f9d70c4b4cd57770",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/nokia-5310-16mb-8mb/": {
+  "hash": "ce5b65d248b210641a568e807ee2d0de1456fe32fbf06105cdbbbdfe1372057f",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/nokia-108-32mb-16mb/": {
+  "hash": "ff935ee71b76559a6366e49f9663250f1a3fb037c8711e2dadd776d4616007d4",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/itel-it5032/": {
+  "hash": "1a8392ec37a7fce84e1f88e8aeda8add7eddbbdba27dbe5357b0ca6f4fee0a53",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/darago-f12-32mb/": {
+  "hash": "0dca0ac2f1e8fa4f7b10685a8e91e5ab955e9b9ee67b25197b16ab29f824c59d",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/samsung-sm-b310e-512mb-16mb/": {
+  "hash": "6ec4dcfd9f6db23fc82ab2d28553290fa24db941e0d6ae50aa7758ea31314c20",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/nokia-130/": {
+  "hash": "fa42da871a8b0999ae34e9c5f2533dab29bae8cea4a67b0d0afbfd65c2c6aeb7",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/i-pro-a7-mini-1gb-1gb/": {
-  "hash": "7512c6c66b7b9a10eb2b04a8778265db97e70c853170ed4e4db1e3ffc9e70491",
+  "hash": "4147445019ae87942c59e1ba70b837da3dbdd5d05102e54afd5db3b715fd2a53",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/nokia-6310/": {
-  "hash": "26a41be15771ff6a1dfaaef1f38007b6c2db248d5fb7a3c80f24102e9f913bd6",
+  "hash": "b29b93c4beca78e4540c33c48a66ff70d6fc17672aa431fecf40431428eb1bb3",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/nokia-215/": {
+  "hash": "88a4b1d366787918fb5e4e7daefaad632702029f630b3f43aa44f3e65ccad1a5",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/nokia-220-4g/": {
+  "hash": "c4f635217aef7d6f728e3150c81150b07b8ae4542a05212144886a4224b5019d",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/itel-2160/": {
+  "hash": "0cc1ebebf728a516621152bca63fc8262be47ee6482c5f3bcbf9745acef5a7f3",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/nokia-108-4g/": {
+  "hash": "685d8e8d1113ef1235df331eddb665f9c237757dc06d86b2774aa26685707c99",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/nokia-125/": {
-  "hash": "55075331a0e0508858f07d7af40729c3652a863be448e89d20ca72fd0256c594",
+  "hash": "f6d12f574042dc0efc778d5ec9c6956a067e1872f8dbef9a9522e2872e70ee9e",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/iku-v100/": {
+  "hash": "9efcec4becf9e29800b8e3434046396c84ba4cc7a1d76a874df47593c984a398",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/itel-neo-r60-128mb-64mb/": {
-  "hash": "dd1de651557824361a1b57a7d7488fb3817817a2437bff1dac6d17fbae2e1c93",
+  "hash": "69d755de58f2eaf37d54298b4e1e05038534b88e1c5e60a69bed0f6087e78575",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/nokia-105-512mb/": {
+  "hash": "96c61ca0e7c1b2a8337a1cf052e52c3215ab87aae00c0b98eb2f9a754201edbf",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/shitel-trend-16gb-2gb/": {
-  "hash": "0801e70cb529bba7bcf713c40c903acf38e7403b0a5075828d93446d0b2bc82a",
+  "hash": "e1c748d67b8a89b81e5cda9b15b77e356009edb4b731bd3287561b92050d2495",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/generic-tend-16gb-2gb/": {
-  "hash": "19fe586dfef1240d6d613d2c345cc9391f6d04b89f7514459e2188dfcd63250b",
+  "hash": "74a5047b8674a7da8beca4e3f88a80e90026a9210500ea72f420d8bc6178bf4a",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/nokia-c1-2nd-edition-16gb-1gb/": {
+  "hash": "51c814695ea0604d3d18e71f2fff31a83029c09ba9fde8947b5f4e643ba6fcd0",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/zte-nubia-a36-64gb-6gb/": {
-  "hash": "39a31c5458f40fecf0d21ebc93a6f4813dec83e6c7cd91af0e06e89160cbce6a",
+  "hash": "c79c7eb44983de3d88691abec964cf82c8f1386a1cfd3c5c4741e71f0b618b84",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/itel-a100c-64gb-2gb/": {
+  "hash": "f1fe6303c5afbe52a715978db0833d4b639928c9593336755506b6aba5cad37e",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/itel-a50c-64gb-2gb/": {
+  "hash": "b9888cb1fcf48d110b2e4f4daeda2de9ebd72e3e9e941e56e7435c670029fc81",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/tecno-spark-go-3-64gb-4gb/": {
-  "hash": "7eaf8d30cf6afd5c9856204e3f69f369072be1a1069228f93907a9beb5a0d2ea",
+  "hash": "39aaaf28b2c5c84212cb907e4f7f310744a12a4f06b098cf8f2adaeaf04b9c2f",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/itel-a100c-128gb-3gb/": {
+  "hash": "a6bcb605411e79cfb0a977590f2d5d056a687c4ebbf14587c2e9546dcbd9840f",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/itel-a70-64gb-4gb/": {
+  "hash": "e8bfde8e5932659d9b2c4e2a45f6e9c6637ba1bc82e72c5411eb869d1df8c561",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/honor-t10-64gb-4gb/": {
-  "hash": "5d97a11148187c145d2c042af9e58e433c1488c1c18006c90e84d20f3cc602b2",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/honor-choice-t10-64gb-4gb-2/": {
-  "hash": "cb0205c58dddf8dce6ef2f4f49a223a5b2b58af8b39de0557e3a8fe10fb34425",
+  "hash": "d69a46ebe6435a425ad0e88ba28b04f17c08de40e9815e2cdd69adc868404d7e",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/honor-choice-t10-64gb-4gb/": {
-  "hash": "eb377fbab74d09440a27562534c69cc239c669cdfef91dea5d1d936748e9b2f5",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/vivo-y05e-64gb-4gb/": {
-  "hash": "13b6c654f69547221eba01b134e2fcb2461f88d6d72dae810191b2ac70b78d85",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/honor-play20a-64gb-4gb/": {
-  "hash": "71af82c0372af3e53e410e4ca858fb2da79b1442090a12e75b41a9ff01dbf974",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/infinix-smart-20-64gb-4gb/": {
-  "hash": "60c605af07fbda05cfe81a6d578317217e6c30edb8deb57a8b319bca4741848a",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/xiaomi-redmi-a7-64gb-3gb/": {
-  "hash": "8f798ba6b5b289c620e5e28277713b78ba88d2d2793c4cbd606662838091cfdc",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/itel-p40-128gb-8gb/": {
-  "hash": "7aaa58dbba3006106296ef7cee614e982ad558d90223b703e0f9b5fd637e529c",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/vivo-y05-64gb-4gb/": {
-  "hash": "66133c943d929eb859658b1eda6d99d176680ad793d661eb4bb2a97fed972bc6",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/infinix-smart-10-64gb-3gb/": {
-  "hash": "1193e853309815a311c12c894817a96781b8a5f13e2d82d675865235ba9dfd78",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/tecno-spark-go-3-128gb-4gb/": {
-  "hash": "f49e479cbc18ef366c7b452fcf71c6ada588464972ce3cd26618c7f522ac5ab3",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/honor-x5c-plus-128gb-4gb/": {
-  "hash": "32df05f5cbed60a1f9f975ba3a77d422b1aa0eac5898b75d39fb3a74faf0525a",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/infinix-smart-20-128gb-4gb/": {
-  "hash": "d238fdb0a045ec4f71c4814101e456bf524c10f003437b2a41c9031a63e8e7f2",
+  "hash": "2f941c69dcce2bd55986aca78bed6247526faf208426b0984bd6a7f8cfa0f79a",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/itel-a200-128gb-3gb/": {
-  "hash": "5ca403c8c76ca9b0a8bf5a06bd476eb13ddde2db78e18ffa9e6ef5f9220c459e",
+  "hash": "3864c166cd77cb05443f480c72425370045742fd018fde239dffbc9ac9c8eeea",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/infinix-smart-10-128gb-4gb/": {
-  "hash": "aa9ac41794450b7eb6c1280a59e6a6ecf04fb37920897683e216958fb38fd362",
+ "https://3rde.online/mobiles/vivo-y05e-64gb-4gb/": {
+  "hash": "526703fb1c61358e0cb5b9419db3076500271a50fdbc81d32f7efbe0a75dd100",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/samsung-galaxy-a07s-64gb-4gb/": {
-  "hash": "06c4951a15c389a6812d9dd01cc222a3c926b9cd7cc05d467c1bcef1234979aa",
+ "https://3rde.online/mobiles/infinix-smart-20-64gb-4gb/": {
+  "hash": "d3c59e2741663d19786927bfcb463433d432de1602401b5815ad07d65add64f0",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/xiaomi-redmi-a7-pro-64gb-4gb/": {
-  "hash": "fb13294703669aace239d01c6c8cfcb96ca6a13af0a36e064d8f73b54d02b005",
+ "https://3rde.online/mobiles/honor-play20a-64gb-4gb/": {
+  "hash": "c204b59a3fc6b418c476a1d5b178df843a746b93a6efe6e2f419f3eaa62f1df1",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/tag-phone-specialtagphone-128gb-6gb/": {
-  "hash": "95f83bf6871dc725ba6fa1e3681899ec467409eaf9b4cbd40246587ee214376a",
+ "https://3rde.online/mobiles/xiaomi-redmi-a7-64gb-3gb/": {
+  "hash": "1de54d38d6fb777409be00d6d74509ec02dfef7cacb287f3c71e019061bcc8d9",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/itel-p40-128gb-8gb/": {
+  "hash": "350625d7e7da43af37c6851918ce1637d44169a44a4ca86106809f3d6d03faf8",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/itel-a50-128gb-3gb/": {
+  "hash": "776aaec4a524417a41743f4e120d1b687e657e85bb53ba591a6eb8867c32af70",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/itel-a90-64gb-3gb/": {
+  "hash": "1f29679f67444842a517da3c3d13a514b5b36040730692a91807f18f45dd2205",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/vivo-y05-64gb-4gb/": {
+  "hash": "cd4065505c24a492d435cd860003a8017eb60ead3ec30e4c2b313e0ca6d5cc42",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/infinix-smart-10-64gb-3gb/": {
+  "hash": "26382a90b577c974a1c7d2189e1051f714a2e1d80f123fd961ca1af6323c42cd",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/tecno-spark-go-3-128gb-4gb/": {
+  "hash": "746022c436bff39447afed828748333cd0bb69dda79f549d8eb207c395701cd0",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/honor-x5c-plus-128gb-4gb/": {
+  "hash": "cbca65b24778e6f1c8e015c10a78fcc30f9a45a45e4e8c05435934ae4561f21b",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/tecno-spark-go-2-128gb-4gb/": {
+  "hash": "51679b917a096e7a83a690b6a2f6f0f389352d7f6b5035c2c359b6591807968d",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/infinix-smart-20-128gb-4gb/": {
+  "hash": "23fe81f185526e4a7b27cd80d9ecf853bc910a1536b74f8fa486ddcd6888133e",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/realme-c100i-64gb-4gb/": {
-  "hash": "6ce06864f58e341d30f6ef48351bc77ceeef50a653f6af89a8f226e5399e7793",
+  "hash": "d2382cb8bda47f6bab1926de3040a8af6097b9df7a4b241518b34cd78ba9a59d",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/xiaomi-redmi-a7-pro-64gb-4gb/": {
+  "hash": "5d9104a5f495081ef595cf528739dc3b5a7296d4b49331c60a0a307b79098677",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/itel-a90-128gb-3gb/": {
+  "hash": "172a1b2df78d48e125f4f341dd5d3964fd67d18af872eac24f4bd0a1ffc06775",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/realme-note-60x-64gb-3gb/": {
+  "hash": "9c0bad3a66fd401a50f745bf47036812c7cf0778f98a0f8060920d5c2ad68d9c",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/honor-x5c-64gb-4gb/": {
+  "hash": "fbf9385d9e0443e53c04c6e5a626c9b90dbb3da75305a8896f0bc8a0fe68dff7",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/infinix-smart-10-128gb-4gb/": {
+  "hash": "5a3c654167f8e64eadbe3c38d2887dee9abe274c8a715401d596fb6e1b9b936a",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/samsung-galaxy-a07s-64gb-4gb/": {
+  "hash": "5f3b5fbdc30c7df21ac43c6fe4aa5e07e0b57e0017ce0d9e547039283e75a58f",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/tag-phone-specialtagphone-128gb-6gb/": {
+  "hash": "572182638c6862985f7d0f56b3c27f3a3fcedd0b70a527bacc06705e987c4405",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/itel-a90-256gb-4gb/": {
+  "hash": "bc93800737d421c7c42ed8739c1f3666be18d0fb3de353d07f5d312ffe965c49",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/xiaomi-redmi-a7-pro-128gb-4gb/": {
-  "hash": "27f7a05a132409fc9763fdbbd992ea3d11a4fa1b9a3d318f53b8e0ecd339524d",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/honor-play20a-128gb-4gb/": {
-  "hash": "59819c64ecc0095382ab12df6b87cebf4bb31be58ed0af3a57cab383aa46e630",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/infinix-hot-70-128gb-4gb/": {
-  "hash": "4ab5565eab6a5b1eb2bd803fbcb632f55b100a766e688251c87ae17e6c679f7b",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/vivo-y05-128gb-4gb/": {
-  "hash": "a7ac4023af0440665c7de3e88f82fdcc2a0e9a80ae8d0567ea5fc327a73116de",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/samsung-galaxy-a07-64gb-4gb/": {
-  "hash": "896d01c3485e6bde092885cf28807b4a8911f0fb96fa32217511fc0dc4680ca3",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/realme-c100i-128gb-4gb/": {
-  "hash": "4ae6b08ab31c8ee034218c3b3019966cfb774cb6e8e40dde519cd6949bde1ccd",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/oppo-a6x-64gb-4gb-2/": {
-  "hash": "dc4f9f3693f8319144a184e8018c2fb191a9dd8b05a767ab82460dae23160834",
+  "hash": "5f40cdb58b033fd58482275525f3b104bb4b66fd8f41ecf55c3fedb1bb53df88",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/samsung-galaxy-a08-64gb-4gb/": {
-  "hash": "4bd5afd2bfd56364aedca842de4d0b51414fbdbd1da5e9a510e6a4334ec41a82",
+  "hash": "bd9a78c0a830a7a579bce1a5176f881fdc9791c3c879ce037c19aff0426b8642",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/hope-k19-64mb-64mb/": {
-  "hash": "6c3ba1ca632a0531386c807c1a2fffae68532f65e7483e37e9ef751a7e4c24f4",
+ "https://3rde.online/mobiles/honor-play20a-128gb-4gb/": {
+  "hash": "ab5992d85b00e33b79dffb7d913012b7e4e5accb12c0a794c7bcc72600871e0d",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/infinix-hot-70-128gb-4gb/": {
+  "hash": "3786b2c66c3c894c27f1bf44316f118d4b81e3a5d9bd4b839768b5c8f1f117a1",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/oppo-a6x-64gb-4gb/": {
-  "hash": "22969f9296262185a0c1f31fe8deb9e2b8a8e8b70868441989c0d656fe092a90",
+  "hash": "cab2d0335d165cef47f910d86b0361794cc5e8c065ef806972fe8e8db5c5ca3f",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/samsung-galaxy-a07-64gb-4gb/": {
+  "hash": "20d207bb9bcf3cd5cba63a4dc285a5810f45588fa4e1c839dd94979a57c02899",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/vivo-y05-128gb-4gb/": {
+  "hash": "89476ddcee2b71b1bd2e4dd2baa7e9188c0a56ee9fb32064c045c30f4a38bf74",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/realme-c100i-128gb-4gb/": {
+  "hash": "a5008ef64b250318bf1a2eb0208ebb0a598c0d9fea6c5a9a66a7563a0571d09e",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/hope-k19-64mb-64mb/": {
+  "hash": "d3f3477da4f49bcaba5fee8ed120a895bc4b1180472860f5856456e2adfd0b05",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/infinix-hot-60i-128gb-6gb/": {
-  "hash": "564de52a2281ad76c83fff059a8db86497aa34efe9752bba260108316f5c2883",
+  "hash": "741086caec6b33ee2e22b94d8513e7efdf2366c0ef14d399a725489752086bcd",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/realme-note-70-128gb-4gb/": {
-  "hash": "f504fafebb34abb83b7479e9da0cd55d39e485f6509a7b2b4d0c4dfbbe02f5c9",
+  "hash": "db0e6cc43c5259e5f6b38ba70d757b46d925bfdb0fbd11771832975d725b7c88",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/samsung-galaxy-a08-64gb-6gb/": {
+  "hash": "82d1f7cccade51dc57f23d65e4d6c4394000a06ac20cbf04bf38e6ea7dbecce7",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/tecno-spark-50-128gb-6gb/": {
-  "hash": "125456f44402f9a5d6dab778e5b0e6604d3561db6cea02fe5a3f82844d6d07b0",
+  "hash": "c4ebd99cf486d9f59d6a89cbaf2352e7950f1a78611475697d40104c71bb1fa3",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/realme-note-60x-128gb-4gb/": {
+  "hash": "69ef9d51ca96ed46407a2c467636e993bab6c503b5eaf9696eadab62d4d145d3",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/samsung-galaxy-a16-128gb-4gb/": {
-  "hash": "74d547a220836c466f2a77d511652286b0b666c3c2aead16dabfc095a5241225",
+  "hash": "6f10dd99cf8f9d88837bfa6a7f2dc0269d494016bcb8d5da1ac115f59b443429",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/honor-x6e-128gb-4gb/": {
-  "hash": "a4050ba7f3498ef07a5c329e25a25921669ab3460465ba18e6aee5a5bc358ccc",
+  "hash": "90832aa818220c0c028ce273ab9140c604a7a91bd1e221fe8fbd09afbc2f04bf",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/samsung-galaxy-a08-128gb-4gb/": {
-  "hash": "b9892f5be5bb35f5ff9c5c7132afd0c8293993916c9d7f4f902433119793c3ad",
+  "hash": "66b645544c709ee3df83657f1f85700b7ef5c2cfcb05b941b0de61eb5c834b4d",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/vivo-y11d-128gb-4gb/": {
-  "hash": "24f816f47fe777fc7f58997ac38e9b3144212f4ddbd16c506427febc7a344c18",
+  "hash": "f180aca975bfc991fe74c9efbccb9a61cc932546f14347159985c81aa05da96e",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/xiaomi-redmi-15c-128gb-6gb/": {
-  "hash": "aae258183049b1b177c609e9f7c6a105fc3e04dd08bcbc03a2a60c101168f860",
+  "hash": "f09be34292347b1c7bc4cc6cd8f825e0fda5a2888ba1f62477e0650ce8c8d2c9",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/samsung-galaxy-a07-128gb-4gb/": {
-  "hash": "940c4d39cb32747a8d087443abd8f533f6b6ff9808d28f81d260a42b6c354bc0",
+  "hash": "95db8e9998d2ef43fb730dda6efef76aa0ee3b977d493ad5ce50dc00342bfd30",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/infinix-hot-60-5g-128gb-6gb/": {
-  "hash": "3afb3e744f89e99146e5529065c001c1038ba98931fd873fc492d44661ffa702",
+  "hash": "9702a59d81c53b54fa6e3184f8e174eb36e17e6f3d10870351c124b62e6f70cc",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/xiaomi-redmi-15-128gb-6gb/": {
-  "hash": "00fdd33be9c67a951ce15a85ef76659facad545e7eb4ba0a0c7b83f4a282ad52",
+  "hash": "a138dfaefcf329ac4e56ddbc14e99e96def49c8f38f8eeaaed603bd9719db017",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/xiaomi-redmi-17-256gb-4gb/": {
-  "hash": "17b55edd130158e5a2c3034dea9de8e8d00b672a583faedf14824134e45df2c3",
+  "hash": "1d16185656eabb79f7a6a4c8ae478e9f6456fe0030619e72c6c37081430cdab9",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/honor-x7e-128gb-6gb/": {
-  "hash": "6939b643e5b2d251847587a910b41e5a9834b932d9ce2068b9315808c22a7b57",
+  "hash": "97a9b95480ede546bc25d7fde2755fea19b93fcfcb92d370a3420253cbea51fe",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/infinix-hot-70-128gb-6gb/": {
-  "hash": "850688e7529c71f067d88369046832b8830ffbd8d19c48a02a0d6dd0522121ea",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/realme-c71-256gb-4gb/": {
-  "hash": "0b02499d268f44faab602621b63dc762998f45f0d5bfc4f6d129fb6a49a2da26",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/samsung-galaxy-a08-128gb-6gb/": {
-  "hash": "e3f6ffca0f7e347382da0da2de1a9e9a31f9ac480f099894171003cd0c340067",
+  "hash": "b66eb47fcfed034c73f19a51bcd50251d449e7fda98475bc50fdbf87a7dfca5d",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/oppo-a6x-128gb-4gb/": {
-  "hash": "f9f5a03bb70e4e4e218164de5be77d25d0a9cef1a088a66299e91d729d3c4292",
+  "hash": "028d59ca6cb6502928e35a4fabba0c990e45d53906ae780e83a84a49417f8d1d",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/xiaomi-poco-c85-256gb-8gb/": {
-  "hash": "6687168f22e678e98d73f1027b4b28cd44b15d61ebdccf05e01ddfb0e8ec8365",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/xiaomi-15-128gb-6gb/": {
-  "hash": "678914566ec861785ebea8f04a16d14c7dfe5527d8edbfbcec3d92bbf2b8ab40",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/realme-c71-128gb-4gb/": {
-  "hash": "a18b6410973ea8f7e087b63f5e22b5e7c30ad728cbce2dd5381fa324058717ab",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/tecno-spark-40-pro-128gb-8gb/": {
-  "hash": "69b31f908688066ad6867b9ce0dd3351c75f37b92f503d69d183b92d23a1d5ab",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/samsung-galaxy-a07-128gb-6gb/": {
-  "hash": "0ce045159b7f7b8c40c70cae4d000d82efe21679d606f27e7fe12d6c02808ea9",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/realme-c75x-128gb-6gb/": {
-  "hash": "f15e3e33d5fa48d0881e472aff8896c5ca1a9d521aa6bbb3500298d126d08638",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/vivo-y11d-128gb-6gb/": {
-  "hash": "25c6a31ec6ea96676cd30ed9f62945d73d916bef0f3df9fc112970a705ee2336",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/xiaomi-poco-c85-256gb-8gb-2/": {
-  "hash": "2b18c2c20270b2f7b4121aad7cf9ad87e5e9dcddb33c02dc66460dbdac19ed6b",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/realme-c100x-128gb-6gb/": {
-  "hash": "db3cea2fc8a9e8acc567bbff5c13a3785fb21dac9b6852883e7a326926bd1fa2",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/oppo-a6-128gb-4gb/": {
-  "hash": "a6659981d44a3a5835684f993d4848c9fa2eaec799f8e4dfac00f909c8e111b6",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/xiaomi-redmi-15c-256gb-8gb/": {
-  "hash": "8459c5a449a686a6e3883789d29e608bce19c9bec6a128856d34b43ce9eb9402",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/samsung-galaxy-a18-128gb-4gb/": {
-  "hash": "0920e2b87b901a9fd0386383b96921958b27437301eeb00d7cd1683e27692634",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/xiaomi-redmi-17-256gb-6gb/": {
-  "hash": "196ab3aeaa3b5fe343a12715880be3e44ae9aa096e0dfa9e826500c5f2ce2438",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/redmi-redmi-15c-256gb-8gb/": {
-  "hash": "e76c80029da8bf738120dc8c581231e89b16101ba3af5ddbe1037e7806a2dc37",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/honor-x7e-256gb-6gb/": {
-  "hash": "76edb5241dba422092f67ebe7ca09d2be8820f18bb13443fec128d57d5578b39",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/tecno-spark-40-pro-256gb-8gb/": {
-  "hash": "c4a03fe4f9f8d9cda72be1216a66b2eda06d06a07c815feb7d9262e80c53f5ce",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/infinix-hot-70-256gb-8gb/": {
-  "hash": "334eea9264daa7b9dfd4c0d4d9102b5436cac8e4dfd2a694e3c5f8a8de3b1a34",
+ "https://3rde.online/mobiles/realme-c71-256gb-4gb/": {
+  "hash": "0f088bb750d2a6625ff1f3099c1b63d6210fba3fb936ad5b143d0722f8c94e9e",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/huawei-nova-y74-256gb-8gb/": {
-  "hash": "e33df187d40d88bd63901602b35fc4f524ac572968f59e0f53b9b873ae87374a",
+  "hash": "378d5cf80d4621e1b695b5f87b42c5a64946d9df54deaaa132bd891259b02471",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/infinix-hot-60i-256gb-8gb/": {
-  "hash": "244903ffcf0543699117afbbdad3a7f0fd851aa5486311fad0bca13b71615bd3",
+ "https://3rde.online/mobiles/vivo-y21d-128gb-4gb/": {
+  "hash": "e7b9141705edee26d3983866c3e97674fb7d51fdddb29e485a157d94984f4039",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/tecno-spark-20-pro-plus-256gb-8gb/": {
-  "hash": "7d9c01c5ab9a758c800554ad88639603af1678d66e154068dcd935c2a4956870",
+ "https://3rde.online/mobiles/samsung-galaxy-a08-128gb-6gb/": {
+  "hash": "e7ff9f1bc2dae3e6804d2e1be4ac5c020c098c3f2904e1b765cf3a1ff9f56e3f",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/samsung-galaxy-a07-128gb-6gb/": {
+  "hash": "b78b1324482f7431da85254473ff730c399876583b985b0dbc19899155a7396e",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/realme-c75x-128gb-6gb/": {
+  "hash": "98be9c340b00da1dbb64ba788553da0b29cb7bc14f97879ff68add896844161c",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/xiaomi-poco-c85-256gb-8gb/": {
+  "hash": "4748c369ac63a51c4a9fd38aa9c9665c8ed2bd4c7369a7db139141f2ab032107",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/xiaomi-15-128gb-6gb/": {
+  "hash": "6404eb629066129792c03562b375ee3f9d1f449b24ffdadb7cb6888292104c76",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/realme-c71-128gb-4gb/": {
+  "hash": "c4698c40954c6fc601dc4bcf2af9730571d46f48abad217070625442183793cc",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/tecno-spark-40-pro-128gb-8gb/": {
+  "hash": "101c6b028c733628c62bf57191b685bb2d30433e78857c7043caa0078d733d64",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/oppo-a6-128gb-4gb/": {
+  "hash": "d2a5751af89c56bfb48148048c3989f07d8364fff914d6d2b79f5c69aefea031",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/xiaomi-redmi-15c-256gb-8gb/": {
+  "hash": "25eda7cbaabc8aec24642b1a2ae57611c8c45735abcfacb45eb0ecb95101cc27",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/vivo-y11d-128gb-6gb/": {
+  "hash": "08b5ad67d96d9bf101b611cf7ebe4ad8938da60629961c3201bf6a3ba925d1f0",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/huawei-nova-14i-256gb-8gb/": {
+  "hash": "32bb9941441b78fa2026f2f459f4c10e48c7963d219b862468e83277d27b8998",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/realme-c100x-128gb-6gb/": {
+  "hash": "e99bd19ba09d90b1ba2b5258cb1911f2ea9b1cba910d1972cfc6da92b2ba40f4",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/xiaomi-redmi-17-256gb-6gb/": {
+  "hash": "4850f9c77a5330b33697e90cc3c0bf9efc256ed144cc79c0a2c0bf12b88e0a3d",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/samsung-galaxy-a18-128gb-4gb/": {
+  "hash": "564ad32a63d5a77d7446422a77b9858f0fad8d039a9a13b8e2d67f5a1fde5709",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/vivo-y21d-128gb-6gb/": {
+  "hash": "c5c17ddf63de0b9766157799a578034b1b1a60ce8ed4d236d404efcbbc837216",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/oppo-a5i-128gb-4gb/": {
+  "hash": "81607a64c4b97abc95cfc1cfbd97685efbe7afc3cafc23595a4d4e1f3aaa8cbe",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/redmi-redmi-15c-256gb-8gb/": {
+  "hash": "0d80f2cbd52f0324187f73fbc46fb201b564ee6e112f5fc28e71e2e80c199e00",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/honor-x7e-256gb-6gb/": {
+  "hash": "2696917e5e7006b07819a598ead263be96b5c7a777dff134f36929faf4249f4b",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/tecno-spark-40-pro-256gb-8gb/": {
+  "hash": "7060324146d2db3f3178e5f3cbf1bea1fbd54a3c50b8b9198e0f4df68b78cf61",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/vivo-y31d-128gb-6gb/": {
-  "hash": "ca58eccdd9f131f0e0178c56d77d6b8a3e494fa4f3dbd24e526e449f866d6765",
+  "hash": "1bc4486fa66d065511689c6554bd81962f0aac296c67e474e3404247a3f03108",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/vivo-y31d-256gb-6gb/": {
-  "hash": "be1962dcdf52af949c8260add67b5ca30f3af914712f15de3fb2a66e903d4ab4",
+ "https://3rde.online/mobiles/infinix-hot-70-256gb-8gb/": {
+  "hash": "7fa88b3551b6e1c8abfb78f21180233a3e55e9447ded6f62300f2c54dbb0c2ec",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/tecno-camon-40-256gb-8gb/": {
-  "hash": "4d52a4d3142805107c3995b89dbbbbd78f246af6d252ad47ef04ba08b7c2459e",
+ "https://3rde.online/mobiles/infinix-hot-60i-256gb-8gb/": {
+  "hash": "cfb35d53cb2c5908debb7f70ce3ce4c17e3abed49e27b5c8912162543c6f813c",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/tecno-spark-20-pro-plus-256gb-8gb/": {
+  "hash": "830cf8f014b99b429ecd7c9bdc303bd494689b9aff3265a90d3b6086c6d09b2c",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/samsung-galaxy-a17-128gb-4gb/": {
-  "hash": "0d561b56cdc5cd54c93237c6680aa7c7f45a0df24f9510139932ea138a05fe52",
+  "hash": "a95cce6de18c72f4f4d18ceb8e9b8b592630d07815e381cfe67d68ced224dc00",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/vivo-y31d-256gb-6gb/": {
+  "hash": "6a2aadb0ceeeeed558f845652e6529c5913a0ecf2104cae9920ac1ccef191462",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/tecno-camon-40-256gb-8gb/": {
+  "hash": "69dd55f4e91b05ba4e407f46784e50003c10c360381ec4ec4a7c692c8b357e70",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/vivo-y21-128gb-4gb/": {
+  "hash": "8fc271ad53b9d13937394ae5b820aa12dd60999d92ab77d61d1428ddc83c88a4",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/samsung-galaxy-a18-128gb-6gb/": {
-  "hash": "d9e5401b80021a91f04f5742419544563edac4b27ebfcf6f0e66e54dceab97c2",
+  "hash": "c07a5adfe6f80465057bcc75f9a5fd8102e310832bae4a3c7c2c8dcf0e897782",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/vivo-v25e-128gb-8gb/": {
+  "hash": "2f8fa0a21287327484b1720a7c2f09730d4a2e9c0c363c55cb73921091a19736",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/tecno-spark-slim-256gb-8gb/": {
-  "hash": "f902eea871f7be0804259dc21201c3b7ea092d3a2062a4681ad342dce9205f76",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/samsung-galaxy-a07-256gb-8gb/": {
-  "hash": "a3975b220d55e1e36208492c0dbc6b71f0b59dc0dce1b455a0d7e341c5b49ee6",
+  "hash": "af4ecc436c708eb64db369e08b280b3bb30cb8dc45f973b7fb47ee303d5b056f",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/realme-c100-128gb-6gb/": {
-  "hash": "91201f83ccfd638d435d0f637e6bb630b3897f5420e6c8911344d927c6e52cd3",
+  "hash": "ab7dce8cb317924426dc1cbc8bb96d8d8cf17b3bffff65a775540f396d1beecb",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/samsung-galaxy-a07-256gb-8gb/": {
+  "hash": "ce091aa801979c7c1567949649dca46a229af81bcb1223a3d91e5fdff50ff51d",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/honor-x7e-plus-128gb-6gb/": {
-  "hash": "2c9f6cbfe4b6a6c77ce8a58c3ba5f271488f59adcf6269eeab87890127b49f14",
+  "hash": "21dd4699e91b0991d86928a9b5224edd7a289d85e98a8bfc2317cbfd24f59009",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/honor-x7d-256gb-8gb/": {
-  "hash": "4ffb53195f6d13e679799d22bdaa457e03e568700fb442c7cb0b1d3684ddfed9",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/infinix-hot-60-pro-256gb-8gb-2/": {
-  "hash": "c83cd6d7aa39299e090ad56040b01886e5750d9ae8a930343f8ccf9d743d39e1",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/samsung-galaxy-a17-128gb-6gb/": {
-  "hash": "b4d1598f043ba758c786e3c3131b90fded401846c69185c5d3fe7e6c8ca63b7e",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/infinix-hot-60-pro-256gb-8gb/": {
-  "hash": "19b61fc131c9c9a67aa12572324239cb7c8e725566e1cd2ef20627e15e779ce2",
+  "hash": "5759ee77f7ba8b55a537d4d885727af2493eaa5864639e783f1608034531296a",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/realme-c85-256gb-8gb/": {
-  "hash": "2663fc076251c2a7569ca980ccc3d566aa15b47b819d6d0fadcb2d535f03fb20",
+  "hash": "9c5999a1fca619cbf6783b86102dd834b52c795932643553f06ceb377196928d",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/infinix-note-edge-256gb-8gb/": {
-  "hash": "813f025fc9fb6e23becc4599c2169ba81435140e99db8aa42cb0a422fbf74c75",
+ "https://3rde.online/mobiles/samsung-galaxy-a17-128gb-6gb/": {
+  "hash": "7dc91ee40bcdb618180f74289f4c95f0825fe4e8fb0fd657a9c9abb904af2d91",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/infinix-hot-60-pro-256gb-8gb-2/": {
+  "hash": "449ddbf0cc9093c965274a1bcb406a526c7f8c4a370924bbe3bc78c25681b0e5",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/oppo-a6-128gb-6gb/": {
-  "hash": "7a65da1a53cafd106de8d14e671a0ad33d48a895d6c075c8d83e125d59da5520",
+  "hash": "9330f10a371c18eb2a6ef2765a2ce672be9d4491a8c3939a0ccb7e20c4db03de",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/redmi-redmi-17-256gb-6gb/": {
-  "hash": "4d65c64ba408f8693bea9fbeb3e6263b2d8a83772059c06717f3da87d86ae2c1",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/xiaomi-redmi-note-17-256gb-6gb/": {
-  "hash": "db204335ac3d4c3cdd84b63246e1f2877b3d86d8b6792fc9d546043a62d4230b",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/samsung-galaxy-a17-5g-128gb-6gb/": {
-  "hash": "bf1d93bf2ad4dd8fcf33621e7baf354a75fbb85cf7e1b396292a0cf4543b5391",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/xiaomi-redmi-note-15-128gb-6gb/": {
-  "hash": "b715b73d8b61bd84f5eda984ac1069130ad54a774cd908d5a3763649e37ade0c",
+ "https://3rde.online/mobiles/infinix-hot-60-pro-256gb-8gb/": {
+  "hash": "50b771b43b528659cb0b6c84bc95ac86cbac99eaf94963d566d6835d16dad8f3",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/vivo-y31d-128gb-8gb/": {
-  "hash": "a8070dbb0bef6231ba73da5ddcce2a4878b0152d6eed1a8d0104770758ef4982",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/oppo-a6t-128gb-6gb-2/": {
-  "hash": "9b69ceb6ccdda6be078288aec8d6d59baa4d79a2832f5b75633bf4390d25f08a",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/samsung-galaxy-a27-128gb-6gb/": {
-  "hash": "c29789a5e1ffe2beaf072051e1109a2212ac353c3df945f2968ba20082a5e17d",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/motorola-moto-g56-5g-256gb-12gb/": {
-  "hash": "5521448e83ca456e8655e25426f2acfa59a20e0d0492f4e2658f82a2c50608e0",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/xiaomi-redmi-note-17-256gb-8gb/": {
-  "hash": "bcc124448ca148a90e73fb21863c64f4310363a798d91cab6a06933299e774e6",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/vivo-y500-256gb-6gb/": {
-  "hash": "b1cffd1db5a85a33b989806bd4be4db4215a85a0afcf50620bd7ae6da48e13f2",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/realme-c100-256gb-8gb/": {
-  "hash": "7ad4a51a60e10d3fea5a32ecd761c24e3dfeb66ffe057c6b79f5a1eb8661d300",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/samsung-galaxy-a17-256gb-8gb/": {
-  "hash": "c95f222985a133f60c143f040dca8f6c42b3c13cfcdd7c5fc0b414fa432906c5",
+  "hash": "2323ca373d10e835644bfff335a05c744fd1d400fc38a507944da7e8acb7b216",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/oppo-a6t-128gb-6gb/": {
-  "hash": "35f0ef0c05c6057e47bb116e7d4f8e28280d1efc3147f993053098e355d9cd8b",
+  "hash": "8c943bd30295569cf6d5f578cec6320f88a54727561f259be2552e83707c350a",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/infinix-note-edge-256gb-8gb/": {
+  "hash": "3092e20c74e988254baaa902ab766fca06391f0307e8aebe5355117836a067ac",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/xiaomi-redmi-note-17-256gb-6gb/": {
+  "hash": "908045cb5584a6c0a205072f4997749aed84cc22b4efd09a9d0110a316ef8e41",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/honor-x6c-256gb-6gb/": {
+  "hash": "74d2cf7661a19d31749ecfe6802d6481390c9f9eb4b47222c49b0179021445b0",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/redmi-redmi-17-256gb-6gb/": {
+  "hash": "3e2153233bcb42b6717f712d133b0841f92190ff238f1edaf272302c91e93c4b",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/samsung-galaxy-a17-5g-128gb-6gb/": {
+  "hash": "d861dff6c3d434ce161f504a48196ecd04250276b81cb3b77e15e69bd442c578",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/realme-c75x-256gb-8gb/": {
+  "hash": "9d358bacf85dca46131bdd8bde02f828b2565a6e3b4f7df39668754c7b840d48",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/xiaomi-redmi-15-256gb-8gb/": {
+  "hash": "5da662dca5b1ef7330a198cb29c82220c62d3cd1ceb502f1ff6dafc6109a384c",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/xiaomi-redmi-note-17-256gb-8gb/": {
+  "hash": "61806271765261659c63370d4e704736fbb0cc025f8e95b7319acd97afda6dad",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/realme-c85-pro-256gb-8gb/": {
-  "hash": "133d393fa223daf580ce019e3bf236a29214aeade1de92ca19f0233e341b4790",
+  "hash": "32cff2249833a65aeb48b530cb11929d7f2afab9708bbc4d652ec2cdffab2382",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/realme-c75-256gb-8gb/": {
+  "hash": "c7cee4f149e52a24ffa516f8d62b07d81942957375b0cd07fc35844232a0cd67",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/xiaomi-redmi-note-15-128gb-6gb/": {
+  "hash": "f63b09e2df820929ff33e2da23e3448ca2cd7097b9a5c6b407004a8f0297af8f",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/samsung-galaxy-a17-256gb-8gb/": {
+  "hash": "f586f36e8a121bbe743a920786f6db99c96ca7126f6faa9194bb2a0fa152cb29",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/realme-c100-256gb-8gb/": {
+  "hash": "2aff1fb56daea3d2f84cff5504f291acecd686bfec13eeaf046adb6e53781960",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/oppo-a6-256gb-8gb/": {
-  "hash": "9acbfa2c29f7a05efad596dcf979c27d718b56fcb88b69fbee2475304f92b11d",
+  "hash": "c4b3349b2f68d02d65fe245c60ccbabc986e737c861008d93af6d799f8d9bed1",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/xiaomi-redmi-note-15-256gb-8gb/": {
+  "hash": "48f1794d3c8a9216ad19b2c28379e7ac680da624a2fc7678ef2e3e228acbef01",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/samsung-galaxy-a27-128gb-6gb/": {
+  "hash": "5da238bd41ac1660d83aa19504552bcf60da10d44fdb0a4918816b98544b9700",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/motorola-moto-g56-5g-256gb-12gb/": {
+  "hash": "966724051c46c01e166824338d04b5ea7256c17197b465a389a8f5ad33918a47",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/vivo-y500-256gb-6gb/": {
+  "hash": "6b7b6df01652d5d496e0440478532f6319c4ad70599e54177bbc49dfaaf58951",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/samsung-galaxy-a26-128gb-6gb/": {
+  "hash": "13dad09bda486a88feb2e338681a105d961e77edf261069f476286da073b03a4",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/infinix-smart-10-64gb-4gb/": {
+  "hash": "e3fdd9244fab713e26dc97c47bac22554b7f490c6fb38ccab952acb4d42cc898",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/honor-x8d-256gb-8gb/": {
-  "hash": "d5ac13776593c051f74b56e512c45e6508fea48835cfd40a4c18948a4a5eda7e",
+  "hash": "46ceb26bf5a85c876e64859f4b46b2a987ea602271c93d614be818c2df0f15c6",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/vivo-y31d-256gb-8gb/": {
-  "hash": "0d46b3386a842ac220c0c49b13f39889a392f5903b549c7687868b35ed3e4d17",
+  "hash": "34ef2f4df0cbbf6bc1c06e18be68bba180d81371705028a23557d52f8df5f570",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/samsung-galaxy-a27-128gb-8gb/": {
-  "hash": "2129930e1fcbc3158590ec66633b25c2aa520d246771c70f7a255343ee1cdabd",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/vivo-y500-256gb-8gb/": {
-  "hash": "869696a88caf1cdebcfd8091ddaa2eb7327d42e5fd6b35a5c0cf33710c17a53b",
+  "hash": "45e995b210942284fa31e0b1d538f9dfacc3a61043d98b561ce49a65862004b6",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/samsung-galaxy-a17-5g-256gb-8gb/": {
-  "hash": "13d8d2b89f41a5f25313366aaa63e6f7eb330d1025493dd3b8a02959ee8dbab2",
+  "hash": "5aca70903272e95537b71f87fa18f7d7ad1d7bf9488480f56dd731e42cc2e9a7",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/vivo-y500-256gb-8gb/": {
+  "hash": "1693746dc8afecf158e6f99ebc8bb4077977af227e6586638e78fbb5bef17254",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/honor-x8d-512gb-8gb/": {
-  "hash": "3147d8db0095809678c9b7a881dc4f885547e4ce5e038736e472c96d7e5fb720",
+  "hash": "e14b9a2fe1100c792e5668971f7a73af4d2120f03b712ca2b1b0285f48185ddd",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/tecno-camon-40-pro-5g-256gb-12gb/": {
-  "hash": "4025914e92dad4bc9de7b3c90e1cb38c10dc7ed4789da99c0612a3e6c3211b01",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/honor-x7e-plus-256gb-8gb/": {
-  "hash": "d261530a4a02f7262df8196c6084827d658b9ab31b41f958a2f3875f12826f8f",
+  "hash": "18fcb0ef8b470881add60042fb4e92edf5a6f32478768af03edd940ef8052cd4",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/honor-600-lite-128gb-8gb/": {
-  "hash": "030ff7307a0a650363e7639ea721cf00409e0c9ab97624df13a50df23dfb8d8a",
+  "hash": "96740a76745b66b2b9ff6041317dc95c2a8b3a7d0e70a8a38b50ff56b5562588",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/honor-x7e-plus-256gb-8gb/": {
+  "hash": "36167bfead58a2d2537bec67fcdb1da9361ff6dd36f3fdf2a5269c3677e84ff0",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/samsung-galaxy-a18-256gb-8gb/": {
-  "hash": "0973ce0598c09295ad0e1325f37487515aa5330710ade51172a78e5f3b3e24a5",
+  "hash": "87d557bfe70a9c8f7a05e1c88d5b575434a16c292cbca2b8b4e2a02802d87847",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/infinix-note-60-256gb-8gb/": {
-  "hash": "7e4cc21bf786395e1ac152d2ccfb745f38b9cfacaa8eb8d716004b9d26ee6564",
+  "hash": "e021c677984287262ff5e8f1b900344c40b37cdc06c9a6237ab2391d998f5620",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/infinix-note-50s-256gb-8gb/": {
+  "hash": "9f958ca8c4e5ca95b96b32b25de7fbe95646575177c123e5673f6839239142c0",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/tecno-camon-40-pro-256gb-12gb/": {
-  "hash": "4323554af3206e08f463cc03762b35e2ac441fa7fa4bc7cde11f1981cbf34fe8",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/honor-600-lite-256gb-8gb/": {
-  "hash": "7985a948009f4cdfa31de1c2b6ca241b8bd3467cce72e6ea89bb072009ef9cb1",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/realme-14-256gb-12gb/": {
-  "hash": "f7659979fdb7bcdcba87d075d333bc6ca9268798185036976f519e1df47bf3b8",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/samsung-galaxy-a36-256gb-8gb/": {
-  "hash": "19288c1e67ce30411061cecf3ea0d349a55a0dc9f1c25e28ad4e6757e20e23fd",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/samsung-galaxy-a26-256gb-8gb/": {
-  "hash": "fcac1435d591e7d6986d5e1a1348dba3fb0be233dff25be67b5b4d4812f0236f",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/realme-16-256gb-8gb/": {
-  "hash": "ac644b1b026b6d98e5a2ad321546bb958e3ef16a74839f8b01caceb6d1d9c619",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/realme-15-256gb-12gb/": {
-  "hash": "b948087e1d3eac072ee60ee27b561f3db2afa73c7d421197d43e1fdd36f9443b",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/samsung-galaxy-a27-256gb-8gb/": {
-  "hash": "7dcf393a0f5aebdc74323cd338d1d4bc486481df33a4957dde51e81692379169",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/apple-iphone-12-128gb-4gb/": {
-  "hash": "770f2f151714356e04b2de2927f950cd6f8bba0efb46ff282f47a907bf1e0109",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/vivo-v60-lite-256gb-8gb/": {
-  "hash": "99eb55109949725c4bde3bac54f45eb9f66436f59a4000c18c55fc8b11ead0b7",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/samsung-galaxy-a56-256gb-8gb/": {
-  "hash": "5d34607e12d20e0617bf97cb905b440805338022fefbe1ada05441272c727a0f",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/infinix-gt-30-pro-512gb-12gb/": {
-  "hash": "23d10750975149d66bcb3828fa85741a30edde83c6764354e1b806f91114a269",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/xiaomi-redmi-note-15-512gb-12gb/": {
-  "hash": "f5dc9f3c0cade2ddd46821cceebde8d8cdab38edf1dc38586d1f285ead297cec",
+  "hash": "89baf12188938da51d3bc83a328ae1c839267ccf6c099f5ddc17457f2d88f6e2",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/huawei-nova-15-max-256gb-8gb/": {
-  "hash": "633e37490c8908b037d72949e2d466dc5355967899014b947d88304ffad4dea2",
+  "hash": "3a4aacf7393eb52d87d3d48921dca5bc6aa6025073f100918b9948bea2697808",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/honor-x9d-256gb-12gb/": {
-  "hash": "f8bc31a94aa08eb534530b232c0dae5fffdd993b7207ab72870ea0cb2955a58d",
+ "https://3rde.online/mobiles/oppo-a5-256gb-8gb/": {
+  "hash": "e5ea589f7d4d66824de5eb8f0baa583eb1574f5d87fe4bcd74a9a3d1d3a3e4ac",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/infinix-note-60-pro-256gb-12gb/": {
-  "hash": "20a791af034a7f42083c7bbffc65ebd5efb5b97ae1bb87db8cf062b2bad0bc3c",
+ "https://3rde.online/mobiles/samsung-galaxy-a26-256gb-8gb/": {
+  "hash": "7f9ea124952eb9013cd099ef207946065eda078c58e4a9e3ffe80c984b780684",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/samsung-galaxy-a37-256gb-8gb/": {
-  "hash": "963d70a92af115adf4d0a624991ba2e285471e40fac3b4bb5749a9c63c368aa4",
+ "https://3rde.online/mobiles/realme-15t-256gb-8gb/": {
+  "hash": "e6075e12580ed4702b351b0eb2cf778a7e6b34c82dd9c9740722a31f720eb38b",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/vivo-v70-fe-256gb-8gb/": {
-  "hash": "0951a7bf0f5f3fde885581f90444a769fc9718bfa1c86c6af5f63ad421bb345f",
+ "https://3rde.online/mobiles/samsung-galaxy-a37-128gb-8gb/": {
+  "hash": "fe76b803e408597c56df50562ae44048c340e5d91c26b67490d11fe18a42424c",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/xiaomi-redmi-note-17-pro-256gb-8gb/": {
-  "hash": "01c3ccca0b7e9575e891366d542b4a9878f7ef2dc7868eda9d514baa2995b8df",
+ "https://3rde.online/mobiles/samsung-galaxy-a27-256gb-8gb/": {
+  "hash": "8d2d5c37965d2666c529a44c8fd9599b3c40e2a1569d56a358edc56cb5311d13",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/vivo-v70fe-256gb-8gb/": {
-  "hash": "7e0ba92206408680e6b5a0324ee323cfad688c0d9f4be724fa0a4d17ca40128c",
+ "https://3rde.online/mobiles/honor-600-lite-256gb-8gb/": {
+  "hash": "ab14febcefcfd4d7001db5c0f0b41575cc43669e02a3f48abe682409e6c997b2",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/samsung-galaxy-a37-256gb-12gb/": {
-  "hash": "323560b88d4fe0c1d46e80f8a8de9938c044e9a21a246f25f05f37aaec216cbe",
+ "https://3rde.online/mobiles/realme-14-256gb-12gb/": {
+  "hash": "fee6be9cb77160b91394deca8f24ab25be42d8d3cae07d978a3e9cb75750f359",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/oppo-a6-pro-256gb-8gb/": {
-  "hash": "492cfa1924d95f27818036f81a06ca38895102c210b1b319d08bac4487d58f27",
+  "hash": "d53b8dd8f96de9de44efc9fdcf32985b8d4687a02f1ee918be9b650d8cd154a9",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/samsung-galaxy-a36-256gb-8gb/": {
+  "hash": "48d868a4850bf4fe7c79b5c2e17d6513598960514e0326887e39dec5990646f4",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/realme-16-256gb-8gb/": {
+  "hash": "23e066c401a976a3dd0b8f07f06dadbe8d1e5002bfbc104737a30e7585c66730",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/realme-15-256gb-12gb/": {
+  "hash": "3b228b67bad1e6fa8bbe8ec41ccad9a9a214a98be9fda2010d21ed0299df5374",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/honor-x9d-256gb-8gb/": {
+  "hash": "04ef52a391d4d588b66d415afc14d14719bd1e6737a5365b4b3595f589d91182",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-12-128gb-4gb/": {
+  "hash": "e824812e13c545159bdd0f956c6e4d1fc6ffb8c70c04f869da3fd2fc149498a0",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/vivo-v60-lite-256gb-8gb/": {
+  "hash": "47daa6645f82394deca04f769acbc3818ed0a8380d9185c735faf0f4834c0b91",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/samsung-galaxy-a36-128gb-8gb/": {
+  "hash": "4877db4c51de2c66cd9bc69f3110dc7fe524af0c6ec32dd3119d65431d615ec7",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/samsung-galaxy-a37-256gb-8gb/": {
+  "hash": "3bbaf3e632acd6d3313dce021901deb289e82829a8a0d7f841a5254bb3db5872",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/samsung-galaxy-a56-256gb-8gb/": {
+  "hash": "e80b1c8631eb1ec35c6ba1d9c86c1dbbc385f283639154bfeff71dbd1be0a1fd",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/infinix-gt-30-pro-512gb-12gb/": {
+  "hash": "8201cd67a6fd413cb27442a8697eac9aec71b64837d410804ce9022c7dc0a1da",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/xiaomi-redmi-note-15-512gb-12gb/": {
+  "hash": "231887135eb0ccb02a387c97add3cdf947c92acbb0c957f2e9f9c5d6cd4c0237",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/honor-x9d-256gb-12gb/": {
+  "hash": "3064d4b7912225e32a823d4e2c1eb264d85187e00e7984c11c27eda474429de6",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/infinix-note-60-pro-256gb-12gb/": {
+  "hash": "d40aec81f12d7fb85e241262865d44b1d0fdd611c722c1d11cc0d0718d73d38e",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/vivo-v70-fe-256gb-8gb/": {
+  "hash": "12afe8cda2e57b958b5858c96782b6129f3bec0b8a11abd3f432921146d57d77",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/samsung-galaxy-a37-256gb-12gb/": {
+  "hash": "493220ec3a8c6b426cbb658f0329d84f7d6fc265afe1624b29ba796fc9e47eeb",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/xiaomi-redmi-note-17-pro-256gb-8gb/": {
+  "hash": "c2738bf431d7d677ed9a3733ea25e3f4aa69d0f140df3eb644829a9a5c4795ab",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/honor-x9e-pro-256gb-8gb/": {
-  "hash": "42ef9271d6ec0ee5e831783a6840952ee6cae5a128fc374fa8d184541e365d06",
+  "hash": "de1232b4d9fe01e31fce9e8d414a174248c9778b2884a83b4dfc11c6af64af26",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/xiaomi-redmi-note-15-pro-512gb-12gb/": {
-  "hash": "330de7b50ba0bc51872f2d47d36289a2d1a5dbbd2c9ea323ed82ab640d50ca3f",
+  "hash": "6a839c0fc654be299ead86b97437994378193fd1703bd59be7202176d7bd3093",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/xiaomi-redmi-note-15-pro-256gb-12gb/": {
-  "hash": "2078cb898030ee6b8b9c4494806c308342e0911a7546222c2202d5ff761a7fea",
+  "hash": "8363584b81e9190b8f252ca2d6690ab88f0e783a19812ea420ce3ed7f665d8e1",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/apple-iphone-12-pro-128gb-6gb/": {
-  "hash": "65b4c009fd5c6a175acf1dce309b84cb294af47b4629a8ac6eb831fb00e3f781",
+  "hash": "804637fedf7bc606af0ac7f24fd0ce055c992f8abf74c069f8915240899aea7c",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/honor-600-256gb-8gb/": {
-  "hash": "e0d21bb382be96ae07d2cd87caa1eb4eba45ff09f033d848037f335cb3ad2d20",
+  "hash": "ba0bc0b26e0fbe5830757a9a869492bda3ce1d021e6396bebf1cd74bdcbc02d4",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/realme-16-pro-256gb-12gb/": {
-  "hash": "9d1597e4914cc77744b22deffdec345b4ba253b74348325989d1cc5978bc30a8",
+  "hash": "d999fc7b81faad57e8a7bd83fdc7bb4ce8508bbb61001b3c73a885ae21815cd9",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/xiaomi-redmi-note-17-pro-256gb-12gb/": {
-  "hash": "fb6d55eeeb42185f13975941c480b7ea8175d7ce42c6a33de668e8adf3d4c8cb",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/oppo-reno-16f-256gb-8gb/": {
-  "hash": "195c51c1bdc69eaf5da19fa801aa4eb98a00007a6b5240e2508b58ceb77b5c13",
+  "hash": "6d9b292c067106c35f0e5f72af6ca52dffc2fdd755690d19032b96db4e230509",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/oppo-reno-15f-256gb-8gb/": {
-  "hash": "a51f3a1ca48fc078d798c4be2751176b8b0b07e342ae74656760d01e8f225f1b",
+  "hash": "23b08515f78be8c44c70acfb97c5ef1a543a7c2a9b82f8b8bda036055432c25d",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/samsung-galaxy-a57-256gb-8gb/": {
-  "hash": "a5347e6e93f6a77d80c54d7ab88e1e8bf327cc5580ddafad6e96902e59a62859",
+ "https://3rde.online/mobiles/oppo-reno-16f-256gb-8gb/": {
+  "hash": "66b4d223ac9b4cec1497ec2ad247c41fe229523af1226e09b77e0859686738c1",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/realme-15-pro-256gb-12gb/": {
-  "hash": "bffb1fb7b5fe64ea13be3f6abae9a7ec65477463e5070aa5b1570e831b23b3f4",
+  "hash": "b8cd619c63f1c50318e8a6d7b114191df03560cabfe23381295db9913bb6b6da",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/realme-15t-256gb-12gb/": {
-  "hash": "3e65102cbe76cc1f469e4577cfab83795a227bcba174c49f90cdf7c82baadbe9",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/oppo-reno15-f-256gb-8gb/": {
-  "hash": "399db6b5d9c7f53b7dc7bfea7a9a2d57ca8a8f5a6584b3567b3c2f5926777b7b",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/oppo-reno-16f-256gb-12gb/": {
-  "hash": "88cfa6ff5002641304af9a13728aedd3d80647ea14df2ea1ad3790ad2661ce40",
+ "https://3rde.online/mobiles/samsung-galaxy-a57-256gb-8gb/": {
+  "hash": "7859b19094c60b4990ebebfa0232b436bf98091051d6ff3501a1321b23fabf06",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/samsung-galaxy-a57-256gb-12gb/": {
-  "hash": "031febd59b9f4455ba7b5a55966a5478069f18ee2d57dfb1fbcf01ae07800de0",
+  "hash": "985f7a7360b2c7baf858c6e087e115bb31d54905ae6f092cd490a38f6c0960ab",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/honor-600-256gb-12gb/": {
-  "hash": "dbf4b853080a09de62f46daa62559ad1f256926e4581a1c0017e209181f5d564",
+ "https://3rde.online/mobiles/vivo-v70-fe-256gb-12gb/": {
+  "hash": "78cebe5b0a6eeeebee3e162cda86cdea8c848456cf1b8e9325558fa1992b496b",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/oppo-reno15-f-256gb-12gb/": {
-  "hash": "499894af9fe5206a6cc473d7f666774d0ddbf9ac5d64a9187e1de85fe9ba03f3",
+ "https://3rde.online/mobiles/tecno-camon-50-ultra-256gb-12gb/": {
+  "hash": "a03239085495f04fe98c2e487cafc179639e244440fb7fbdf3deb1b448f79055",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/apple-iphone-13-128gb-4gb/": {
-  "hash": "9689a7afbf2943e801545cfd18fb34afb2f153b9e7ef883238fa926bd369bb66",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/xiaomi-redmi-note-15-pro-plus-256gb-12gb/": {
-  "hash": "505a4ff7eb15c16252ea76550af68eed7cf955557bd9f6e74f6dce54965ea10b",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/xiaomi-redmi-turbo-5-256gb-12gb/": {
-  "hash": "4594dbfaaebe7900b5d148e6285e9321a0c54fc1e14f56cccb0e58d1af7b267c",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/xiaomi-redmi-note-17-pro-max-256gb-12gb/": {
-  "hash": "5db302d37da0bea16b0c5f5f7541d2e3d92dfa6556a21d3aa2c42270b7cb8d66",
+ "https://3rde.online/mobiles/realme-15t-256gb-12gb/": {
+  "hash": "6ac596f1c7252aa936a382a59e5537360bbf8f27b71c1b286407421a639f774f",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/oppo-reno-15f-256gb-12gb/": {
-  "hash": "e9c4bd630e85a9ee96862880bafb7e85ea8c71b862ffcbf09b62e06f13b6b6ff",
+  "hash": "e720ee9d8e4dbe4f163efa41197268fcfa9509b897889715b6c0484e698fcb32",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/samsung-galaxy-a56-256gb-12gb/": {
+  "hash": "d1bbbae0dbb2ac898328d7bc5b5b799b068b9e8e5fd6612bbe94ce03b7809eac",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/oppo-reno15-f-256gb-8gb/": {
+  "hash": "8061959618759bc6953642e5b0fc0c49e1c7e52cc3b550a820b0aee49a0f118d",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/oppo-reno-16f-256gb-12gb/": {
+  "hash": "e9bef544c622e5f7a6efd542b818bbfbed94d55bfabacc3334ad803ca19afde6",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/honor-600-256gb-12gb/": {
+  "hash": "03870ddd43976d7e942c72945b3b9006c42a00d8abbad09cabc16b24bff24f1f",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-12-pro-256gb-6gb/": {
+  "hash": "1290819d9fc14c252d98be77d83c8547b447d319e82deca7671f2dda517e8947",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/oppo-reno15-f-256gb-12gb/": {
+  "hash": "0685183f346476116729278f21079dd589acc1780225d5661e8b43affd34da2a",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/oppo-reno-15-pro-256gb-12gb/": {
+  "hash": "997e023335e310e1325967a30c32320c2f73b987dae94be4db0872ff6ac82940",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-13-128gb-4gb/": {
+  "hash": "89dd69df67b8c1a696deb92e585015f34654c144b09cb0ca11fa8ba7619a2195",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-12-pro-max-128gb-6gb/": {
+  "hash": "32f495d493e97faea7364249b3b66ce7eabcac8f4762ab2e91352b4cb1e9d337",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/xiaomi-redmi-note-15-pro-plus-256gb-12gb/": {
+  "hash": "7b5684ce01acb9102307d430720339f87213babf0d2fe6de3572a2b9c8af6bf4",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/xiaomi-redmi-turbo-5-256gb-12gb/": {
+  "hash": "e1d50e01b7a73a14ed5939e1c3820dd6f21f8ad66d0cf7fba2e024e6d7de838c",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/xiaomi-15t-512gb-12gb/": {
-  "hash": "aac9d10215cad99477914d85d2051563f3bd60ac0457abc2c62344932154e925",
+  "hash": "3656b8a4de19ae450bdd9ef66ff1ad42e5b8195a49aff2423585a6ea2aa82e7f",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/vivo-v70-256gb-8gb/": {
+  "hash": "8f5b763fc6263420ce68e201ee777df36a494d6d75dac8275c2a0344f129cfe0",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/huawei-nova-16s-256gb-12gb/": {
+  "hash": "7deff08ecfca1c46c7bc87d008962382852621fc93461bd2b32cc0b038418035",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/oppo-reno-15-256gb-12gb/": {
-  "hash": "4dc5990576d1c2efbd5c031c6cb3ff9cd7229b8134f250057dc183e250e4f3cc",
+  "hash": "43c6d01366879629998c101b2a7ff4bb4d0302dfe03c0fa96b0ec3e39b52eca1",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/xiaomi-redmi-note-17-pro-max-256gb-12gb/": {
+  "hash": "c630ea78ff5ab7ff581fb152ec415e08e00fd2d7ac6fe89ec51b1918e1276007",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/xiaomi-15t-512gb-12gb-2/": {
+  "hash": "c2a8a201d38e6474c2babcf935b70465d699f4088b92e7ce8b0ab8e11b9a758e",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/xiaomi-redmi-note-15-pro-plus-512gb-12gb/": {
+  "hash": "3f9460d4665dd4975592586e5bb4b02287d830c95865804442475cbc8a556ec2",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/samsung-galaxy-a57-512gb-12gb/": {
-  "hash": "6dd46ce6df681da6320e79da66b2db176fc582180cc7e977fcab6e6b2fd82899",
+  "hash": "a9e184b6fddab67a72cf56a535be95b6d28c1daee6980394a59e6b9a265e3893",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/oppo-reno-16-256gb-12gb/": {
-  "hash": "85fb6bade5d4e4160b9760f723aede56f18103124f06a8526fc785667a92ad17",
+  "hash": "7049c921f31d6206eb8ad10603a340e713da5501bcc2ef8fb39434b4f0b5c8f4",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/realme-16-pro-plus-256gb-12gb/": {
-  "hash": "7b54c2732dfb69aa7c6dcd0950403131e90c27cf7f0f267eae15d85a34f779ac",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/xiaomi-17t-256gb-12gb/": {
-  "hash": "08ef0c7a4d1cb91218b228e633d34b244ee26128797f066b7d346a52eecd80b2",
+  "hash": "1260982c73f1796d6b17cf5a2ee73092887ce8fc3c88913850a4d096f3bf2d80",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/vivo-v70-256gb-12gb/": {
-  "hash": "856b6a93693ccb93e66ff86d051626bf0f25c276f87cce0eadc9765cd828e695",
+  "hash": "7e5877373f2d74950e87bb8cc14c906d42d2ab910e54a9fd3c208a9898b6a975",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/xiaomi-17t-256gb-12gb/": {
+  "hash": "ff6f1b15fee353ec897aa932746bdf7d00ded4eb1b753a5241858db8055bab62",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-14-128gb-6gb/": {
+  "hash": "4bbf20b05a77633e13973636716712ece43ca95a819a9d99ae99424518a19af8",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/oppo-reno-15-512gb-12gb/": {
-  "hash": "21365a530a68baf1fb5b67d00e6d201c4f2e57baa7eaa5af7b322ca876437bae",
+  "hash": "c445cc1fcc6bcdc24dc70280c53b12cbe0be2bd00fe842da8250a1e9256d010f",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/samsung-galaxy-s26-fe-256gb-8gb/": {
-  "hash": "b4ca3adcfc35b86095ab9d66945499dd28c7446e89efbcc3b24ea4ff15b33506",
+  "hash": "d1c5135c0ffd5e3108cc19b372bfe0478ddd77995c8040275d9806fef4f61b25",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-12-pro-max-256gb-6gb/": {
+  "hash": "31612d88937a34a2c1debad2deadb06038e95f32441ad87537f756c577de4160",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/xiaomi-17t-512gb-12gb/": {
-  "hash": "75ab96f6e30b05ec3c6c98f4b97156c3130603e47ab14acee3c2c7e33b67cf9b",
+  "hash": "ec0a81b33f896a55484613a94ad0237c83e1aee3e84249cbf451aacd76636e65",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/samsung-galaxy-s25-fe-512gb-8gb/": {
-  "hash": "6890072c9b8cac41fad81eaabb5f94e37b322006ccb0e71af3a601ec4889a7fd",
+  "hash": "de8fd54375a57d4f8f9171aaba43635abc3ff9760fb1f45ab1348a6bd910ba85",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/vivo-v80-256gb-8gb/": {
-  "hash": "39a9882d7e641cebb84adba7bd20beb2d82ad7df747e6aedadcfc758d13db939",
+  "hash": "b94368729389cd04e0f20a3ca1c83802068df401c9a1bbfe256f95eca5720e5e",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-13-pro-128gb-6gb/": {
+  "hash": "fc9628201c09688f2fd9454aaeba4ebb7deffaf4f96ea8e49734bd6101f70d3f",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-13-pro-256gb-6gb/": {
+  "hash": "4b2fd582919dcf225a1ddca78bdf50d7c8daed3f9e08db9b0c7e629db0b6c84d",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/apple-iphone-13-pro-max-128gb-6gb/": {
-  "hash": "cacbea006242c8b43f7162d3bf4733400519c5fd965fa5f7e351ee8b0db05e34",
+  "hash": "20d97998fcd416e9624a017bbac1281850d7a7efda3f9854fad7eb1c90c702bc",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/samsung-galaxy-s26-fe-512gb-8gb/": {
-  "hash": "223897de5da474ebcf3aae6e0cc2a2ffdca879b233c69c4fd1fdd95f3fab5487",
+  "hash": "e09093f00bc200cf52be5dba264e82f8ecef40eeddaa6e870f19efc2d468b451",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/samsung-galaxy-s26-256gb-12gb/": {
-  "hash": "fe950a317bd0c531603f0b3bf0e9e50f656c1d2fdc3f582c7b5fbb5df14102c9",
+  "hash": "a4d5f56edd7cfeaecf23e649da2756d0855d4ea696d9dfc04e796114ab036e1a",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/vivo-v80-512gb-8gb/": {
-  "hash": "1584e92c352be46fc098b48f18f7f27cc6288913eeb6848a07672bc54188b293",
+ "https://3rde.online/mobiles/apple-iphone-14-pro-128gb-6gb/": {
+  "hash": "55edd687a1ed663d83fcd5921f95e3842ff42c0c0c884d63f53b84dd696d9ee2",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/honor-600-pro-512gb-12gb/": {
-  "hash": "71e4a68390fe564516eaa909547770eefb8f40ce8b0c8a2f1bec4598e15a9389",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/apple-iphone-15-128gb-6gb/": {
-  "hash": "6b4747b32976a849bd7ccb50c29b374225ebc9295c6c6285d16ad92a81caa066",
+  "hash": "891d43c3a39be7cc8b57c1266717d1e6c7886a649126fe1bc887c1a309eaf580",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/xiaomi-17t-pro-512gb-12gb/": {
-  "hash": "5058f93f49c2e8eed566420dea86338a5a6f3fd8cb47775e4126c33279119b5d",
+  "hash": "e980c1a586ed25e1e6c317a2af84b087a8fd35457a75ab6f0f3b09a0d9bf45fc",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-15-128gb-6gb/": {
+  "hash": "fef8af3c12c7b6bc9c9dd2f23db21a2860837fb22cf6b0056b67f54cb8c6d4dd",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/vivo-v80-512gb-8gb/": {
+  "hash": "589b6d0cbc39f568f170faec0761e9bd8939d95903f788fcca7591ca49803c34",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-13-pro-max-256gb-6gb/": {
+  "hash": "3309a81149817429c0f2d6fe0f75d432cddbeda0551c60c8356f2db51fa9fb6d",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-17e-256gb-8gb/": {
+  "hash": "60bf7bea8dc75754b044842c2939d322ccc045bba17f2d7db6404536a42e5ec4",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/oppo-reno-15-pro-512gb-12gb/": {
+  "hash": "a093fea0ba7d70ef005aa6fa518521a31ef13e15c6540387c359135591cd3a19",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-14-pro-256gb-6gb/": {
+  "hash": "44d8a7362bac22ce48bb746a57a529eb08287f7dd5a570107d824f30d0c37b4a",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-14-pro-max-128gb-6gb/": {
+  "hash": "8785836cce916d325d5706d947ac20332111d0adf1cbc1331ebc1ebb087420ef",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/samsung-galaxy-s26-plus-256gb-12gb/": {
-  "hash": "e1f66d1d6866b01e6367bf5ef6c2cb0b16af7fc3503dea7138e86f4b3aadb776",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/samsung-galaxy-s25-ultra-256gb-12gb/": {
-  "hash": "13e138b661ac593877457caeb2208a63dc7c1c222da81abe4190ae2e3fcc1ff0",
+  "hash": "a327e1d9a04248242afaece8d1e873169979073a1b32c35b514b0abb20ee85ce",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/apple-iphone-16-128gb-8gb/": {
-  "hash": "15607db469cc5e59d945202d4fb85bc12df6271d27e2686502241ae522b61e58",
+  "hash": "c52f1f1e6510651f46c5a14bee4bb6d3e2d1be574fe955ca7974ed5dbc26e36b",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/samsung-galaxy-s25-ultra-256gb-12gb/": {
+  "hash": "d5de8bbce3eeab9e2595efca1bcda6fb75c38333143585b19850ac7519e27998",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/apple-iphone-15-pro-max-256gb-8gb/": {
-  "hash": "eb783491895db457fdd58a4d3256fc2472241c5669c9fad69ea9aadf1c4cec17",
+  "hash": "817ca6ae0ff0cddd867d5e5ea84a8fd3a0b955d7014047daddc0fa6b39bbef3c",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-14-pro-max-256gb-6gb/": {
+  "hash": "91e70d80617156563162c95ba529756d7adf586828967d441f409a0ef3c86e59",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-15-pro-256gb-8gb/": {
+  "hash": "874b67d62c300e0b122a55255712182a8e86a80e170320ef751fa19cf48d9b38",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/samsung-galaxy-s25-ultra-512gb-12gb/": {
-  "hash": "4925a16217bc048d3b926b39add8d774a76c4f0bb236a1f89474a172c30da891",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/apple-iphone-16-plus-128gb-8gb/": {
-  "hash": "4532327110533e943e2324aae3fe5b14af712a3ad038c00653f62a3355d2b302",
+  "hash": "8d1ce5e9f3f603ab2e0dc728c4bf245e938c48f114bac4961c2b13d94b7f5058",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/samsung-galaxy-s26-ultra-256gb-12gb/": {
-  "hash": "02071a72c627236c36c412da0c182566926c435a5d8dfda1d864fb079f6f3bd1",
+  "hash": "6cb8574a471f6a22d21500659c079b4c9c2a2f23bddba850a66ab3feb042934b",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-16-plus-128gb-8gb/": {
+  "hash": "97215d5eb302fd9ad925d90c28903ed7bf0c9d082a3aa22bd3c97ed98d46af58",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/apple-iphone-17-256gb-8gb/": {
-  "hash": "558f746b0486091a2161602fe16f0714f96e36880dad9c0ac7c7aa52a4e05eaa",
+  "hash": "1f10e806e727c48bf3bdaabf99fb668199788eede6d51777337b4e7711d1840e",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-16-pro-256gb-8gb/": {
+  "hash": "b666002e02001923cc42c0ab4b8cff75b10fec80353cc27e85481a47acd75c74",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-15-pro-max-512gb-8gb/": {
+  "hash": "3a1308e36b1cb6d4f130f41e5d36df4437b01e9eb74b657f204dbf32998e1cd8",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/apple-iphone-16-plus-256gb-8gb/": {
-  "hash": "f620b9e851d4fda409db7b0c71e4ff78c71743f66f8d204ae5e6cd912b81fc58",
+  "hash": "f432913b50a0959f075ca300819b9181366e32961b60139445451a3da6d1c027",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-16-pro-max-256gb-8gb/": {
+  "hash": "3b5ed5c029721142e639937c38f69c216f8d9188705ccaf80a5d8a67711bcacb",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/samsung-galaxy-s26-ultra-512gb-12gb/": {
-  "hash": "2066ea07874dec3f2a9d5eb4610ab3c90b7cb1ebc1f514e681b03899eb8b5da2",
-  "lastmod": "2026-11-20"
- },
- "https://3rde.online/mobiles/apple-iphone-17-pro-max-256gb-12gb/": {
-  "hash": "bc016f399396e90d1cbd86ec6fec34f8927b16faccf969667b6b44744d38520d",
+  "hash": "07f4ce9f11e181aebc8969873d48dd86f05a65b3c61cb33cc3864727d6b66e5d",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/apple-iphone-17-pro-256gb-12gb/": {
-  "hash": "b5d3311c6526e8e54e74635e970142b2e7d028a3a0f396a93065993a9b7b37b3",
+  "hash": "87b0cdf3942fdba7769eb44857febe49e064e4b947d78e738b0e083cbbe89d32",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-16-pro-max-512gb-8gb/": {
+  "hash": "b5ec71cc5d99ae4f5ec26ba8377246d382e58d0d3142d10a3a1b5a2cdc3ef377",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-17-pro-max-256gb-12gb/": {
+  "hash": "328c075ceebf6c14454e1157a89adb03b3eb9a5b6288616d6836ecca2cc0831e",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/samsung-galaxy-s24-ultra-512gb-12gb/": {
+  "hash": "d94e8ec8383d55c1a5b7851c3fdff801d059cfa2f73deac9b6ebf0b9aa049279",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/apple-iphone-17-pro-512gb-12gb/": {
-  "hash": "f2d6db5cd3a368ba47ac303ec55f9891c9c196c4a7c981f8f3e0a205fcbe31d4",
+  "hash": "b3e42d471e22074be5c26822f15c35ce1143546a62d9f288c94f17297e2d49d8",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/nokia-106-4g-4mb/": {
-  "hash": "4bcea0d6f3fb269755f6d3d62d97467d0fcf547a9d0feda245acbc721583360f",
+  "hash": "3b689744cb838c3f764f63cb3c65e839991fc28e56f338d633bbd6ce208e3f8e",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-18-pro-256gb-12gb/": {
+  "hash": "8378a2bf536f2e5868b3e489cdd7ee8f877d17654eec449aa9cb71ed7642af64",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-17-pro-max-512gb-12gb/": {
+  "hash": "b734b1458d480266babfc531739d29bc38dde539768c9b031c0174e0ed98b522",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/apple-iphone-18-pro-max-256gb-12gb/": {
-  "hash": "de4f5ab65a6c30a97ab05a7ecb668788831120debacd68dff7a51f2ad9ba48aa",
+  "hash": "67577d6e5d8b8d03311861dc3aba0954136cd151524f1e3ed16c5bb634e445eb",
   "lastmod": "2026-11-20"
  },
- "https://3rde.online/mobiles/apple-iphone-18-pro-1tb-12gb/": {
-  "hash": "8c8aa653379ff8b35428cb47b4501ce3fedfc6b68b1cb93a5a1f481b1ed4111b",
+ "https://3rde.online/mobiles/apple-iphone-18-pro-512gb-12gb/": {
+  "hash": "1a5cfbda320ce117d41c1917f5df9988f77deb9ba1d8db09ec4060af56cd8442",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/mobiles/apple-iphone-18-pro-max-512gb-12gb/": {
-  "hash": "2fb5e1862a0d3bc68247f19c0502a1fa31135bdc7e3ac5487953e3284c2c39d8",
+  "hash": "aa18c866217c402f8c01bf0ee6fcd4d89a2508cf6d560972919fa8f5fd5f3dcf",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-17-pro-max-1tb-12gb/": {
+  "hash": "075e57468f182e0a401d2af3b9685ef2240ed2650583eb96107f0b047d7efbd6",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-18-pro-1tb-12gb/": {
+  "hash": "17eed32d8ee5de95b9e23ee9bd58bc7913545a4e6d2910aa65bf44b49872adad",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-18-pro-max-1tb-12gb/": {
+  "hash": "fb03933a5fbb18bd733e8516bc963aadd1e80a4df146c25d21d6a7887af650d7",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-duo-256gb-12gb/": {
+  "hash": "8c83d5c2d180015e74b87595c4629bcd7c319738ccb209335dd1e291bdbabf9e",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-18-pro-max-2tb-12gb/": {
+  "hash": "fd30e37e7c6651246eda5c1d3f96af589ddbae91766e4fc506884855ea9e91d8",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-duo-512gb-12gb/": {
+  "hash": "7efb4bd1a7f1109b0894ebc792b4cbdd9ec4f7dd9bb7f99308066f35fec8e6d5",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/mobiles/apple-iphone-duo-1tb-12gb/": {
+  "hash": "cc00901b1539c67618f6f17c0ce7c76aa2c9903e8335b1358c8af822d400803c",
   "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/apple/": {
-  "hash": "8fec9bc30f0892123ce7507e7b12f46f596eb35d28d076b13990d10a4f853453",
-  "lastmod": "2026-11-19"
+  "hash": "db165692c6919cfb174bc63e289aaabb75cbf6c92bd7bbe651dae7c16fda6e2c",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/samsung/": {
-  "hash": "218a64b1c4ac84b5dcaca3cda0d8c1a8c4aa20a9b5c4f5167b3c90a55a108a58",
-  "lastmod": "2026-11-19"
+  "hash": "9bd98f350078eca71d6eb2bc6821ed9401c470a49641508d241a0ea919f597ef",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/xiaomi/": {
-  "hash": "9faf03cf923790bf27dad6d028a4701722bdc48593414eb75592f0d43dd10e2f",
-  "lastmod": "2026-11-19"
+  "hash": "5b33d988c12d06bd1769f19121d563a637007a3a20c39caf97266fc0341ef965",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/oppo/": {
-  "hash": "c3496c90b32cfcf4c3a40ab844c8d52b6a7f825aec3e7d559168dd2ccc10e3a2",
-  "lastmod": "2026-11-19"
+  "hash": "3c4da0c4690bcb9d861343302f4f58f64a85d96c44fbcf4c5542ec0a78cb989d",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/realme/": {
-  "hash": "905b5bbd40287ddd5f57017c869df19749fcbf74a18a92d663f391cc738ce434",
-  "lastmod": "2026-11-19"
+  "hash": "5cb5812619dd7833121499a2e06b974d3443fce69f666cbb5e309168f76eb360",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/vivo/": {
-  "hash": "de6f5cde98bd204a2ac16124878e12906ff09c69f0be42def1a054d1dd8cf3e7",
-  "lastmod": "2026-11-19"
+  "hash": "656625b6babdcc10f8ab0910ba8cfd99ea825a7c2ecfa2d7baa6049f3009176f",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/redmi/": {
   "hash": "12cce8fe81c49afd35283283c79a490122286913957aa3919c111070cb76199b",
   "lastmod": "2026-11-19"
  },
  "https://3rde.online/brand/honor/": {
-  "hash": "f73d18f83a78558f771e6759998d881c5ddebe4160cd3837d71450c0b1cabc47",
-  "lastmod": "2026-11-19"
+  "hash": "5ff275b1298e043b084fc796621f79e1c3273ae301a28c373c86f0b001a89b8c",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/huawei/": {
-  "hash": "17a92be7d79e2a673652b9fa29d89a235cfdb03c4c91fe6beeb98f4d88668c60",
-  "lastmod": "2026-11-19"
+  "hash": "cd35ef4b8d9a8fded10245c95f23df19cda7f4a7ffed1bd2b259b2486fd2f873",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/infinix/": {
-  "hash": "6d939ad9f3ed5def2ca1c71703956815e5dfd1b56f6e50f5b096d0dfd08e9957",
-  "lastmod": "2026-11-19"
+  "hash": "44712e8c5b1959dfd6974d33c3e37861bb2772965dc197f8d63e65b13c8c07b7",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/tecno/": {
-  "hash": "39afdab847bc63d3d10ffe646a3a0fff990c9fcc7dc98f5eaf0ed5f3e8f35353",
-  "lastmod": "2026-11-19"
+  "hash": "ec9a8a61c6fef06ccd397a2437232cceeb78553607c70c2201ce1c3ecd72b25c",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/nokia/": {
-  "hash": "9a818cd7fa1943fe096727fb2667ec680c0714848e5a22b03c8215240155dce5",
-  "lastmod": "2026-11-19"
+  "hash": "9ba3d0864388443c9f58b2d16b1c79a2d84c042efca9cb9edbbbb79f60b8a465",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/motorola/": {
-  "hash": "fc38b11a7de3fb99bd701f2c2c18123abc692783a5e852c5d32054a242b0c1ce",
-  "lastmod": "2026-11-19"
+  "hash": "a89ee4bcdc4e98beea40794a992e66b6df47cea19fdcd51fee651a0542606d5e",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/itel/": {
-  "hash": "872271982e2f194b24e63b3363f8157daea4a6a5727902497343d6a77f765db0",
-  "lastmod": "2026-11-19"
+  "hash": "f328c5b0f660b0572ea580d65b24642da22d8237c0d5321f58b811f9b3d7cfc9",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/zte/": {
-  "hash": "63e3067a8681e3bc79855bb1178e5e9ffa3c110cc7f9658e8ab8a73879a1835e",
-  "lastmod": "2026-11-19"
+  "hash": "7f8687c9dd6ec843a3fdd8df653345d448765aa9f75dae54e831dabafaf794f6",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/micromax/": {
-  "hash": "bda14a020648b72f84e8cd4b034abfc10a1eced6677e4954a39d53d774f7e704",
-  "lastmod": "2026-11-19"
+  "hash": "2eeb35ad59c817dc5fe37651014460fddf9175f05596d9ee33cc0590b7e9ccf1",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/generic/": {
-  "hash": "ba851e37f5922c45b8afd881ab7605cb08fa63b3f1875d7dc2f84ca8236bc0ad",
-  "lastmod": "2026-11-19"
+  "hash": "717d29b1c8f2ced72f47470e9c08a4e872735e912bfde757101f963669a0e57d",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/girasole/": {
-  "hash": "ad36f8aa21c70db129eea02f9ef9ea7d6554cd61190ee253ac5292ec021df560",
-  "lastmod": "2026-11-19"
+  "hash": "e601288829691c3245a4e13d4c1063ccb1bed721158d4460bbcca1ba2ddbdd98",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/hope/": {
-  "hash": "5a572116fd0d9ff476774aa5598bd17fa44bdd96c33cc4848f3c1c93a2f51985",
-  "lastmod": "2026-11-19"
+  "hash": "6c8371152f43df2e11ec9e3834e2e3538d8b6d619447959939c2df7471e97e33",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/i-pro/": {
-  "hash": "34301e7c2c28e49048a7b6af7a620c3dc86c68133ce28c953143b6ddca6d1873",
-  "lastmod": "2026-11-19"
+  "hash": "02dd8d2f1213f37a5929cb608d39899ff6b4c5ce56a5871ec5bae21cc4d7f93f",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/pluzz/": {
-  "hash": "c20cc9837a5f2847d69865f980d63bd37aab5e34e4fe30f8d176fa3562702ae2",
-  "lastmod": "2026-11-19"
+  "hash": "746791ba924369c012ecb7332c32fc7a36a0338804a8e7fb4dfd6e6ccd31e7dc",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/sary/": {
-  "hash": "a7ff7e6c59a503ceac3eefc76b91662e60810ea974804beecd8472b17d02c788",
-  "lastmod": "2026-11-19"
+  "hash": "919d40c33e8059bc160c4b7dbab3505b9cd6ee64ab594a974d53355349683b89",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/shitel/": {
-  "hash": "ab4b7915a9b9171c86c42920c54e1db7e61962da7ae5305bd1d9fe6a4da8871c",
-  "lastmod": "2026-11-19"
+  "hash": "eb0d21ff28db862b59043e94dad72b909aac78deb88c49ec05de64e341a64b55",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/sunelan/": {
-  "hash": "65966dbda530ccd71b8d765a089b02f74012462960e5a52c286c4aa003ab6532",
-  "lastmod": "2026-11-19"
+  "hash": "3704a51d0d34807cc840e0af06ab61249036749cc05851e3c7cc702a7cc7c1b2",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brand/tag-phone/": {
-  "hash": "093e3eb14b619b027faa32fbbb9e874fcfd13d99a38e5b4f2cd7929d675dd55b",
-  "lastmod": "2026-11-19"
+  "hash": "e92d0c2b2f89c0568c48afb0865edb96fea900a3370bc7e2c0dd62ee579db0c8",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/brand/darago/": {
+  "hash": "af8799ea1e2230f3def8108068c1be589baa1a1177a0e473a5feb2903c64123a",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/brand/enes/": {
+  "hash": "10b864f20b30efa390da6000e693e565091853b993a87d940387ae148ce9c60b",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/brand/iku/": {
+  "hash": "697bca8bb5741470083af52bde4ab7d6f7c05145b5ca10782b5ee25fd6fe2116",
+  "lastmod": "2026-11-20"
+ },
+ "https://3rde.online/brand/link/": {
+  "hash": "33bd1bbcddcaa3225e5f3e2f9c2ee6173c25ab9a6841be545678b5d7fe6cecfb",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/brands/": {
-  "hash": "bbcbab386678c23ae7e162d9be5f02fb2d2baca1afcaebf2b211969564893fcb",
-  "lastmod": "2026-11-19"
+  "hash": "126abb98d11ded5943396399c4d685714dffa3d5f1943a2e8021f1f3ee3a6eba",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/deals/": {
-  "hash": "1a8d9e6e0cfdd81753ece552dfadedf6d903c084cb355ca0dfc26abb2cf92f8f",
-  "lastmod": "2026-11-19"
+  "hash": "242834fc1defb679f9d9f0c092746b848ae0d71aaf3828097d79efcc7739223a",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/coupons/": {
   "hash": "eb58038f6a5af15cfced8f0676660e2e7604c0c0e1447a9d35180214a6834f4a",
@@ -980,64 +1368,64 @@
   "lastmod": "2026-11-19"
  },
  "https://3rde.online/guides/best-phones-under-10000/": {
-  "hash": "590276eafcc933a4863f911f80937061be29dc08ab06a12b4efb7e4192b8abb7",
-  "lastmod": "2026-11-19"
+  "hash": "1e3e3a732d5f7d87ac803152ed1ce3bad54ccde90b8217832ca05c9011c5aaaa",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/guides/best-battery-phones/": {
-  "hash": "e1fc29e18cbbc00c31df45537ebb823bf590239c69752d39eb54a8f29f0dcbdd",
-  "lastmod": "2026-11-19"
+  "hash": "672c897aee5ec7e3772f8dccc2d879294c553ab094a6863fc19df19c75523b99",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/guides/best-camera-phones/": {
-  "hash": "60a3d10060ede05dd71aecdc678b4ccf6730e1ff4ca1b044ac02a98e5ccd0dc1",
-  "lastmod": "2026-11-19"
+  "hash": "f9eb2aa79c90e0f866b654ff4233cc15f2ed3e0b6032e4f8a39e78b2a0955729",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/guides/best-gaming-phones-2026/": {
-  "hash": "f822585bec1cb19557a569e5e784c460088c164e0603a0acd683d26400d3ddd3",
-  "lastmod": "2026-11-19"
+  "hash": "06032ff71ccc8487b2cc251808813ab27e01c026cca6e99cfeeb304ef37a2923",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/guides/best-camera-phones-2026/": {
-  "hash": "ba567081be46c399ca23122663d274ec9c2a5301291b7c310314fee3e8c032e8",
-  "lastmod": "2026-11-19"
+  "hash": "80b3dada72e7d8165c5f2fd0c0b9a6b76c31e040f3b2a4bcf1618b68cb9426bd",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/guides/best-battery-phones-2026/": {
-  "hash": "b523d3de7af890a0e8a5aafd7d057c88167295df6c981f4e8914f3716766f64a",
-  "lastmod": "2026-11-19"
+  "hash": "859454b796f8a96fcd9fa193393f959fc924825be3c5c5941743a33d59c86a90",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/news/": {
   "hash": "c61b33d9f70d5435cac86d082de3f1b848f9d0044793704cd2b255b6ed54a26b",
   "lastmod": "2026-11-19"
  },
  "https://3rde.online/news/oppo-a6-price-drop-example/": {
-  "hash": "7a99dd0fec2461c2aec70f3e9b56166b81ec2f2d3e8b69292222d76630800546",
-  "lastmod": "2026-11-19"
+  "hash": "c6b0f6d76c5372d1001f093279f84d4bfaa5a6c80344caa2090f1856a8d03671",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/compare/": {
   "hash": "ad940e953d3c682c3897f657244d2607fd0a6a7ff6c5a0948d2d6c9e351f178c",
   "lastmod": "2026-11-19"
  },
  "https://3rde.online/budget/": {
-  "hash": "70ef40382ac7d172077357a8d396726dcb71f5520a0019e5cee79bd214cd6b8d",
-  "lastmod": "2026-11-19"
+  "hash": "9bb9798f3a8818a4041bf288a5610ba7f778f22d67274e1e63603322bbec9a76",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/budget/under-10000/": {
-  "hash": "dd68561ca5a5427edc94d7e8df8c7c9c67f5898c92975ea95d6ce5ce0699ea33",
-  "lastmod": "2026-11-19"
+  "hash": "a0161c70eace0b40b46d89f0e7e93a4d2a8a8e0883e310a8dee29cf86f8091c4",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/budget/under-15000/": {
-  "hash": "16072b4447db683aaf0e7682ad8d8390a68ded24e2ac93058dafa7f026fd658a",
-  "lastmod": "2026-11-19"
+  "hash": "20fc1c080f4bf648fe30d128896ce6a94bbe77a0729f5f7758893feae9a17e13",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/budget/under-20000/": {
-  "hash": "79827b6dd067fd8d94ef1e3e006271f72244686220fd7a43a7e6b020145fc68c",
-  "lastmod": "2026-11-19"
+  "hash": "790eea90355bd5e8f9d9bd98617aa3271b621d77d22ff50f523086d1dc33edc8",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/search/": {
   "hash": "45077505f61bb884662dd3eb295b89fb1964a6645771c5dccfeb6ebad5a90262",
   "lastmod": "2026-11-19"
  },
  "https://3rde.online/search/specs/": {
-  "hash": "1b1c0730267e3bdd831c853a3552f1ed9beef18fe5aade29adbec0a96b2764c9",
-  "lastmod": "2026-11-19"
+  "hash": "69f2eab10888cd03526022c2f0328d7b08fd577d449459ab4d4d67b8feee6426",
+  "lastmod": "2026-11-20"
  },
  "https://3rde.online/privacy/": {
   "hash": "4c6d68825f18e1631e9e250573790ab945eca4b26c84294681bb1468185382b5",
