@@ -53,6 +53,8 @@ TAB_FILES = {
     "سجل الأسعار": "price_history.json",
     "المكرر فقط": "duplicates.json",
     "الكوبونات": "coupons.json",
+    "الأدلة": "guides.json",
+    "الأخبار": "news.json",
 }
 LAYOUTS = ("classic", "rows", "deals", "store", "compact", "luxury",
            "forest", "royal", "sunset", "minimal", "showcase",

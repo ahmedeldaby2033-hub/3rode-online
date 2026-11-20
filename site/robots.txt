@@ -3,5 +3,4 @@ Allow: /
 Disallow: /adamwnor/
 Disallow: /search/
 Disallow: /compare/
-Disallow: /guides/
 Sitemap: https://3rde.online/sitemap.xml

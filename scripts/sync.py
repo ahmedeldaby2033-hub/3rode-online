@@ -162,6 +162,168 @@ def refresh_from_sheet():
     return refreshed
 
 
+def _tags_list(v):
+    """Split a tags cell on comma or Arabic comma into a list."""
+    if isinstance(v, list):
+        return [str(t).strip() for t in v if str(t).strip()]
+    return [t.strip() for t in str(v or "").replace("،", ",").split(",")
+            if t.strip()]
+
+
+def sync_guides_from_raw():
+    """Convert the Sheet's «الأدلة» tab export into data/guides.json
+    (the file build.py reads). Mirrors sync_coupons_from_raw().
+    SAFETY: if the raw tab has fewer than 2 rows (header only / empty),
+    the local file is NOT overwritten — a fresh/empty tab must never
+    wipe the site's guides. Merge-preserve by slug from the existing
+    local file: guides keep local-only 'hidden', 'tips', 'is_example'."""
+    src = None
+    for cand in (RAW / "guides.json", RAW / "الأدلة"):
+        if cand.exists():
+            src = cand
+            break
+    if src is None:
+        return
+    try:
+        raw = json.loads(src.read_text(encoding="utf-8"))
+    except Exception as e:  # noqa: BLE001
+        LOG["errors"].append(f"guides raw parse: {e}")
+        return
+    values = raw.get("values", []) if isinstance(raw, dict) else raw
+    if not isinstance(values, list) or len(values) < 2:
+        log("guides", f"raw {src.name} has <2 rows — keeping local file")
+        return
+    header = [str(h).strip() for h in values[0]]
+
+    def col(row, name, default=""):
+        try:
+            i = header.index(name)
+        except ValueError:
+            return default
+        return row[i] if i < len(row) else default
+
+    existing = {}
+    note = None
+    gf = DATA / "guides.json"
+    if gf.exists():
+        try:
+            old = json.loads(gf.read_text(encoding="utf-8"))
+            note = old.get("note")
+            for g in old.get("guides", []):
+                existing[g.get("slug")] = g
+        except Exception:  # noqa: BLE001
+            pass
+    guides = []
+    for row in values[1:]:
+        slug = str(col(row, "slug", "")).strip()
+        if not slug:
+            continue
+        prev = existing.get(slug, {})
+        guides.append({
+            "slug": slug,
+            "title": str(col(row, "title", "")).strip(),
+            "criterion": str(col(row, "criterion", "")).strip(),
+            "description": str(col(row, "description", "")).strip(),
+            "human_review": str(col(row, "human_review", "")).strip(),
+            "status": str(col(row, "status", "")).strip() or "draft",
+            "author": str(col(row, "author", "")).strip() or "فريق عروض أونلاين",
+            "date": str(col(row, "date", "")).strip(),
+            "publish_at": str(col(row, "publish_at", "")).strip(),
+            "image": str(col(row, "image", "")).strip(),
+            "image_alt": str(col(row, "image_alt", "")).strip(),
+            "keyword": str(col(row, "keyword", "")).strip(),
+            "meta_title": str(col(row, "meta_title", "")).strip(),
+            "meta_desc": str(col(row, "meta_desc", "")).strip(),
+            "tags": _tags_list(col(row, "tags", "")),
+            "hidden": bool(prev.get("hidden", False)),
+            "tips": prev.get("tips", []),
+            "is_example": bool(prev.get("is_example", False)),
+        })
+    out = {"guides": guides}
+    if note:
+        out["note"] = note
+    gf.write_text(json.dumps(out, ensure_ascii=False, indent=1),
+                  encoding="utf-8")
+    log("guides", f"synced {len(guides)} guides from {src.name}")
+
+
+def sync_news_from_raw():
+    """Convert the Sheet's «الأخبار» tab export into data/news.json
+    (the file build.py reads). Mirrors sync_coupons_from_raw().
+    SAFETY: same <2-rows guard as guides — an empty tab must never
+    wipe the site's news. Merge-preserve by slug: news keeps local-only
+    'date_modified'."""
+    src = None
+    for cand in (RAW / "news.json", RAW / "الأخبار"):
+        if cand.exists():
+            src = cand
+            break
+    if src is None:
+        return
+    try:
+        raw = json.loads(src.read_text(encoding="utf-8"))
+    except Exception as e:  # noqa: BLE001
+        LOG["errors"].append(f"news raw parse: {e}")
+        return
+    values = raw.get("values", []) if isinstance(raw, dict) else raw
+    if not isinstance(values, list) or len(values) < 2:
+        log("news", f"raw {src.name} has <2 rows — keeping local file")
+        return
+    header = [str(h).strip() for h in values[0]]
+
+    def col(row, name, default=""):
+        try:
+            i = header.index(name)
+        except ValueError:
+            return default
+        return row[i] if i < len(row) else default
+
+    existing = {}
+    note = None
+    nf = DATA / "news.json"
+    if nf.exists():
+        try:
+            old = json.loads(nf.read_text(encoding="utf-8"))
+            note = old.get("note")
+            for p in old.get("posts", []):
+                existing[p.get("slug")] = p
+        except Exception:  # noqa: BLE001
+            pass
+    posts = []
+    for row in values[1:]:
+        slug = str(col(row, "slug", "")).strip()
+        if not slug:
+            continue
+        prev = existing.get(slug, {})
+        act = col(row, "is_example", False)
+        is_ex = act not in (False, "false", "FALSE", "0", "no", "No", "NO", "")
+        posts.append({
+            "slug": slug,
+            "title": str(col(row, "title", "")).strip(),
+            "description": str(col(row, "description", "")).strip(),
+            "body": str(col(row, "body", "")).strip(),
+            "model_slug": str(col(row, "model_slug", "")).strip(),
+            "author": str(col(row, "author", "")).strip() or "فريق عروض أونلاين",
+            "date_published": str(col(row, "date_published", "")).strip(),
+            "date_modified": prev.get("date_modified") or str(col(row, "date_published", "")).strip(),
+            "is_example": is_ex,
+            "publish_at": str(col(row, "publish_at", "")).strip(),
+            "image": str(col(row, "image", "")).strip(),
+            "image_alt": str(col(row, "image_alt", "")).strip(),
+            "keyword": str(col(row, "keyword", "")).strip(),
+            "meta_title": str(col(row, "meta_title", "")).strip(),
+            "meta_desc": str(col(row, "meta_desc", "")).strip(),
+            "tags": _tags_list(col(row, "tags", "")),
+            "category": str(col(row, "category", "")).strip(),
+        })
+    out = {"posts": posts}
+    if note:
+        out["note"] = note
+    nf.write_text(json.dumps(out, ensure_ascii=False, indent=1),
+                  encoding="utf-8")
+    log("news", f"synced {len(posts)} news posts from {src.name}")
+
+
 def sync_coupons_from_raw():
     """Convert the Sheet's «الكوبونات» tab export into data/coupons.json
     (the file build.py reads). The admin panel writes coupons to the
@@ -335,6 +497,8 @@ def main():
     try:
         refresh_from_sheet()
         sync_coupons_from_raw()
+        sync_guides_from_raw()
+        sync_news_from_raw()
         changes = diff_prices()
         if changes:
             # append to the local price-history file (merged by build.py

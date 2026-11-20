@@ -97,8 +97,23 @@ function setupTabs() {
   sheet(SHEET_REPORTS, ['timestamp', 'model', 'correct_price', 'note', 'product_url']);
   sheet(SHEET_REQUESTS, ['timestamp', 'model', 'budget', 'email']);
   sheet(SHEET_STOCK_ALERTS, ['timestamp', 'model', 'whatsapp']);
-  sheet(SHEET_GUIDES, ['slug', 'title', 'criterion', 'description', 'human_review', 'status', 'author', 'date']);
-  sheet(SHEET_NEWS, ['slug', 'title', 'description', 'body', 'model_slug', 'author', 'date_published', 'is_example']);
+  sheet(SHEET_GUIDES, ['slug', 'title', 'criterion', 'description', 'human_review', 'status', 'author', 'date', 'publish_at', 'image', 'image_alt', 'keyword', 'meta_title', 'meta_desc', 'tags']);
+  sheet(SHEET_NEWS, ['slug', 'title', 'description', 'body', 'model_slug', 'author', 'date_published', 'is_example', 'publish_at', 'image', 'image_alt', 'keyword', 'meta_title', 'meta_desc', 'tags', 'category']);
+  // Guides/news SEO + media columns (cols 10-15 guides, 10-16 news):
+  // existing sheets created before these columns existed get the missing
+  // headers appended, like the publish_at / description fixes above.
+  (function () {
+    var gs = ss().getSheetByName(SHEET_GUIDES);
+    var gh = gs.getRange(1, 1, 1, Math.max(gs.getLastColumn(), 1)).getValues()[0];
+    ['image', 'image_alt', 'keyword', 'meta_title', 'meta_desc', 'tags'].forEach(function (h, k) {
+      if (gh[9 + k] !== h) gs.getRange(1, 10 + k).setValue(h);
+    });
+    var ns = ss().getSheetByName(SHEET_NEWS);
+    var nh = ns.getRange(1, 1, 1, Math.max(ns.getLastColumn(), 1)).getValues()[0];
+    ['image', 'image_alt', 'keyword', 'meta_title', 'meta_desc', 'tags', 'category'].forEach(function (h, k) {
+      if (nh[9 + k] !== h) ns.getRange(1, 10 + k).setValue(h);
+    });
+  })();
   // Scheduled publishing (col 9): guides + news get a publish_at column
   // (ISO datetime, e.g. 2026-11-25T10:00). publishScheduled() publishes
   // due rows hourly. Existing sheets created before this column existed
@@ -457,7 +472,7 @@ function doGet(e) {
     if (action === 'export') {  // used by scripts/sync.py (no token needed: read-only data)
       setupTabs();
       var tabs = {};
-      ['الورقة1', 'ملخص', 'سجل الأسعار', 'المكرر فقط', 'الكوبونات'].forEach(function (name) {
+      ['الورقة1', 'ملخص', 'سجل الأسعار', 'المكرر فقط', 'الكوبونات', 'الأدلة', 'الأخبار'].forEach(function (name) {
         tabs[name] = ss().getSheetByName(name).getDataRange().getValues();
       });
       return jsonOut({ ok: true, tabs: tabs, settings: getSettings() });
@@ -721,27 +736,29 @@ function doPost(e) {
       if (action === 'saveGuide') {
         s = sheet(SHEET_GUIDES);
         var g = body.guide || {};
+        var gvals = [g.slug, g.title, g.criterion, g.description, g.human_review || '', g.status || 'draft', g.author || 'فريق عروض أونلاين', g.date || '', g.publish_at || '', g.image || '', g.image_alt || '', g.keyword || '', g.meta_title || '', g.meta_desc || '', g.tags || ''];
         var gr = s.getDataRange().getValues();
         for (i = 1; i < gr.length; i++) {
           if (gr[i][0] === g.slug) {
-            s.getRange(i + 1, 1, 1, 9).setValues([[g.slug, g.title, g.criterion, g.description, g.human_review || '', g.status || 'draft', g.author || 'فريق عروض أونلاين', g.date || '', g.publish_at || '']]);
+            s.getRange(i + 1, 1, 1, 15).setValues([gvals]);
             return jsonOut({ ok: true, updated: g.slug });
           }
         }
-        s.appendRow([g.slug, g.title, g.criterion, g.description, g.human_review || '', g.status || 'draft', g.author || 'فريق عروض أونلاين', g.date || '', g.publish_at || '']);
+        s.appendRow(gvals);
         return jsonOut({ ok: true, added: true });
       }
       if (action === 'saveNews') {
         s = sheet(SHEET_NEWS);
         var n = body.news || {};
+        var nvals = [n.slug, n.title, n.description, n.body, n.model_slug || '', n.author || 'فريق عروض أونلاين', n.date_published || '', !!n.is_example, n.publish_at || '', n.image || '', n.image_alt || '', n.keyword || '', n.meta_title || '', n.meta_desc || '', n.tags || '', n.category || ''];
         var nr = s.getDataRange().getValues();
         for (i = 1; i < nr.length; i++) {
           if (nr[i][0] === n.slug) {
-            s.getRange(i + 1, 1, 1, 9).setValues([[n.slug, n.title, n.description, n.body, n.model_slug || '', n.author || 'فريق عروض أونلاين', n.date_published || '', !!n.is_example, n.publish_at || '']]);
+            s.getRange(i + 1, 1, 1, 16).setValues([nvals]);
             return jsonOut({ ok: true, updated: n.slug });
           }
         }
-        s.appendRow([n.slug, n.title, n.description, n.body, n.model_slug || '', n.author || 'فريق عروض أونلاين', n.date_published || '', !!n.is_example, n.publish_at || '']);
+        s.appendRow(nvals);
         return jsonOut({ ok: true, added: true });
       }
       if (action === 'syncNow') {

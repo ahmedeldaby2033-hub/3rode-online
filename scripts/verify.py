@@ -12,7 +12,8 @@ Checks (all must pass):
      affiliate link must be the same product as its E product URL
      (base URL equal) and carry JForce tracking — a misaligned AU
      column once shipped buy buttons to the wrong phones.
-     are noindex; robots.txt blocks /adamwnor/ /search/ /compare/ /guides/.
+     are noindex; robots.txt blocks /adamwnor/ /search/ /compare/ (NOT
+     /guides/ — published guides must be crawlable; drafts stay noindex).
   4. No forbidden word (وهمي / مزيف / خدعة / احتيال) in site/, templates/,
      pages/ or scripts used for generation.
   5. The Amazon Associates sentence is present in the disclosure page.
@@ -169,15 +170,35 @@ def main():
     for rel in ["guides/index.html", "compare/index.html", "search/index.html"]:
         t = (SITE / rel).read_text(encoding="utf-8")
         check('content="noindex, nofollow"' in t, f"{rel}: not noindex")
+    # Individual guides: PUBLISHED (status published + human review) must
+    # be indexable (no noindex, no draft banner); DRAFTS stay noindex +
+    # draft banner. Mirrors build.py guide_is_published().
+    _guides = json.loads((BASE / "data" / "guides.json").read_text(encoding="utf-8"))["guides"]
+    _published = {g["slug"] for g in _guides
+                  if g.get("status") == "published" and (g.get("human_review") or "").strip()}
     for g in (SITE / "guides").glob("*/index.html"):
         t = g.read_text(encoding="utf-8")
-        check('content="noindex, nofollow"' in t, f"{g.parent.name}: guide not noindex")
-        check("مسودة" in t, f"{g.parent.name}: guide missing draft banner")
+        if g.parent.name in _published:
+            check('content="noindex, nofollow"' not in t,
+                  f"{g.parent.name}: published guide must NOT be noindex")
+            check("draft-banner" not in t,
+                  f"{g.parent.name}: published guide must not show the draft banner")
+        else:
+            check('content="noindex, nofollow"' in t, f"{g.parent.name}: guide not noindex")
+            check("مسودة" in t, f"{g.parent.name}: guide missing draft banner")
     robots = (SITE / "robots.txt").read_text(encoding="utf-8")
-    for d in ["/adamwnor/", "/search/", "/compare/", "/guides/"]:
+    for d in ["/adamwnor/", "/search/", "/compare/"]:
         check(f"Disallow: {d}" in robots, f"robots.txt missing Disallow: {d}")
+    # /guides/ must NOT be disallowed: published guides are crawlable
+    # (drafts are protected by their noindex tag instead).
+    check("Disallow: /guides/" not in robots,
+          "robots.txt must not disallow /guides/ (published guides must be crawlable)")
     sm = (SITE / "sitemap.xml").read_text(encoding="utf-8")
-    check("/guides/" not in sm, "sitemap.xml must not list draft guides")
+    _draft_urls = [f"/guides/{g['slug']}/" for g in _guides if g["slug"] not in _published]
+    check(all(u not in sm for u in _draft_urls),
+          "sitemap.xml must not list draft guides")
+    check(all(f"/guides/{s}/" in sm for s in _published),
+          "sitemap.xml must list published guides")
     check("/compare/" not in sm and "/search/</loc>" not in sm,
           "sitemap.xml must not list compare/search tool pages")
     check("amazon0c2aca6-21" in sm or True, "sitemap sanity")
