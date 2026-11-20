@@ -255,7 +255,7 @@
     if (!ADMIN_API) { toast('هذه الميزة تُفعَّل بعد ربط لوحة التحكم. يمكنك مراسلتنا على ' + (CFG.contactEmail || 'البريد الرسمي') + '.'); return; }
     fetch(ADMIN_API + '?action=' + action, {
       method: 'POST', mode: 'cors',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(payload)
     }).then(function () { toast(okMsg); })
       .catch(function () { toast('تعذّر الإرسال حالياً — جرّب مراسلتنا بالبريد.'); });
