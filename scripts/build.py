@@ -679,7 +679,7 @@ def footer_html():
 <button id="to-top" type="button" aria-label="العودة للأعلى">↑</button>
 <div class="toast" id="toast" role="status"></div>
 <script>window.SITE_CONFIG = {json.dumps({"adminApiUrl": ADMIN_API_URL, "onesignalAppId": ONESIGNAL_APP_ID, "contactEmail": EMAIL}, ensure_ascii=False)};</script>
-<script src="/assets/app.js?v=3" defer></script>"""
+<script src="/assets/app.js?v=4" defer></script>"""
 
 
 def page_shell(title, desc, canonical, body, noindex=False, json_ld=None,
@@ -855,7 +855,7 @@ def build_index():
 <label for="request-model">اسم المنتج المطلوب</label>
 <input type="text" id="request-model" required placeholder="مثال: Samsung Galaxy A56">
 <label for="request-budget">ميزانيتك القصوى (جنيه) — اختياري</label>
-<input type="number" id="request-budget" min="0" placeholder="مثال: 15000">
+<input type="text" id="request-budget" inputmode="numeric" placeholder="مثال: 15000">
 <label for="request-whatsapp">رقم الواتساب — اختياري (لإعلامك عند إضافته)</label>
 <input type="tel" id="request-whatsapp" dir="ltr" style="text-align:right" placeholder="مثال: 01012345678">
 <button class="btn" type="submit">أرسل الطلب</button>
@@ -2119,7 +2119,7 @@ def write_manifest():
                   {"src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png"}],
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     (SITE / "sw.js").write_text(
-        "const CACHE='r3de-v10';const CORE=['/','/assets/style.css','/assets/app.js',"
+        "const CACHE='r3de-v11';const CORE=['/','/assets/style.css','/assets/app.js',"
         "'/assets/logo.png','/assets/icon-192.png','/assets/icon-512.png'];\n"
         "self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});\n"
         "self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});\n"

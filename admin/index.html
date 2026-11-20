@@ -753,7 +753,7 @@ async function loadOverview(){
       "</b> · أمازون: <b>"+(clicks.byStore["أمازون"]||0)+"</b> · نون: <b>"+(clicks.byStore["نون"]||0)+
       "</b><br>أكثر المنتجات نقراً: " + (top.map(function(m){return esc(m)+" ("+clicks.byModel[m]+")"}).join("، ")||"—");
     document.getElementById("reports-list").innerHTML = reports.rows.length ?
-      "<table><tr><th>التاريخ</th><th>الموديل</th><th>السعر الصحيح</th><th>ملاحظة</th></tr>"+reports.rows.slice(0,10).map(function(r){return "<tr><td>"+esc(r[0])+"</td><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td>"+esc(r[3])+"</td></tr>"}).join("")+"</table>" : "لا توجد بلاغات.";
+      "<table><tr><th>التاريخ</th><th>الموديل</th><th>السعر الصحيح</th><th>ملاحظة</th><th>رابط المنتج</th></tr>"+reports.rows.slice(0,10).map(function(r){return "<tr><td>"+esc(r[0])+"</td><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td>"+esc(r[3])+"</td><td>"+(r[4] ? "<a href=\""+esc(r[4])+"\" target=\"_blank\">فتح المنتج</a>" : "—")+"</td></tr>"}).join("")+"</table>" : "لا توجد بلاغات.";
     document.getElementById("requests-list").innerHTML = requests.rows.length ?
       "<table><tr><th>التاريخ</th><th>الموديل</th><th>الميزانية</th><th>تواصل</th></tr>"+requests.rows.slice(0,10).map(function(r){return "<tr><td>"+esc(r[0])+"</td><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td>"+esc(r[3])+"</td></tr>"}).join("")+"</table>" : "لا توجد طلبات.";
     // كوبونات تنتهي خلال 7 أيام (أو انتهت) — بطاقة تنبيه في نظرة عامة
@@ -917,7 +917,7 @@ async function loadInbox(){
 function renderInbox(){
   var q = (document.getElementById("inbox-q").value || "").toLowerCase();
   var showHandled = document.getElementById("inbox-show-handled").checked;
-  function table(rows, kind, cols){
+  function table(rows, kind, cols, linkCol){
     var kept = [];
     rows.forEach(function(r, i){
       if(!showHandled && isHandled(kind, r)) return;
@@ -928,11 +928,12 @@ function renderInbox(){
     return "<table><tr>" + cols.map(function(c){ return "<th>" + c + "</th>"; }).join("") + "<th></th></tr>" +
       kept.map(function(pair){
         var r = pair[0], i = pair[1];
-        return "<tr><td>" + esc(r[0]) + "</td><td>" + esc(r[1]) + "</td><td>" + esc(r[2]) + "</td><td>" + esc(r[3]) + "</td><td><button class='btn-ghost' onclick='toggleHandled(\"" + kind + "\"," + i + ")'>" + (isHandled(kind, r) ? "إعادة" : "تمت المعالجة ✓") + "</button></td></tr>";
+        var linkCell = (linkCol === undefined) ? "" : (r[linkCol] ? "<td><a href=\""+esc(r[linkCol])+"\" target=\"_blank\">فتح المنتج</a></td>" : "<td>—</td>");
+        return "<tr><td>" + esc(r[0]) + "</td><td>" + esc(r[1]) + "</td><td>" + esc(r[2]) + "</td><td>" + esc(r[3]) + "</td>" + linkCell + "<td><button class='btn-ghost' onclick='toggleHandled(\"" + kind + "\"," + i + ")'>" + (isHandled(kind, r) ? "إعادة" : "تمت المعالجة ✓") + "</button></td></tr>";
       }).join("") + "</table>";
   }
   document.getElementById("inbox-requests").innerHTML = table(INBOX_DATA.requests, "req", ["التاريخ", "المنتج", "الميزانية", "تواصل (واتساب)"]);
-  document.getElementById("inbox-reports").innerHTML = table(INBOX_DATA.reports, "rep", ["التاريخ", "الموديل", "السعر الصحيح", "ملاحظة"]);
+  document.getElementById("inbox-reports").innerHTML = table(INBOX_DATA.reports, "rep", ["التاريخ", "الموديل", "السعر الصحيح", "ملاحظة", "رابط المنتج"], 4);
 }
 
 /* ---------------- products ---------------- */
