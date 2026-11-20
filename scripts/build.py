@@ -241,6 +241,51 @@ def jumia_url(offer_url, affiliate_url=""):
     return build_jumia_product_url(offer_url)
 
 
+def jumia_search_url(model_display):
+    """Jumia search link for a model with no tracked Jumia offer."""
+    return f"https://www.jumia.com.eg/catalog/?q={quote_plus(model_display)}"
+
+
+def store_display_name(store_raw):
+    """Arabic display name for a Sheet store value (جوميا/أمازون/نون),
+    falling back to the raw value for any other store."""
+    key = STORE_ALIASES.get((store_raw or "").strip().lower(), "")
+    if key and key in STORE_META:
+        return STORE_META[key][0]
+    return (store_raw or "").strip()
+
+
+def offer_buy_url(row, model=None):
+    """Buy link for ONE offer row, honouring the row's own store.
+    Jumia rows keep the JForce deep link. Other stores link to the
+    product URL directly — never put Jumia tracking on a non-Jumia URL.
+    Amazon product links carry the affiliate tag when missing.
+    Returns (href, store_key) with store_key in jumia/amazon/noon/''."""
+    store = norm(c(row, "المتجر (جوميا / أمازون)")).strip().lower()
+    url = norm(c(row, "رابط المنتج"))
+    aff = norm(c(row, "رابط الأفلييت"))
+    if store in ("جوميا", "jumia"):
+        return jumia_url(url, aff), "jumia"
+    if store in ("أمازون", "امازون", "amazon"):
+        href = url or (amazon_url(model.display, model.slug) if model else "")
+        if href and AMAZON_TAG and "tag=" not in href:
+            href += ("&" if "?" in href else "?") + "tag=" + AMAZON_TAG
+        return href, "amazon"
+    if store in ("نون", "noon"):
+        return url or (noon_url(model.display) if model else ""), "noon"
+    return url, ""
+
+
+def model_jumia_href(model):
+    """Href for the card/product Jumia button: the cheapest Jumia
+    offer's deep link, or a Jumia search link when the model has no
+    tracked Jumia offer."""
+    for r in model.offers:
+        if norm(c(r, "المتجر (جوميا / أمازون)")).strip().lower() in ("جوميا", "jumia"):
+            return jumia_url(norm(c(r, "رابط المنتج")), norm(c(r, "رابط الأفلييت")))
+    return jumia_search_url(model.display)
+
+
 AMAZON_ASINS = {}
 _asin_file = DATA / "amazon_asins.json"
 if _asin_file.exists():
@@ -345,6 +390,8 @@ def availability_ar(text):
     if not t:
         return "متوفر"
     low = t.lower()
+    if "out of stock" in low or "غير متوفر" in low or "نفد" in low:
+        return "غير متوفر"
     if "in stock" in low and "units" not in low:
         return "متوفر"
     m = re.match(r"(\d+)\s*(?:units? left|in stock)", low)
@@ -742,13 +789,14 @@ def card_html(m):
               if m.rating else "")
     g5 = " • يدعم 5G" if m.g5 else ""
     search_text = f"{m.name_en} {m.name_ar} {m.brand} {m.model}".lower()
+    cheapest_store = store_display_name(norm(c(m.offers[0], "المتجر (جوميا / أمازون)"))) if m.offers else "جوميا"
     return f"""<article class="pcard" data-slug="{m.slug}" data-brand="{esc(m.brand)}" data-price="{m.cheapest_price:g}" data-discount="{m.discount}" data-rating="{m.rating or 0}" data-ram="{esc(m.ram)}" data-storage="{esc(m.storage)}" data-g5="{1 if m.g5 else 0}" data-instock="{1 if m.in_stock else 0}" data-updated="{m.last_update}" data-year="{m.year}" data-search="{esc(search_text)}">
 <a href="/mobiles/{m.slug}/"><img src="{esc(img)}" alt="هاتف {esc(m.name_ar)} {esc(m.storage)} / {esc(m.ram)}" loading="lazy" decoding="async" width="500" height="500"></a>
 <div class="pcard-body">
 <h3><a href="/mobiles/{m.slug}/">{esc(m.name_ar)}</a></h3>
 <div class="brand-line">{esc(m.brand)} {esc(m.model)} • {esc(m.storage)} / {esc(m.ram)}{g5}{(" • " + str(m.year)) if m.year else ""}</div>
 <div class="price-row"><span class="price">{fmt_price(m.cheapest_price)} جنيه</span>{old}{disc}</div>
-<div class="brand-line">{rating} • أرخص سعر في جوميا</div>
+<div class="brand-line">{rating} • أرخص سعر في {esc(cheapest_store)}</div>
 <div class="actions"><a class="btn-mini btn-prices" href="/mobiles/{m.slug}/">عرض الأسعار</a><button class="btn-mini btn-compare" type="button" data-compare="{m.slug}">قارن</button><button class="btn-mini btn-fav" type="button" data-fav="{m.slug}">♡ مفضلة</button></div>
 </div></article>"""
 
@@ -1022,7 +1070,8 @@ def split_list(text):
 
 def build_product(model):
     cheapest = model.offers[0]
-    cheapest_url = jumia_url(norm(c(cheapest, "رابط المنتج")), norm(c(cheapest, "رابط الأفلييت")))
+    cheapest_buy_url, _cheapest_key = offer_buy_url(cheapest, model)
+    jumia_href = model_jumia_href(model)
     # badge logic (audit ت-4)
     badge = lowest_price_badge(model.history_days)
     badge_html = ""
@@ -1043,6 +1092,7 @@ def build_product(model):
         disc = offer_discount(r)
         rating = num(c(r, "التقييم"))
         rc = int(num(c(r, "عدد التقييمات"), 0) or 0)
+        buy_href, buy_store = offer_buy_url(r, model)
         rows_html += f"""<tr class="{'best-row' if i == 0 else ''}">
 <td>{'<span class="best-badge">الأرخص</span>' if i == 0 else ''} {esc(norm(c(r, 'المتجر (جوميا / أمازون)')))}</td>
 <td>{esc(norm(c(r, 'البائع')))}</td>
@@ -1051,7 +1101,7 @@ def build_product(model):
 <td>{f'خصم {int(disc)}%' if disc else '—'}</td>
 <td>{esc(availability_ar(c(r, 'التوفر')))}</td>
 <td>{f'★ {rating} ({rc})' if rating else '—'}</td>
-<td><a class="buy-mini" href="{esc(jumia_url(norm(c(r, 'رابط المنتج')), norm(c(r, 'رابط الأفلييت'))))}" {SPONSORED} data-store="jumia" data-model="{model.slug}" data-event="buy-click">اشترِ الآن</a></td>
+<td><a class="buy-mini" href="{esc(buy_href)}" {SPONSORED} data-store="{buy_store or 'other'}" data-model="{model.slug}" data-event="buy-click">اشترِ الآن</a></td>
 </tr>"""
     # specs
     spec_rows = [
@@ -1135,8 +1185,8 @@ def build_product(model):
             "@type": "Offer", "price": price, "priceCurrency": "EGP",
             "availability": ("https://schema.org/InStock" if availability_in_stock(c(r, "التوفر"))
                              else "https://schema.org/OutOfStock"),
-            "url": jumia_url(norm(c(r, "رابط المنتج")), norm(c(r, "رابط الأفلييت"))),
-            "seller": {"@type": "Organization", "name": norm(c(r, "البائع")) or "جوميا"},
+            "url": offer_buy_url(r, model)[0],
+            "seller": {"@type": "Organization", "name": norm(c(r, "البائع")) or store_display_name(norm(c(r, "المتجر (جوميا / أمازون)")))},
         })
     product_ld = {
         "@type": "Product", "name": model.name_ar,
@@ -1177,8 +1227,8 @@ def build_product(model):
 {f'<span class="disc-badge">خصم {int(model.discount)}%</span>' if model.discount >= 5 else ''}</div>
 <p>{badge_html}</p>
 <p>{'★ ' + str(model.rating) + f' ({model.rating_count} تقييمات)' if model.rating else ''} • التوفر: {esc(availability_ar(c(cheapest, 'التوفر')))}</p>
-<p class="muted">آخر تحديث للسعر: <strong>{model.last_update}</strong> — المصدر: <a href="{esc(cheapest_url)}" rel="nofollow noopener" target="_blank">صفحة المنتج في جوميا</a></p>
-{buy_buttons(model.slug, model.display, cheapest_url, norm(c(cheapest, "المتجر (جوميا / أمازون)")))}
+<p class="muted">آخر تحديث للسعر: <strong>{model.last_update}</strong> — المصدر: <a href="{esc(cheapest_buy_url)}" rel="nofollow noopener" target="_blank">صفحة المنتج في {esc(store_display_name(norm(c(cheapest, "المتجر (جوميا / أمازون)"))))}</a></p>
+{buy_buttons(model.slug, model.display, jumia_href, norm(c(cheapest, "المتجر (جوميا / أمازون)")))}
 <div class="share-row">
 <a class="share-wa" href="https://wa.me/?text={share_text}%20{quote_plus(share_url)}" rel="nofollow noopener" target="_blank">مشاركة واتساب</a>
 <a class="share-tg" href="https://t.me/share/url?url={quote_plus(share_url)}&amp;text={share_text}" rel="nofollow noopener" target="_blank">مشاركة تليجرام</a>
@@ -2094,7 +2144,7 @@ def products_json():
             "rear_camera_mp": parse_rear_camera_mp(c(r0, "الكاميرا الخلفية")),
             "front_camera": norm(c(r0, "الكاميرا الأمامية")),
             "image": _img_local or _img_remote,
-            "jumia_url": jumia_url(norm(c(r0, "رابط المنتج")), norm(c(r0, "رابط الأفلييت"))),
+            "jumia_url": model_jumia_href(m),
             "amazon_url": amazon_url(m.display, m.slug),
             "noon_url": noon_url(m.display),
             "url": f"/mobiles/{m.slug}/",
