@@ -1,0 +1,8 @@
+{
+"majorDimension": "ROWS",
+"range": "'الكوبونات'!A1:Z1000",
+"retrieved_at": {"user_local": "2026-11-20T08:44:08.431+02:00", "user_timezone": "Africa/Cairo", "utc": "2026-11-20T06:44:08.431Z"},
+"values": [
+["id", "title", "store", "code", "value", "redirect_url", "expires_at", "active"]
+]
+}
