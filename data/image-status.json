@@ -1275,10 +1275,9 @@
   "note": "downloaded + watermarked A"
  },
  "itel-a90-256gb-4gb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "",
-  "note": "retry with new Sheet image URL (subagent found)"
+  "local": true,
+  "working_url": "https://www.pointekonline.com/wp-content/uploads/2025/05/itel-A90.png",
+  "note": "downloaded + watermarked A"
  },
  "samsung-galaxy-a08-64gb-6gb": {
   "local": true,
@@ -1296,10 +1295,9 @@
   "note": "downloaded + watermarked A"
  },
  "huawei-nova-14i-256gb-8gb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "",
-  "note": "retry with new Sheet image URL (subagent found)"
+  "local": true,
+  "working_url": "https://technoperry.com/upload/iblock/4df/71afnygwzan8ml06osr3jvq3798jwlmc/e20988bd9a965c1305bbad29a51dccd3c76f030b82d5cdafb88290b9198eea8d.jpg.webp",
+  "note": "downloaded + watermarked A"
  },
  "vivo-y21d-128gb-6gb": {
   "local": true,
@@ -1307,10 +1305,9 @@
   "note": "downloaded + watermarked A"
  },
  "oppo-a5i-128gb-4gb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "",
-  "note": "retry with new Sheet image URL (subagent found)"
+  "local": true,
+  "working_url": "https://emcor.com.ph/wp-content/uploads/2025/10/A5i.jpg",
+  "note": "downloaded + watermarked A"
  },
  "vivo-y21-128gb-4gb": {
   "local": true,
@@ -1333,10 +1330,9 @@
   "note": "downloaded + watermarked A"
  },
  "xiaomi-redmi-15-256gb-8gb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "",
-  "note": "retry with new Sheet image URL (subagent found)"
+  "local": true,
+  "working_url": "https://www.mojandroid.sk/wp-content/uploads/2025/08/redmi15_03.jpg",
+  "note": "downloaded + watermarked A"
  },
  "realme-c75-256gb-8gb": {
   "local": true,
@@ -1394,10 +1390,9 @@
   "note": "downloaded + watermarked A"
  },
  "tecno-camon-50-ultra-256gb-12gb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "",
-  "note": "retry with new Sheet image URL (subagent found)"
+  "local": true,
+  "working_url": "https://on-smart.ru/upload/resize_cache/iblock/2c0/500_500_140cd750bba9870f18aada2478b24840a/f7svjwca1jcvdwr33zukix1yq214xnsk.jpg",
+  "note": "downloaded + watermarked A"
  },
  "samsung-galaxy-a56-256gb-12gb": {
   "local": true,
@@ -1467,8 +1462,8 @@
  "apple-iphone-13-pro-max-256gb-6gb": {
   "local": false,
   "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2021/09/iPhone-13-Pro-Max-1.jpg",
-  "tried_at": "",
-  "note": "retry with new Sheet image URL (subagent found)"
+  "tried_at": "2026-11-20",
+  "note": "both w_800 and original URLs failed (404?) — placeholder used"
  },
  "apple-iphone-17e-256gb-8gb": {
   "local": true,

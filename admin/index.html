@@ -532,6 +532,13 @@ async function login(){
 }
 
 function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;")}
+/* Apps Script returns Sheet dates as ISO datetimes (2026-11-30T00:00:00.000Z);
+   show/fill only the YYYY-MM-DD part. */
+function fmtDate(v){
+  var s = String(v == null ? "" : v);
+  var m = s.match(/^(\d{4}-\d{2}-\d{2})/);
+  return m ? m[1] : s;
+}
 
 /* ---------------- setup & connection ---------------- */
 function setupFields(){
@@ -977,7 +984,7 @@ async function loadCoupons(){
   try{var d=await api("coupons");
     document.getElementById("coupons-table").innerHTML = d.rows.length>1 ?
       "<table><tr><th>العنوان</th><th>المتجر</th><th>الكود</th><th>القيمة</th><th>الوصف</th><th>ينتهي</th><th>مفعّل</th><th></th></tr>"+
-      d.rows.slice(1).map(function(r){return "<tr><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td dir='ltr'>"+esc(r[3])+"</td><td>"+esc(r[4])+"</td><td>"+esc(r[8]||"")+"</td><td>"+esc(r[6])+"</td><td>"+(r[7]?"نعم":"لا")+"</td><td><button class='btn-ghost' onclick='fillCoupon("+JSON.stringify(r)+")'>تعديل</button> <button class='btn-danger' onclick='deleteCoupon("+JSON.stringify(r[0])+")'>حذف</button></td></tr>"}).join("")+"</table>" : "لا توجد كوبونات.";
+      d.rows.slice(1).map(function(r){return "<tr><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td dir='ltr'>"+esc(r[3])+"</td><td>"+esc(r[4])+"</td><td>"+esc(r[8]||"")+"</td><td>"+esc(fmtDate(r[6]))+"</td><td>"+(r[7]?"نعم":"لا")+"</td><td><button class='btn-ghost' onclick='fillCoupon("+JSON.stringify(r)+")'>تعديل</button> <button class='btn-danger' onclick='deleteCoupon("+JSON.stringify(r[0])+")'>حذف</button></td></tr>"}).join("")+"</table>" : "لا توجد كوبونات.";
   }catch(err){document.getElementById("coupons-table").innerHTML='<span class="error">'+err.message+"</span>"}
 }
 function fillCoupon(r){
@@ -985,7 +992,7 @@ function fillCoupon(r){
   document.getElementById("cp-id").value=r[0]; document.getElementById("cp-title").value=r[1];
   document.getElementById("cp-store").value=storeMap[r[2]]||r[2]; document.getElementById("cp-code").value=r[3];
   document.getElementById("cp-value").value=r[4]; document.getElementById("cp-url").value=r[5];
-  document.getElementById("cp-expires").value=r[6]; document.getElementById("cp-active").value=r[7]?"true":"false";
+  document.getElementById("cp-expires").value=fmtDate(r[6]); document.getElementById("cp-active").value=r[7]?"true":"false";
   document.getElementById("cp-desc").value=r[8]||"";
 }
 async function saveCoupon(){
@@ -1187,7 +1194,7 @@ async function loadNews(){
   try{var d=await api("news");
     document.getElementById("news-table").innerHTML = d.rows.length>1 ?
       "<table><tr><th>العنوان</th><th>التاريخ</th><th>مثال؟</th><th></th></tr>"+
-      d.rows.slice(1).map(function(r){return "<tr><td>"+esc(r[1])+"</td><td>"+esc(r[6])+"</td><td>"+(r[7]?"نعم":"لا")+"</td><td><button class='btn-ghost' onclick='fillNews("+JSON.stringify(r)+")'>تعديل</button> <button class='btn-danger' onclick='deleteNews("+JSON.stringify(r[0])+")'>حذف</button></td></tr>"}).join("")+"</table>" : "لا توجد أخبار.";
+      d.rows.slice(1).map(function(r){return "<tr><td>"+esc(r[1])+"</td><td>"+esc(fmtDate(r[6]))+"</td><td>"+(r[7]?"نعم":"لا")+"</td><td><button class='btn-ghost' onclick='fillNews("+JSON.stringify(r)+")'>تعديل</button> <button class='btn-danger' onclick='deleteNews("+JSON.stringify(r[0])+")'>حذف</button></td></tr>"}).join("")+"</table>" : "لا توجد أخبار.";
   }catch(err){document.getElementById("news-table").innerHTML='<span class="error">'+err.message+"</span>"}
 }
 async function saveNews(){
@@ -1201,7 +1208,7 @@ async function saveNews(){
 function fillNews(r){
   document.getElementById("nw-slug").value=r[0]; document.getElementById("nw-title").value=r[1];
   document.getElementById("nw-desc").value=r[2]; document.getElementById("nw-body").value=r[3];
-  document.getElementById("nw-model").value=r[4]; document.getElementById("nw-date").value=r[6];
+  document.getElementById("nw-model").value=r[4]; document.getElementById("nw-date").value=fmtDate(r[6]);
   window.scrollTo(0, document.getElementById("nw-slug").offsetTop);
 }
 async function deleteNews(slug){
