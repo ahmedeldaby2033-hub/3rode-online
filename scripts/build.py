@@ -1066,17 +1066,6 @@ def build_product(model):
     cons = split_list(c(cheapest, "العيوب"))
     pros_html = ("<ul class='pros'>" + "".join(f"<li>{esc(p)}</li>" for p in pros) + "</ul>") if pros else "<p>لا توجد مميزات مسجلة بعد.</p>"
     cons_html = ("<ul class='cons'>" + "".join(f"<li>{esc(p)}</li>" for p in cons) + "</ul>") if cons else "<p>لا توجد عيوب مسجلة بعد.</p>"
-    mobizil_link = norm(c(cheapest, "رابط صفحة موبيزل"))
-    mobizil_rating = norm(c(cheapest, "تقييم موبيزل"))
-    diff_flag = norm(c(cheapest, "يوجد اختلاف بين مواصفات الشيت وموبيزل؟"))
-    diff_details = norm(c(cheapest, "تفاصيل الاختلاف بين مواصفات الشيت وموبيزل"))
-    mobizil_html = ""
-    if mobizil_link:
-        mobizil_html = f"""<section class="card"><h2>مواصفات موبيزل وتقييمه</h2>
-<p>صفحة الهاتف على موبيزل: <a href="{esc(mobizil_link)}" rel="nofollow noopener" target="_blank">{esc(mobizil_link)}</a></p>
-{'<p>تقييم موبيزل: <strong>' + esc(mobizil_rating) + '</strong></p>' if mobizil_rating else ''}
-{f'<div class="note"><strong>ملاحظة اختلاف المواصفات:</strong> {esc(diff_details)}</div>' if diff_flag == 'يوجد' and diff_details else ''}
-</section>"""
     full_specs = norm(c(cheapest, "المواصفات الكاملة"))
     full_specs_html = ("<section class='card'><h2>المواصفات الكاملة</h2><p>"
                        + esc(full_specs).replace("؛", "<br>") + "</p></section>") if full_specs else ""
@@ -1167,8 +1156,7 @@ def build_product(model):
                                for q, a in faqs]}]
     body = f"""<p class="muted"><a href="/">الرئيسية</a> › <a href="/brand/{BRAND_SLUGS[model.brand]}/">{esc(model.brand)}</a> › {esc(model.name_ar)}</p>
 <div class="product-top">
-<div class="product-img"><img src="{esc((lambda _l, _r, _p: _l or _r)(*resolve_model_image(model)))}" alt="هاتف {esc(model.name_ar)} {esc(model.storage)} / {esc(model.ram)}" width="500" height="500">
-<p class="muted">الصورة من موبيزل — المصدر: <a href="{esc(mobizil_link)}" rel="nofollow noopener" target="_blank">موبيزل</a></p></div>
+<div class="product-img"><img src="{esc((lambda _l, _r, _p: _l or _r)(*resolve_model_image(model)))}" alt="هاتف {esc(model.name_ar)} {esc(model.storage)} / {esc(model.ram)}" width="500" height="500"></div>
 <div>
 <h1>{esc(model.name_ar)}</h1>
 <p class="muted">{esc(model.name_en)} • {esc(model.brand)} {esc(model.model)} • {esc(model.storage)} / {esc(model.ram)}{' • يدعم 5G' if model.g5 else ''}</p>
@@ -1202,7 +1190,6 @@ def build_product(model):
 <section class="card"><h2>المواصفات الكاملة</h2><table class="spec-table">{spec_html}</table></section>
 {full_specs_html}
 <section class="card"><h2>المميزات والعيوب</h2><h3>المميزات</h3>{pros_html}<h3>العيوب</h3>{cons_html}</section>
-{mobizil_html}
 <section class="install-box"><h2>حاسبة التقسيط</h2>
 <label for="inst-price">سعر الهاتف (جنيه)</label>
 <input type="number" id="inst-price" value="{int(model.cheapest_price)}" min="0">
