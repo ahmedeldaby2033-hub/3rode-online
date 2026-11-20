@@ -312,6 +312,22 @@ def availability_in_stock(text):
     return True
 
 
+def units_left(text):
+    """Units left parsed from an availability string ('1 unit left',
+    'يوجد منتج 1 فقط', 'Few units left' -> 3). None if unknown/plenty."""
+    t = norm(text).lower()
+    if not t:
+        return None
+    m = re.search(r"(\d+)\s*(?:units?\s+left|unit\s+left|in\s+stock|pieces?)", t)
+    if m:
+        return int(m.group(1))
+    if "only 1" in t or "منتج 1 فقط" in t or "1 unit" in t:
+        return 1
+    if "few units" in t:
+        return 3
+    return None
+
+
 def availability_ar(text):
     t = norm(text)
     if not t:
@@ -619,7 +635,7 @@ def head_html(title, desc, canonical, og_image=None, noindex=False,
 <link rel="apple-touch-icon" href="/assets/icon-192.png">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0b5ed7">
-<link rel="stylesheet" href="/assets/style.css?v=4">
+<link rel="stylesheet" href="/assets/style.css?v=5">
 {verif}{ga}{extra}"""
 
 
@@ -640,7 +656,7 @@ def footer_html():
 <div class="cols">
 <div><h3>{esc(SITE_NAME)}</h3><p>مقارنة أسعار الهواتف في مصر.</p>
 <p class="muted">آخر تحديث للأسعار من الشيت: {SHEET_UPDATED_DATE} — تُحدَّث كل ساعة.</p></div>
-<div><h3>روابط سريعة</h3><a href="/coupons/">الكوبونات</a><a href="/deals/">أفضل العروض</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/budget/">البحث بالميزانية</a><a href="/compare/">قارن بين الهواتف</a><a href="/about/">من نحن</a><a href="/contact/">اتصل بنا</a></div>
+<div><h3>روابط سريعة</h3><a href="/coupons/">الكوبونات</a><a href="/deals/">أفضل العروض</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/budget/">البحث بالميزانية</a><a href="/search/specs/">بحث بالمواصفات</a><a href="/compare/">قارن بين الهواتف</a><a href="/about/">من نحن</a><a href="/contact/">اتصل بنا</a></div>
 <div><h3>سياسات الموقع</h3><a href="/privacy/">سياسة الخصوصية</a><a href="/terms/">شروط الاستخدام</a><a href="/affiliate-disclosure/">إفصاح التسويق بالعمولة</a><a href="/cookies/">سياسة ملفات تعريف الارتباط</a></div>
 <div><h3>تواصل معنا</h3><a href="mailto:{EMAIL}">{EMAIL}</a></div>
 </div>
@@ -1076,11 +1092,31 @@ def build_product(model):
                                      abs(m.cheapest_price - model.cheapest_price)))
     related = sorted([m for m in others if m.brand == model.brand],
                      key=lambda m: abs(m.cheapest_price - model.cheapest_price))[:4]
-    alt_html = (f'<div class="pcard"><div class="pcard-body"><h3><a href="/mobiles/{alt.slug}/">'
-                f'{esc(alt.name_ar)}</a></h3><div class="price-row"><span class="price">'
-                f'{fmt_price(alt.cheapest_price)} جنيه</span></div>'
-                f'<div class="actions"><a class="btn-mini" href="/mobiles/{alt.slug}/">عرض الهاتف البديل</a></div></div></div>')
+    alt_html = card_html(alt)
     rel_html = "".join(card_html(m) for m in related)
+    # back-in-stock alert: shown when the phone is out of stock, or when the
+    # cheapest offer is nearly gone (<= 2 units left) — currently no model is
+    # fully out of stock, so the scarce case is what renders in practice.
+    _cheap_units = units_left(c(cheapest, "التوفر"))
+    stock_alert_html = ""
+    if not model.in_stock:
+        stock_alert_html = f"""<section class="card stock-alert-box"><h2>أخبرني عند التوفر</h2>
+<p>هذا الهاتف غير متوفر حالياً — اترك رقم واتساب وسنخبرك فور توفره.</p>
+<form id="stock-alert-form" data-model="{model.slug}">
+<label for="stock-whatsapp">رقم الواتساب</label>
+<input type="tel" id="stock-whatsapp" dir="ltr" style="text-align:right" placeholder="مثال: 01012345678" required>
+<button class="btn" type="submit">أخبرني عند التوفر</button>
+</form>
+<p class="muted">سنراسلك على واتساب فقط عند توفر الهاتف — لا رسائل دعائية.</p></section>"""
+    elif _cheap_units is not None and _cheap_units <= 2:
+        stock_alert_html = f"""<section class="card stock-alert-box"><h2>أخبرني عند التوفر</h2>
+<p>بقي عدد محدود جداً من هذا الهاتف بأرخص سعر ({'وحدة واحدة' if _cheap_units == 1 else 'وحدتان'} فقط) — اترك رقم واتساب وسنخبرك فور توفر كمية جديدة.</p>
+<form id="stock-alert-form" data-model="{model.slug}">
+<label for="stock-whatsapp">رقم الواتساب</label>
+<input type="tel" id="stock-whatsapp" dir="ltr" style="text-align:right" placeholder="مثال: 01012345678" required>
+<button class="btn" type="submit">أخبرني عند التوفر</button>
+</form>
+<p class="muted">سنراسلك على واتساب فقط عند توفر الهاتف — لا رسائل دعائية.</p></section>"""
     faqs = faqs_for(model)
     faq_html = "".join(
         f"<details class='faq-item'><summary>{esc(q)}</summary><p>{esc(a)}</p></details>"
@@ -1156,6 +1192,7 @@ def build_product(model):
 <p class="muted">فرق السعر بين أرخص وأغلى عرض: {fmt_price(max(o['price'] for o in offers_ld) - model.cheapest_price)} جنيه ({round((max(o['price'] for o in offers_ld) - model.cheapest_price) / model.cheapest_price * 100, 1)}%).</p>
 <div style="overflow-x:auto"><table class="offers"><thead><tr><th>المتجر</th><th>البائع</th><th>السعر</th><th>قبل الخصم</th><th>الخصم</th><th>التوفر</th><th>التقييم</th><th>شراء</th></tr></thead><tbody>{rows_html}</tbody></table></div>
 <p class="muted">الأسعار استرشادية وتُحدَّث كل ساعة. السعر النهائي هو سعر المتجر وقت الشراء.</p></section>
+{stock_alert_html}
 <section class="card"><h2>تاريخ سعر {esc(model.name_ar)}</h2>
 {price_chart_svg(model)}
 {hist_html}
@@ -1466,6 +1503,19 @@ def guide_candidates(criterion):
             mm = re.search(r"(\d+)\s*MP", norm(c(m.offers[0], "الكاميرا الخلفية")))
             return float(mm.group(1)) if mm else 0
         return sorted(MODELS, key=lambda m: (-mp(m), m.cheapest_price))[:5]
+    if criterion == "gaming":
+        # أقوى رام أولاً، ثم الأعلى تقييماً، ثم الأرخص
+        def ram_gb(m):
+            s = norm(m.ram).upper()
+            mm = re.search(r"([\d.]+)\s*GB", s)
+            if mm:
+                return float(mm.group(1))
+            mm = re.search(r"([\d.]+)\s*MB", s)
+            if mm:
+                return float(mm.group(1)) / 1024.0
+            return 0
+        return sorted(MODELS, key=lambda m: (-ram_gb(m), -(m.rating or 0),
+                                             m.cheapest_price))[:5]
     return []
 
 
@@ -1473,6 +1523,7 @@ GUIDE_TAGS = {
     "under_10000": ["أقل من 10,000 جنيه", "هواتف اقتصادية", "دليل شراء"],
     "battery": ["بطارية كبيرة", "عمر البطارية", "دليل شراء"],
     "camera": ["كاميرا", "تصوير", "دليل شراء"],
+    "gaming": ["ألعاب", "أداء قوي", "دليل شراء"],
 }
 
 
@@ -1542,6 +1593,12 @@ def build_guide(g):
     else:
         review_note = """<section class="card"><h2>رأي فريق عروض أونلاين — بانتظار المراجعة البشرية</h2>
 <p>[مسودة] لم تُضف المراجعة البشرية بعد لهذا الدليل: لماذا اخترنا هذه الهواتف؟ ما عيوب كل منها؟ ولمن يناسب كل هاتف؟ لن تُنشر هذه الصفحة لمحركات البحث قبل إكمال المراجعة.</p></section>"""
+    tips_html = ""
+    tips = [t for t in (g.get("tips") or []) if norm(t)]
+    if tips:
+        tips_html = ("<section class='card'><h2>نصائح قبل الشراء</h2><ul>"
+                     + "".join(f"<li>{esc(t)}</li>" for t in tips)
+                     + "</ul></section>")
     hero_src, hero_abs = guide_hero_image(g)
     hero = ""
     if hero_src:
@@ -1572,6 +1629,7 @@ def build_guide(g):
 {tag_chips(tags)}
 <p>{esc(g.get('description', ''))}</p>
 {table}
+{tips_html}
 {review_note}
 <p><a href="/guides/">← كل أدلة الشراء</a></p>"""
     return page_shell(g["title"] + " | " + SITE_NAME,
@@ -1581,6 +1639,8 @@ def build_guide(g):
 
 
 def build_guides_index(guides):
+    # الأدلة المخفية (مسودات جديدة قيد المراجعة) لا تظهر في الفهرس
+    guides = [g for g in guides if not g.get("hidden")]
     items = ""
     for g in guides:
         hero_src, _abs = guide_hero_image(g)
@@ -1743,6 +1803,7 @@ def build_budget():
                      f'<div class="grid">{"".join(card_html(m) for m in pool)}</div>')
     body = f"""<h1>ابحث عن هاتف بميزانيتك</h1>
 <p>اكتب حدك الأقصى للسعر، واختر الرام إن أردت، وستظهر الهواتف المطابقة مرتبة من الأرخص.</p>
+<p>صفحات جاهزة حسب الميزانية: <a href="/budget/under-10000/">أفضل هاتف تحت 10,000 جنيه</a> • <a href="/budget/under-15000/">أفضل هاتف تحت 15,000 جنيه</a> • <a href="/budget/under-20000/">أفضل هاتف تحت 20,000 جنيه</a> — أو جرّب <a href="/search/specs/">البحث بالمواصفات</a> (بطارية، كاميرا، رام، سعر).</p>
 <form id="budget-form" class="toolbar">
 <input type="number" id="budget-max" placeholder="حد أقصى للسعر (جنيه)" min="0" required style="flex:1;min-width:180px">
 <select id="budget-ram"><option value="">أي رام</option><option>4GB</option><option>6GB</option><option>8GB</option><option>12GB</option></select>
@@ -1759,8 +1820,136 @@ fetch('/data/products.json').then(function (r) {{ return r.json(); }}).then(func
                       BASE_URL + "/budget/", body)
 
 
+def build_specs_search():
+    brands_opts = "".join(
+        f'<option value="{esc(b)}">{esc(b)}</option>' for b in BRANDS)
+    body = f"""<h1>بحث بالمواصفات</h1>
+<p>ابحث عن هاتف بمواصفاتك أنت — لا بالاسم: بطارية كبيرة، كاميرا قوية، رام وتخزين وسعر مناسب.</p>
+<section class="deals-filters" aria-label="بحث بالمواصفات">
+<div class="deals-filters-grid">
+<div class="field"><label for="spec-battery">بطارية لا تقل عن (mAh)</label>
+<input type="number" id="spec-battery" placeholder="مثال: 5000" min="0"></div>
+<div class="field"><label for="spec-camera">كاميرا خلفية لا تقل عن (MP)</label>
+<input type="number" id="spec-camera" placeholder="مثال: 50" min="0"></div>
+<div class="field"><label for="spec-ram">رام لا يقل عن</label>
+<select id="spec-ram"><option value="">أي رام</option><option value="4">4GB</option><option value="6">6GB</option><option value="8">8GB</option><option value="12">12GB</option></select></div>
+<div class="field"><label for="spec-storage">تخزين لا يقل عن</label>
+<select id="spec-storage"><option value="">أي تخزين</option><option value="64">64GB</option><option value="128">128GB</option><option value="256">256GB</option><option value="512">512GB</option></select></div>
+<div class="field"><label for="spec-maxprice">حد أقصى للسعر (جنيه)</label>
+<input type="number" id="spec-maxprice" placeholder="مثال: 12000" min="0"></div>
+<div class="field"><label for="spec-brand">الماركة</label>
+<select id="spec-brand"><option value="">كل الماركات</option>{brands_opts}</select></div>
+</div>
+<div class="deals-filters-checks">
+<label class="check"><input type="checkbox" id="spec-5g"> يدعم 5G فقط</label>
+<button class="btn" type="button" id="spec-reset">مسح الفلاتر</button>
+<span id="spec-count" class="results-count">عرض 0 هاتفاً</span>
+</div>
+</section>
+<div id="spec-results" style="margin-top:18px"></div>
+<script>
+(function () {{
+  function toGB(s) {{
+    s = (s || '').toUpperCase().replace(/,/g, '');
+    var m = s.match(/([\\d.]+)\\s*TB/); if (m) return parseFloat(m[1]) * 1024;
+    m = s.match(/([\\d.]+)\\s*GB/); if (m) return parseFloat(m[1]);
+    m = s.match(/([\\d.]+)\\s*MB/); if (m) return parseFloat(m[1]) / 1024;
+    if (s.indexOf('<1') !== -1) return 0.5;
+    return 0;
+  }}
+  function val(id) {{ var el = document.getElementById(id); return el ? el.value : ''; }}
+  function numOr(v, d) {{ var n = parseFloat(v); return isNaN(n) ? d : n; }}
+  fetch('/data/products.json').then(function (r) {{ return r.json(); }}).then(function (all) {{
+    var out = document.getElementById('spec-results');
+    var count = document.getElementById('spec-count');
+    function card(p) {{
+      return '<article class="pcard"><a href="/mobiles/' + p.slug + '/"><img src="' + (p.image || '/images/placeholder.jpg?v=2') + '" alt="هاتف ' + p.name + '" loading="lazy" width="500" height="500"></a><div class="pcard-body"><h3><a href="/mobiles/' + p.slug + '/">' + p.name + '</a></h3>' +
+        '<div class="brand-line">' + p.brand + ' • ' + p.storage + ' / ' + p.ram + (p.g5 ? ' • يدعم 5G' : '') + (p.year ? ' • ' + p.year : '') + '</div>' +
+        '<div class="brand-line">' + (p.battery || '') + (p.rear_camera ? ' • كاميرا ' + p.rear_camera : '') + '</div>' +
+        '<div class="price-row"><span class="price">' + p.price.toLocaleString('en-US') + ' جنيه</span></div>' +
+        '<div class="actions"><a class="btn-mini btn-prices" href="/mobiles/' + p.slug + '/">عرض السعر</a><button class="btn-mini btn-compare" type="button" data-compare="' + p.slug + '">قارن</button><button class="btn-mini btn-fav" type="button" data-fav="' + p.slug + '">♡ مفضلة</button></div></div></article>';
+    }}
+    function render() {{
+      var minBat = numOr(val('spec-battery'), 0);
+      var minCam = numOr(val('spec-camera'), 0);
+      var minRam = numOr(val('spec-ram'), 0);
+      var minSto = numOr(val('spec-storage'), 0);
+      var maxPrice = numOr(val('spec-maxprice'), Infinity);
+      var brand = val('spec-brand');
+      var g5only = document.getElementById('spec-5g').checked;
+      var list = all.filter(function (p) {{
+        if ((p.battery_mah || 0) < minBat) return false;
+        if ((p.rear_camera_mp || 0) < minCam) return false;
+        if (toGB(p.ram) < minRam) return false;
+        if (toGB(p.storage) < minSto) return false;
+        if (p.price > maxPrice) return false;
+        if (brand && p.brand !== brand) return false;
+        if (g5only && !p.g5) return false;
+        return true;
+      }});
+      list.sort(function (a, b) {{ return (b.year || 0) - (a.year || 0) || a.price - b.price; }});
+      count.textContent = 'عرض ' + list.length + ' هاتفاً';
+      out.innerHTML = list.length
+        ? '<div class="grid">' + list.map(card).join('') + '</div>'
+        : '<p>لا توجد هواتف مطابقة — خفف بعض الشروط وجرّب مجدداً.</p>';
+    }}
+    ['spec-battery', 'spec-camera', 'spec-ram', 'spec-storage', 'spec-maxprice', 'spec-brand', 'spec-5g'].forEach(function (id) {{
+      var el = document.getElementById(id);
+      if (el) el.addEventListener(el.tagName === 'SELECT' || el.type === 'checkbox' ? 'change' : 'input', render);
+    }});
+    document.getElementById('spec-reset').addEventListener('click', function () {{
+      ['spec-battery', 'spec-camera', 'spec-maxprice'].forEach(function (id) {{ document.getElementById(id).value = ''; }});
+      ['spec-ram', 'spec-storage', 'spec-brand'].forEach(function (id) {{ document.getElementById(id).value = ''; }});
+      document.getElementById('spec-5g').checked = false;
+      render();
+    }});
+    render();
+  }});
+}})();
+</script>"""
+    return page_shell("بحث بالمواصفات | " + SITE_NAME,
+                      "ابحث عن هاتف بمواصفاتك: بطارية لا تقل عن 5000mAh، كاميرا 50MP فأكثر، رام وتخزين وسعر مناسب — من بين كل الهواتف في مصر.",
+                      BASE_URL + "/search/specs/", body)
+
+
+def build_budget_band(limit):
+    """One SEO landing page per budget band: phones at or under the limit,
+    newest-first (release year desc, then cheapest)."""
+    pool = [m for m in MODELS if m.cheapest_price <= limit]
+    pool = sorted(pool, key=lambda m: (-(m.year or 0), m.cheapest_price))
+    cards = "".join(card_html(m) for m in pool)
+    cheapest = min((m.cheapest_price for m in pool), default=0)
+    title = f"أفضل هاتف تحت {fmt_price(limit)} جنيه في مصر {TODAY[:4]}"
+    desc = (f"أفضل {len(pool)} هاتفاً بسعر أقل من {fmt_price(limit)} جنيه في مصر "
+            f"({TODAY[:4]}): قارن الأسعار في جوميا وأمازون ونون، مرتّبة من الأحدث "
+            f"إصداراً، وتبدأ من {fmt_price(cheapest)} جنيه.")
+    intro = (f"<p>تبحث عن هاتف بسعر أقل من <strong>{fmt_price(limit)} جنيه</strong>؟ "
+             f"هذه قائمة محدّثة بأفضل {len(pool)} هاتفاً في مصر ضمن ميزانيتك، "
+             f"مرتّبة من الأحدث إصداراً، مع أرخص سعر لكل هاتف في جوميا وأمازون ونون. "
+             f"الأسعار محدّثة من الشيت (آخر تحديث: {SHEET_UPDATED_DATE}).</p>"
+             f"<p><a href=\"/budget/\">← البحث بميزانية مخصصة</a> • "
+             f"<a href=\"/budget/under-10000/\">تحت 10,000</a> • "
+             f"<a href=\"/budget/under-15000/\">تحت 15,000</a> • "
+             f"<a href=\"/budget/under-20000/\">تحت 20,000</a></p>")
+    top = pool[:10]
+    ld = {"@context": "https://schema.org", "@type": "ItemList",
+          "name": title,
+          "itemListElement": [{"@type": "ListItem", "position": i + 1,
+                               "url": f"{BASE_URL}/mobiles/{m.slug}/",
+                               "name": m.name_ar}
+                              for i, m in enumerate(top)]}
+    body = (f"<section class=\"page-hero\" style=\"margin:0 -18px 20px;padding:22px 18px\">"
+            f"<h1 style=\"margin:0\">{esc(title)}</h1>"
+            f"<p>{len(pool)} هاتفاً — تبدأ من {fmt_price(cheapest)} جنيه.</p></section>"
+            f"{intro}<div class=\"grid\">{cards}</div>")
+    return page_shell(title + " | " + SITE_NAME, desc,
+                      f"{BASE_URL}/budget/under-{limit}/", body, json_ld=ld,
+                      og_image=abs_image(top[0]) if top else None)
+
+
 def build_search():
     body = """<h1>ابحث في عروض أونلاين</h1>
+<p>أو جرّب <a href="/search/specs/">البحث بالمواصفات</a> — بطارية، كاميرا، رام، تخزين وسعر.</p>
 <form class="search-box" onsubmit="return false">
 <input type="search" id="search-q" placeholder="ابحث عن هاتف أو ماركة…" aria-label="بحث">
 </form>
@@ -1783,7 +1972,7 @@ def build_search():
             return '<article class="pcard"><a href="/mobiles/' + p.slug + '/"><img src="' + (p.image || '/images/placeholder.jpg?v=2') + '" alt="هاتف ' + p.name + '" loading="lazy" width="500" height="500"></a><div class="pcard-body"><h3><a href="/mobiles/' + p.slug + '/">' + p.name + '</a></h3>' +
               '<div class="price-row"><span class="price">' + p.price.toLocaleString('en-US') + ' جنيه</span></div>' +
               '<div class="brand-line">' + p.brand + ' • ' + p.storage + ' / ' + p.ram + '</div>' +
-              '<div class="actions"><a class="btn-mini" href="/mobiles/' + p.slug + '/">عرض السعر</a></div></div></article>';
+              '<div class="actions"><a class="btn-mini btn-prices" href="/mobiles/' + p.slug + '/">عرض السعر</a><button class="btn-mini btn-compare" type="button" data-compare="' + p.slug + '">قارن</button></div></div></article>';
           }).join('') + '</div>'
         : '<p>لا توجد نتائج مطابقة لـ "' + input.value + '". جرّب اسماً آخر، أو <a href="/contact/">اطلب الهاتف</a> وسنضيفه.</p>';
     }
@@ -1797,6 +1986,25 @@ def build_search():
 
 
 # ------------------------------------------------------------- data output
+def parse_battery_mah(text):
+    """Battery capacity in mAh from a raw spec string ('5000 mAh',
+    '5000 مللي أمبير'). 0 if unknown."""
+    v = num(re.sub(r"[^\d.]", "", norm(text)), 0) or 0
+    return int(v)
+
+
+def parse_rear_camera_mp(text):
+    """Rear camera resolution in MP from a raw spec string ('50MP',
+    '50 ميغابكسل'). 0 if unknown."""
+    m = re.search(r"(\d+(?:\.\d+)?)\s*MP", norm(text))
+    if m:
+        return float(m.group(1))
+    m = re.search(r"(\d+(?:\.\d+)?)\s*ميغابكسل", norm(text))
+    if m:
+        return float(m.group(1))
+    return 0
+
+
 def products_json():
     out = []
     for m in MODELS:
@@ -1812,7 +2020,9 @@ def products_json():
             "screen": norm(c(r0, "حجم الشاشة")),
             "processor": norm(c(r0, "المعالج")),
             "battery": norm(c(r0, "البطارية")),
+            "battery_mah": parse_battery_mah(c(r0, "البطارية")),
             "rear_camera": norm(c(r0, "الكاميرا الخلفية")),
+            "rear_camera_mp": parse_rear_camera_mp(c(r0, "الكاميرا الخلفية")),
             "front_camera": norm(c(r0, "الكاميرا الأمامية")),
             "image": _img_local or _img_remote,
             "jumia_url": jumia_url(norm(c(r0, "رابط المنتج")), norm(c(r0, "رابط الأفلييت"))),
@@ -1872,7 +2082,7 @@ def write_manifest():
                   {"src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png"}],
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     (SITE / "sw.js").write_text(
-        "const CACHE='r3de-v3';const CORE=['/','/assets/style.css','/assets/app.js',"
+        "const CACHE='r3de-v4';const CORE=['/','/assets/style.css','/assets/app.js',"
         "'/assets/logo.png','/assets/icon-192.png','/assets/icon-512.png'];\n"
         "self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});\n"
         "self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});\n"
@@ -1952,7 +2162,10 @@ def main():
         emit(f"news/{p['slug']}/index.html", build_news_post(p, model))
     emit("compare/index.html", build_compare())
     emit("budget/index.html", build_budget())
+    for _limit in (10000, 15000, 20000):
+        emit(f"budget/under-{_limit}/index.html", build_budget_band(_limit))
     emit("search/index.html", build_search())
+    emit("search/specs/index.html", build_specs_search())
 
     # policy pages (already built — copy as-is)
     policy_map = {"privacy": "privacy", "terms": "terms",
@@ -1985,9 +2198,11 @@ def main():
         new_meta[loc] = {"hash": h, "lastmod": lastmod}
     meta_file.write_text(json.dumps(new_meta, ensure_ascii=False, indent=1),
                          encoding="utf-8")
-    # drafts + tools are NOT in the sitemap
+    # drafts + tools are NOT in the sitemap (but /search/specs/ IS a content
+    # page, so only the bare /search/ tool page is excluded)
     sitemap_meta = {loc: m for loc, m in new_meta.items()
-                    if not any(x in loc for x in ("/guides/", "/compare/", "/search/"))}
+                    if not any(x in loc for x in ("/guides/", "/compare/"))
+                    and not loc.rstrip("/").endswith("/search")}
     write_sitemap(sitemap_meta, news)
 
     print(f"models: {len(MODELS)}  offers: {len(ROWS)}  brands: {len(BRANDS)}")

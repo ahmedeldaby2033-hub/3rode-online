@@ -18,7 +18,7 @@
 <link rel="apple-touch-icon" href="/assets/icon-192.png">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0b5ed7">
-<link rel="stylesheet" href="/assets/style.css?v=4">
+<link rel="stylesheet" href="/assets/style.css?v=5">
 
 
 </head>
@@ -36,6 +36,7 @@
 <main class="container wide">
 <h1>ابحث عن هاتف بميزانيتك</h1>
 <p>اكتب حدك الأقصى للسعر، واختر الرام إن أردت، وستظهر الهواتف المطابقة مرتبة من الأرخص.</p>
+<p>صفحات جاهزة حسب الميزانية: <a href="/budget/under-10000/">أفضل هاتف تحت 10,000 جنيه</a> • <a href="/budget/under-15000/">أفضل هاتف تحت 15,000 جنيه</a> • <a href="/budget/under-20000/">أفضل هاتف تحت 20,000 جنيه</a> — أو جرّب <a href="/search/specs/">البحث بالمواصفات</a> (بطارية، كاميرا، رام، سعر).</p>
 <form id="budget-form" class="toolbar">
 <input type="number" id="budget-max" placeholder="حد أقصى للسعر (جنيه)" min="0" required style="flex:1;min-width:180px">
 <select id="budget-ram"><option value="">أي رام</option><option>4GB</option><option>6GB</option><option>8GB</option><option>12GB</option></select>
@@ -244,7 +245,7 @@ fetch('/data/products.json').then(function (r) { return r.json(); }).then(functi
 <div class="cols">
 <div><h3>عروض أونلاين</h3><p>مقارنة أسعار الهواتف في مصر.</p>
 <p class="muted">آخر تحديث للأسعار من الشيت: 2026-11-19 — تُحدَّث كل ساعة.</p></div>
-<div><h3>روابط سريعة</h3><a href="/coupons/">الكوبونات</a><a href="/deals/">أفضل العروض</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/budget/">البحث بالميزانية</a><a href="/compare/">قارن بين الهواتف</a><a href="/about/">من نحن</a><a href="/contact/">اتصل بنا</a></div>
+<div><h3>روابط سريعة</h3><a href="/coupons/">الكوبونات</a><a href="/deals/">أفضل العروض</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/budget/">البحث بالميزانية</a><a href="/search/specs/">بحث بالمواصفات</a><a href="/compare/">قارن بين الهواتف</a><a href="/about/">من نحن</a><a href="/contact/">اتصل بنا</a></div>
 <div><h3>سياسات الموقع</h3><a href="/privacy/">سياسة الخصوصية</a><a href="/terms/">شروط الاستخدام</a><a href="/affiliate-disclosure/">إفصاح التسويق بالعمولة</a><a href="/cookies/">سياسة ملفات تعريف الارتباط</a></div>
 <div><h3>تواصل معنا</h3><a href="mailto:3rdeonline@gmail.com">3rdeonline@gmail.com</a></div>
 </div>

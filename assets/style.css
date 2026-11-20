@@ -258,6 +258,12 @@ html[data-theme="dark"] .product-img a { color: var(--blue); }
   background: #fff3e0; color: #9a3412; border-radius: 999px; padding: 5px 14px;
 }
 html[data-theme="dark"] .deals-filters-checks #results-count { background: #3a2a12; color: #fdba74; }
+/* same orange pill for the specs-search result count */
+.deals-filters-checks .results-count {
+  margin-inline-start: auto; font-weight: 800; font-size: .92rem;
+  background: #fff3e0; color: #9a3412; border-radius: 999px; padding: 5px 14px;
+}
+html[data-theme="dark"] .deals-filters-checks .results-count { background: #3a2a12; color: #fdba74; }
 .chip {
   display: inline-block; padding: 7px 14px; border-radius: 999px;
   border: 1px solid var(--border); background: var(--card); color: var(--text);
@@ -340,6 +346,20 @@ table.offers th { background: #eef4fc; color: var(--blue-dark); }
 html[data-theme="dark"] table.offers th { background: #1b3049; color: #fff; }
 table.offers .best-row { background: #f0fdf4; }
 html[data-theme="dark"] table.offers .best-row { background: #122b1d; }
+/* mobile: keep the offers-table buy column pinned so the buy button is
+   always reachable without scrolling the wide table */
+@media (max-width: 640px) {
+  table.offers th:last-child,
+  table.offers td:last-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--card);
+    box-shadow: 2px 0 6px rgba(0, 0, 0, .14);
+  }
+  table.offers tr.best-row td:last-child { background: #f0fdf4; }
+  html[data-theme="dark"] table.offers tr.best-row td:last-child { background: #122b1d; }
+}
 .gap-up { color: var(--red); font-weight: 700; }
 
 /* spec table */
@@ -433,6 +453,13 @@ html[data-theme="dark"] .coupon-value { background: #3a2a12; color: #ffb74d; }
 html[data-theme="dark"] .coupon-code { color: #ffb347; background: #2a2113; }
 .coupon-code-click { cursor: pointer; }
 .coupon-code-click:hover { border-color: var(--orange); }
+/* back-in-stock alert box on product pages */
+.stock-alert-box { border-inline-start: 5px solid var(--orange); }
+.stock-alert-box form { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; margin-top: 10px; }
+.stock-alert-box label { flex: 1 1 200px; font-weight: 700; }
+.stock-alert-box input[type="tel"] { width: 100%; padding: 11px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); font-family: inherit; font-size: 1rem; }
+.stock-alert-box input[type="tel"]:focus { outline: 2px solid var(--blue); background: var(--card); }
+
 /* زر موحّد: ينسخ الكود ثم يحوّل إلى المتجر (بدل زرّين منفصلين) */
 .coupon-go-btn {
   display: block; width: 100%; border: 0; border-radius: 10px; cursor: pointer;
