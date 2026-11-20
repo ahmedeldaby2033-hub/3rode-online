@@ -16,6 +16,9 @@ Env vars (set in Coolify):
   REPO_BRANCH             default: main
   DEPLOY_KEY              SSH private key (deploy key, write access)
   COOLIFY_DEPLOY_WEBHOOK  deploy-webhook URL of the main 3rode-online app
+  COOLIFY_API_TOKEN       Coolify API token (Bearer auth for the webhook —
+                          /api/v1/* returns 401 without it, even with API
+                          access enabled; fix 2026-11-20)
   PORT                    default: 8000
   WORKDIR                 default: /data/repo
 """
@@ -42,6 +45,7 @@ DEPLOY_KEY = os.environ.get("DEPLOY_KEY", "")
 DEPLOY_KEY_FILE = os.environ.get("DEPLOY_KEY_FILE",
                                  "/run/secrets/deploy-key")
 DEPLOY_WEBHOOK = os.environ.get("COOLIFY_DEPLOY_WEBHOOK", "")
+COOLIFY_API_TOKEN = os.environ.get("COOLIFY_API_TOKEN", "")
 
 TAB_FILES = {
     "الورقة1": "sheet1.json",
@@ -206,8 +210,14 @@ def trigger_deploy(job):
     if not DEPLOY_WEBHOOK:
         log(job, "لا يوجد رابط نشر Coolify — تخطّي إعادة النشر")
         return False
+    # Coolify /api/v1/* endpoints return 401 without auth even when API
+    # access is enabled; a Bearer API token fixes it (2026-11-20).
+    headers = {}
+    if COOLIFY_API_TOKEN:
+        headers["Authorization"] = "Bearer " + COOLIFY_API_TOKEN
     try:
-        req = urlrequest.Request(DEPLOY_WEBHOOK, data=b"", method="POST")
+        req = urlrequest.Request(DEPLOY_WEBHOOK, data=b"", method="POST",
+                                 headers=headers)
         with urlrequest.urlopen(req, timeout=30) as resp:
             ok = 200 <= resp.status < 300
     except URLError as e:
