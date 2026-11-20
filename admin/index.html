@@ -415,7 +415,7 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
 
   <section class="tab" id="tab-guides">
     <div class="card"><h2>أدلة الشراء</h2>
-      <p class="hint">الأدلة المولَّدة آلياً تبقى <b>مسودات</b> حتى تراجعها أنت بنفسك وتكتب المراجعة البشرية — لا يُنشر دليل قبل ذلك (سياسة المحتوى الموسَّع في Google).</p>
+      <p class="hint">النصوص المولَّدة جاهزة للنشر بعد مراجعتك البصرية فقط — المراجعة البشرية تُكتب تلقائياً بأسلوب احترافي. لا يُنشر دليل قبل مراجعتك (سياسة المحتوى الموسَّع في Google).</p>
       <p><input type="text" id="guides-filter" placeholder="بحث بالعنوان…" oninput="renderGuides()"></p>
       <div id="guides-table" class="table-scroll">—</div>
       <h3>إضافة / تعديل دليل</h3>
@@ -460,8 +460,8 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
         <p class="hint">فحص التشابه الداخلي، وبحث يدوي عن الانتحال عبر جوجل، ومؤشر تقريبي للكتابة الآلية، وفحص حقوق الصورة — كلها بدون خدمة خارجية مدفوعة.</p>
         <p><button type="button" class="btn-ghost" onclick="qualityCheck('gd')">تشغيل الفحوصات</button></p>
         <div id="gd-quality"></div></div>
-      <div class="card" style="background:var(--bg,#f4f6fb);margin-top:14px"><h3>توليد مسودة من بيانات الشيت</h3>
-        <p class="hint">مسودة مولّدة آلياً من بيانات الشيت — راجعها وعدّلها قبل النشر.</p>
+      <div class="card" style="background:var(--bg,#f4f6fb);margin-top:14px"><h3>توليد تلقائي من أسعار السوق المصري</h3>
+        <p class="hint">توليد تلقائي من أسعار السوق المصري — راجع النص بصرياً قبل النشر.</p>
         <label for="gd-gen-criterion">المعيار</label>
         <select id="gd-gen-criterion"><option value="under_10000">أفضل هواتف تحت 10,000 جنيه</option><option value="battery">أفضل بطارية</option><option value="camera">أفضل كاميرا</option><option value="gaming">أفضل هواتف للألعاب</option></select>
         <p><button type="button" class="btn" onclick="genGuide()">توليد مسودة الدليل</button></p>
@@ -524,7 +524,7 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
         <p><button type="button" class="btn-ghost" onclick="qualityCheck('nw')">تشغيل الفحوصات</button></p>
         <div id="nw-quality"></div></div>
       <div class="card" style="background:var(--bg,#f4f6fb);margin-top:14px"><h3>توليد مسودة خبر انخفاض سعر</h3>
-        <p class="hint">مسودة مولّدة آلياً من بيانات الشيت — راجعها وعدّلها قبل النشر.</p>
+        <p class="hint">توليد تلقائي من أسعار السوق المصري — راجع النص بصرياً قبل النشر.</p>
         <div class="row">
           <div><label for="nw-gen-q">ابحث عن الموديل</label><input type="text" id="nw-gen-q" placeholder="مثال: OPPO A6"></div>
           <div><label for="nw-gen-old">السعر القديم (جنيه)</label><input type="number" id="nw-gen-old" placeholder="مثال: 13500"></div>
@@ -1794,42 +1794,194 @@ function parseRamGb(row){
   if(m) return parseFloat(m[1]) / 1024;
   return 0;
 }
+/* ---- Publish-ready generation (template-based, from live market data).
+   RULES (user's standard):
+   - Every generated text is directly publishable: professional human style,
+     no placeholders, no "[...]" notes, no "draft" wording inside the text.
+   - NEVER mention the Sheet as a data source. The store (Jumia Egypt) or
+     the Egyptian market may be named.
+   - The human review is WRITTEN by the generator (professional human style).
+   - Images: guides need >=800px wide, news needs >=1200px wide.
+   - The text must satisfy the live SEO check (14 items) as far as the
+     content allows; the only item that stays open is the publish status
+     itself, which only the user can set. ---- */
+function sizedImageUrl(url, px){
+  url = String(url || "");
+  if(!url) return "";
+  // Jumia imgproxy: /unsafe/fit-in/500x500/ -> /unsafe/fit-in/1200x1200/
+  if(/\/unsafe\/fit-in\/\d+x\d+\//.test(url)){
+    return url.replace(/\/unsafe\/fit-in\/\d+x\d+\//, "/unsafe/fit-in/" + px + "x" + px + "/");
+  }
+  // ShortPixel serves at most the original file size (Mobizil originals are
+  // often only ~500px) — use the original directly (largest available).
+  // A w_1200 request only redirects back to the same original.
+  if(/\/spai\/w_\d+/.test(url)){
+    var m = url.match(/^https:\/\/cdn\.shortpixel\.ai\/spai\/w_\d+\+[^/]+\/(.+)$/);
+    if(m) return "https://" + m[1];
+    return url.replace(/\/spai\/w_\d+/, "/spai/w_" + px);
+  }
+  return url;
+}
+function _spec(row, i){ var v = (row && row[i] != null) ? String(row[i]).trim() : ""; return v; }
+function _mah(row){ var m = String((row && row[19]) || "").match(/(\d[\d,.]*)\s*mAh/i); return m ? m[1].replace(/,/g, "") : ""; }
+function _mp(row){ var m = String((row && row[17]) || "").match(/(\d+)\s*MP/i); return m ? m[1] : ""; }
+function _frontMp(row){ var m = String((row && row[18]) || "").match(/(\d+)\s*MP/i); return m ? m[1] : ""; }
+var GD_TITLES = {
+  under_10000: "أفضل هواتف تحت 10,000 جنيه في مصر 2026 — دليل الشراء",
+  battery: "أفضل هواتف ببطارية كبيرة في مصر 2026 — دليل الشراء",
+  camera: "أفضل هواتف للتصوير في مصر 2026 — دليل الشراء",
+  gaming: "أفضل هواتف للألعاب في مصر 2026 — دليل الشراء"
+};
+var GD_KEYWORDS = {
+  under_10000: "أفضل هواتف تحت 10,000 جنيه",
+  battery: "أفضل هواتف ببطارية كبيرة",
+  camera: "أفضل هواتف للتصوير",
+  gaming: "أفضل هواتف للألعاب"
+};
+var GD_CRIT_LABEL = {under_10000: "هواتف اقتصادية", battery: "بطارية كبيرة", camera: "تصوير", gaming: "ألعاب"};
+function guideDescText(g){
+  return "دليل شراء محدث بالأسعار الحالية في السوق المصري: " + g.title + " — أفضل 5 هواتف حسب الأسعار والتقييمات: " + g.list + ". الأسعار من جوميا مصر وقد تتغير — راجع السعر قبل الشراء.";
+}
+function phoneReviewPara(m, crit, rank){
+  var row = m.row || [];
+  var name = _spec(row, 0) || "";
+  var price = m.price || 0;
+  var mah = _mah(row), mp = _mp(row), ram = _spec(row, 14), storage = _spec(row, 13);
+  var screen = _spec(row, 15), cpu = _spec(row, 16);
+  var s = [];
+  var specs = [];
+  if(screen) specs.push("شاشة " + screen);
+  if(cpu) specs.push("معالج " + cpu);
+  if(ram || storage) specs.push("رام " + (ram || "—") + " وتخزين " + (storage || "—"));
+  if(mp) specs.push("كاميرا خلفية " + mp + " ميجابكسل");
+  if(mah) specs.push("بطارية " + mah + " مللي أمبير");
+  var first = name + " بسعر " + price + " جنيهاً في جوميا مصر";
+  if(specs.length) first += "، يأتي بـ" + specs.join("، ");
+  first += ".";
+  s.push(first);
+  if(crit === "battery" && mah){
+    s.push("بطارية " + mah + " مللي أمبير تضعه بين الأفضل في فئته من حيث عمر البطارية، وتمنحك يوماً كاملاً من الاستخدام العادي دون قلق من الشحن.");
+  }else if(crit === "camera" && mp){
+    s.push("كاميرته الخلفية " + mp + " ميجابكسل من الأقوى في فئته، وتلتقط صوراً بتفاصيل واضحة في الإضاءة الجيدة.");
+  }else if(crit === "gaming" && cpu){
+    s.push("معالج " + cpu + (ram ? " ورام " + ram : "") + " يمنحانه أداءً سلساً في الألعاب والتطبيقات الثقيلة.");
+  }else{
+    s.push("بهذا السعر يقدم قيمة ممتازة مقابل المال مقارنة بمنافسيه في نفس الفئة.");
+  }
+  if(crit === "battery"){
+    s.push("مناسب لمن يعتمد على هاتفه طوال اليوم ولا يريد البحث عن شاحن.");
+  }else if(crit === "camera"){
+    s.push("مناسب لعشاق التصوير الذين يريدون كاميرا قوية دون دفع سعر هاتف رائد.");
+  }else if(crit === "gaming"){
+    s.push("مناسب للاعبين الذين يبحثون عن أداء قوي بسعر معقول.");
+  }else{
+    s.push("خيار مناسب لمن يريد هاتفاً قوياً بميزانية محدودة دون تنازلات كبيرة.");
+  }
+  return rank + ") " + s.join(" ");
+}
+function guideReviewText(g){
+  var kw = GD_KEYWORDS[g.crit];
+  var intro = "في هذا الدليل جمعنا لك " + kw + " في السوق المصري لعام 2026، مرتبة حسب السعر والتقييم والمواصفات. الأسعار التالية من جوميا مصر وقت كتابة الدليل، وقد تتغير — راجع جدول الأسعار في صفحة كل هاتف قبل الشراء.";
+  var paras = g.top.map(function(m, i){ return phoneReviewPara(m, g.crit, i + 1); });
+  var closing = "هذه قائمة " + kw + " لهذا العام — قبل أن تقرر، حدّد أولوياتك: إذا كان السعر هو الأهم فابدأ بالخيار الأول، وإذا كانت البطارية أو الكاميرا أو الأداء أولاً فستجد خيارك بين الباقية. وقارن دائماً بين عروض جوميا وأمازون ونون في جدول الأسعار أسفل كل صفحة، فالفرق بين المتاجر قد يصل إلى مئات الجنيهات على نفس الهاتف.";
+  return intro + "\n\n" + paras.join("\n\n") + "\n\n" + closing;
+}
+function newsTitleSuffix(n){
+  // Attractive hook, never a price (user rule: no price in the title, ever).
+  return (n.pct && n.pct >= 15) ? " — خصم قوي لفترة محدودة" : " — وفّر الآن في مصر";
+}
+function newsDisplayName(n){
+  var full = n.name || "";
+  var t = "انخفاض سعر " + full + newsTitleSuffix(n);
+  if(t.length <= 60) return full;
+  var short = ((_spec(n.best.row, 2) || "") + " " + (_spec(n.best.row, 3) || "")).trim();
+  return short || full;
+}
+function newsTitleText(n){
+  var suffix = newsTitleSuffix(n);
+  var name = newsDisplayName(n);
+  var t = "انخفاض سعر " + name + suffix;
+  if(t.length > 60) t = "انخفاض سعر " + name + " — وفّر الآن";
+  return t;
+}
+function newsMetaTitle(n){
+  // Meta title keeps the brand when it fits; title itself never has a price.
+  var name = newsDisplayName(n);
+  var t = "انخفاض سعر " + name + " — وفّر الآن في مصر | عروض أونلاين";
+  if(t.length <= 60) return t;
+  var short = ((_spec(n.best.row, 2) || "") + " " + (_spec(n.best.row, 3) || "")).trim() || name;
+  var t2 = "انخفاض سعر " + short + " — وفّر الآن | عروض أونلاين";
+  if(t2.length <= 60) return t2;
+  return _trimMetaTitle("انخفاض سعر " + short + " | عروض أونلاين");
+}
+function newsDescText(n){
+  return "انخفاض سعر " + n.displayName + " إلى " + n.price + " جنيهاً في جوميا مصر" + (n.diff ? " (كان " + n.oldPrice + " جنيهاً) — وفّر " + n.diff + " جنيهاً (" + n.pct + "%)" : "") + ". قارن السعر في جوميا وأمازون ونون قبل الشراء، وتابع الأسعار المحدثة يومياً على عروض أونلاين.";
+}
+function newsBodyText(n){
+  var row = n.best.row || [];
+  var name = n.displayName;
+  var slug = modelSlugFromRow(row);
+  var screen = _spec(row, 15), cpu = _spec(row, 16), ram = _spec(row, 14), storage = _spec(row, 13);
+  var mp = _mp(row), fmp = _frontMp(row), mah = _mah(row);
+  var charge = _spec(row, 20), os = _spec(row, 22);
+  var P = [];
+  P.push("انخفاض سعر " + name + " إلى " + n.price + " جنيهاً في جوميا مصر" + (n.diff ? "، بعد أن كان سعره " + n.oldPrice + " جنيهاً — أي بانخفاض قدره " + n.diff + " جنيهاً بنسبة " + n.pct + "%" : "") + ".");
+  var sp = [];
+  if(screen) sp.push("شاشة " + screen);
+  if(cpu) sp.push("معالج " + cpu);
+  if(ram || storage) sp.push("رام " + (ram || "—") + " وتخزين " + (storage || "—"));
+  if(mp) sp.push("كاميرا خلفية " + mp + " ميجابكسل");
+  if(fmp) sp.push("كاميرا أمامية " + fmp + " ميجابكسل");
+  if(mah) sp.push("بطارية " + mah + " مللي أمبير");
+  if(charge) sp.push("شحن بقدرة " + charge);
+  if(os) sp.push("نظام " + os);
+  if(sp.length){
+    P.push(name + " يأتي بـ" + sp.join("، ") + ".");
+  }else{
+    P.push(name + " يأتي بمواصفات قوية في فئته السعرية، تجعله خياراً منافساً بين الهواتف المتوسطة.");
+  }
+  if(mp){
+    P.push("كاميرا " + name + " الخلفية بدقة " + mp + " ميجابكسل تلتقط صوراً واضحة التفاصيل في الإضاءة الجيدة." + (fmp ? " أما الكاميرا الأمامية " + fmp + " ميجابكسل فتكفي لمكالمات الفيديو وصور السيلفي اليومية." : ""));
+  }else{
+    P.push("كاميرات الهاتف مصممة للاستخدام اليومي، من الصور العائلية إلى مكالمات الفيديو.");
+  }
+  if(mah){
+    P.push("بطارية " + name + " بسعة " + mah + " مللي أمبير تمنحك يوماً كاملاً من الاستخدام العادي دون الحاجة إلى شاحن." + (charge ? " كما يدعم الشحن بقدرة " + charge + " ليعيد شحن البطارية بسرعة." : ""));
+  }else{
+    P.push("بطارية الهاتف تكفي ليوم كامل من الاستخدام العادي، من التصفح والمكالمات إلى مشاهدة الفيديو.");
+  }
+  if(n.diff){
+    P.push("سعر " + name + " قبل هذا الانخفاض كان " + n.oldPrice + " جنيهاً. الانخفاض الحالي بنسبة " + n.pct + "% يعني توفير " + n.diff + " جنيهاً كاملة عند الشراء الآن، وهو مبلغ يستحق الانتباه إذا كنت تخطط لشراء الهاتف قريباً.");
+  }else{
+    P.push("سعر " + name + " الحالي " + n.price + " جنيهاً من أفضل الأسعار المتاحة لهذا الهاتف في السوق المصري حالياً، خاصة مع مواصفاته في هذه الفئة السعرية.");
+  }
+  P.push("بعد انخفاض سعر " + name + " إلى " + n.price + " جنيهاً، يمكنك شراؤه من جوميا مصر بالسعر الجديد. قارن سعره أيضاً في أمازون ونون من صفحة المنتج على عروض أونلاين: https://3rde.online/mobiles/" + slug + "/ — فالأسعار تختلف بين المتاجر وقد تتغير خلال اليوم.");
+  P.push("هذا الانخفاض يجعل " + name + " من أقوى الخيارات في فئته السعرية حالياً. إذا كنت تنتظر انخفاض سعر " + name + " فهذا هو الوقت المناسب للشراء قبل أن يعود السعر للارتفاع، لكن تأكد أولاً من توفر الهاتف في المتجر.");
+  P.push("عند اختيار هاتف في هذه الفئة السعرية، رتّب أولوياتك: البطارية لمن يستخدم الهاتف طوال اليوم، والكاميرا لمن يصور كثيراً، والرام والمعالج لمن يلعب أو يفتح تطبيقات كثيرة في نفس الوقت. ولا تنظر إلى رقم واحد فقط — قارن المواصفات الكاملة في صفحة المنتج قبل أن تقرر. وإذا كان الهاتف للعمل، انتبه إلى جودة الشاشة وسطوعها تحت الشمس وإلى دعم الشبكات الحديثة.");
+  P.push("اشترِ دائماً من متجر موثوق، وتحقق من الضمان وسياسة الإرجاع قبل الدفع. وإذا وجدت سعراً أقل بكثير من المتاجر الكبرى، تأكد من أن البائع معتمد وأن الهاتف أصلي بضمان رسمي.");
+  P.push("تابع عروض أونلاين لأسعار الهواتف المحدثة يومياً في السوق المصري، وقارن دائماً بين جوميا وأمازون ونون قبل كل عملية شراء — فالفرق بين المتاجر على نفس الهاتف قد يصل إلى مئات الجنيهات.");
+  return P.join("\n\n");
+}
 async function genGuide(){
-  var crit = document.getElementById("gd-gen-criterion").value;
   var msg = document.getElementById("gd-gen-msg");
-  msg.textContent = "جارٍ جلب المنتجات من الشيت…";
+  msg.textContent = "جارٍ جلب المنتجات من السوق المصري…";
   try{
-    var d = await api("products");
-    var models = cheapestModels(d.rows || []);
-    var top = [];
-    var titles = {
-      under_10000: "أفضل هواتف تحت 10,000 جنيه في مصر 2026",
-      battery: "أفضل هواتف ببطارية كبيرة في مصر 2026",
-      camera: "أفضل هواتف للتصوير في مصر 2026",
-      gaming: "أفضل هواتف للألعاب في مصر 2026"
-    };
-    if(crit === "under_10000"){
-      top = models.filter(function(m){ return m.price && m.price < 10000; })
-        .sort(function(a, b){ return a.price - b.price || b.rating - a.rating; }).slice(0, 5);
-    }else if(crit === "battery"){
-      top = models.slice().sort(function(a, b){ return parseMah(b.row) - parseMah(a.row) || a.price - b.price; }).slice(0, 5);
-    }else if(crit === "camera"){
-      top = models.slice().sort(function(a, b){ return parseMp(b.row) - parseMp(a.row) || a.price - b.price; }).slice(0, 5);
-    }else{
-      top = models.slice().sort(function(a, b){ return parseRamGb(b.row) - parseRamGb(a.row) || b.rating - a.rating || a.price - b.price; }).slice(0, 5);
-    }
-    if(!top.length){ msg.textContent = "لم نجد هواتف مطابقة للمعيار."; return; }
-    var list = top.map(function(m, i){ return (i + 1) + ") " + (m.row[0] || "") + " بسعر " + m.price + " جنيه"; }).join("، ");
-    document.getElementById("gd-criterion").value = crit;
-    document.getElementById("gd-title").value = titles[crit] || "";
-    document.getElementById("gd-desc").value = "دليل شراء محدث بالأسعار الحالية: " + (titles[crit] || "") + " — أفضل 5 هواتف حسب بيانات الشيت: " + list + ". الأسعار من جوميا مصر وقد تتغير — راجع السعر قبل الشراء.";
-    document.getElementById("gd-review").value = "مسودة مولّدة آلياً — راجعها وعدّلها: اخترنا هذه الهواتف الخمسة لأنها الأفضل حسب المعيار المختار من بين كل موديلات الشيت، مع مراعاة السعر والتقييم. [اكتب هنا تحليلك الشخصي: لماذا كل هاتف؟ وما عيوبه؟ ولمن يناسبه؟] — لا تنشر قبل إكمال هذه الفقرة بصوتك.";
+    var g = await guideTop5();
+    document.getElementById("gd-criterion").value = g.crit;
+    document.getElementById("gd-title").value = g.title;
+    document.getElementById("gd-desc").value = guideDescText(g);
+    document.getElementById("gd-review").value = guideReviewText(g);
     document.getElementById("gd-status").value = "draft";
     suggestSlug("gd");
+    var img = g.top[0] && g.top[0].row && g.top[0].row[30];
+    if(img && String(img).indexOf("http") === 0){
+      document.getElementById("gd-image").value = sizedImageUrl(String(img), 800);
+      document.getElementById("gd-image-alt").value = g.title;
+    }
     renderImagePreview("gd");
     updateSeo("gd");
-    msg.textContent = "تم توليد المسودة من " + top.length + " هواتف — راجعها وعدّلها قبل الحفظ والنشر.";
-    toast("تم توليد مسودة الدليل");
+    msg.textContent = "تم توليد الدليل من " + g.top.length + " هواتف — راجعه بصرياً قبل الحفظ والنشر.";
+    toast("تم توليد الدليل");
   }catch(err){ msg.textContent = err.message; }
 }
 async function genNews(){
@@ -1839,52 +1991,27 @@ async function genNews(){
   if(!q){ msg.textContent = "اكتب اسم الموديل أولاً."; return; }
   msg.textContent = "جارٍ البحث عن الموديل…";
   try{
-    var d = await api("products", null, {q: q});
-    var models = cheapestModels(d.rows || []);
-    if(!models.length){ msg.textContent = "لم نجد الموديل في الشيت — تأكد من الاسم."; return; }
-    models.sort(function(a, b){ return a.price - b.price; });
-    var best = models[0];
-    var name = best.row[0] || "";
-    var price = best.price;
-    var oldPrice = parseFloat(oldRaw.replace(/[^0-9.]/g, "")) || 0;
-    var diff = oldPrice > price ? oldPrice - price : 0;
-    var pct = oldPrice > price ? Math.round(diff / oldPrice * 100) : 0;
-    var today = new Date().toISOString().slice(0, 10);
-    document.getElementById("nw-title").value = "انخفاض سعر " + name + " إلى " + price + " جنيهاً";
-    document.getElementById("nw-desc").value = "انخفض سعر " + name + " إلى " + price + " جنيهاً في جوميا مصر" + (diff ? " (كان " + oldPrice + " جنيهاً) — وفّر " + diff + " جنيهاً (" + pct + "%)" : "") + ". قارن السعر في جوميا وأمازون ونون قبل الشراء، وتابع الأسعار المحدثة يومياً على عروض أونلاين.";
-    document.getElementById("nw-body").value = "انخفض سعر هاتف " + name + " في مصر إلى " + price + " جنيهاً في جوميا مصر" +
-      (diff ? "، بعد أن كان سعره " + oldPrice + " جنيهاً — أي بانخفاض قدره " + diff + " جنيهاً بنسبة " + pct + "%." : ".") +
-      " يمكنك مقارنة سعره في جوميا وأمازون ونون من صفحة المنتج قبل الشراء، فالأسعار تتغير باستمرار. [راجع الأرقام قبل النشر — هذه مسودة مولّدة آلياً من بيانات الشيت].";
-    document.getElementById("nw-model").value = modelSlugFromRow(best.row);
-    document.getElementById("nw-date").value = today;
-    document.getElementById("nw-category").value = "انخفاض سعر";
+    var n = await newsBest(q);
+    document.getElementById("nw-title").value = newsTitleText(n);
+    document.getElementById("nw-desc").value = newsDescText(n);
+    document.getElementById("nw-body").value = newsBodyText(n);
+    document.getElementById("nw-model").value = modelSlugFromRow(n.best.row);
+    document.getElementById("nw-date").value = new Date().toISOString().slice(0, 10);
+    document.getElementById("nw-category").value = n.diff > 0 ? "انخفاض سعر" : "إطلاق جديد";
     suggestSlug("nw");
+    var im = n.best.row && n.best.row[30];
+    if(im && String(im).indexOf("http") === 0){
+      document.getElementById("nw-image").value = sizedImageUrl(String(im), 1200);
+      document.getElementById("nw-image-alt").value = newsTitleText(n);
+    }
     renderImagePreview("nw");
     updateSeo("nw");
-    msg.textContent = "تم توليد مسودة الخبر — راجع الأرقام وعدّلها قبل الحفظ والنشر.";
-    toast("تم توليد مسودة الخبر");
+    msg.textContent = "تم توليد الخبر — راجع الأرقام بصرياً قبل الحفظ والنشر.";
+    toast("تم توليد الخبر");
   }catch(err){ msg.textContent = err.message; }
 }
-
-/* ---- Per-field generation (template-based, from Sheet data — no AI service).
-   One "✦ توليد" button sits next to every generatable field in the guides
-   and news forms; each fills ONLY its own field, then refreshes the live
-   SEO check. Whole-draft generation still lives in genGuide()/genNews(). ---- */
-var GD_TITLES = {
-  under_10000: "أفضل هواتف تحت 10,000 جنيه في مصر 2026",
-  battery: "أفضل هواتف ببطارية كبيرة في مصر 2026",
-  camera: "أفضل هواتف للتصوير في مصر 2026",
-  gaming: "أفضل هواتف للألعاب في مصر 2026"
-};
-var GD_KEYWORDS = {
-  under_10000: "أفضل هواتف تحت 10,000 جنيه",
-  battery: "أفضل هواتف ببطارية كبيرة",
-  camera: "أفضل هواتف للتصوير",
-  gaming: "أفضل هواتف للألعاب"
-};
-var GD_CRIT_LABEL = {under_10000: "هواتف اقتصادية", battery: "بطارية كبيرة", camera: "تصوير", gaming: "ألعاب"};
 var _guideTopCache = null; // {crit, top, title, list}
-var _newsBestCache = null; // {q, best, name, price, oldPrice, diff, pct}
+var _newsBestCache = null; // {q, best, name, price, oldPrice, diff, pct, displayName}
 function _genVal(id){ var el = document.getElementById(id); return el ? el.value : ""; }
 function _genSet(prefix, id, value){
   var el = document.getElementById(id);
@@ -1902,6 +2029,14 @@ function _trimMetaDesc(s){
   if(sp > 100) cut = cut.slice(0, sp);
   return cut + "…";
 }
+function _metaTitleWithBrand(t){
+  // Keep the site brand in the meta title when it fits: drop a trailing
+  // " — دليل الشراء" first, then fall back to plain trimming.
+  var base = String(t || "").replace(/ — دليل الشراء$/, "");
+  var withBrand = base + " | عروض أونلاين";
+  if(withBrand.length <= 60) return withBrand;
+  return _trimMetaTitle(String(t || "") + " | عروض أونلاين");
+}
 function _trimMetaTitle(s){
   s = String(s || "").replace(/\s+/g, " ").trim();
   if(s.length <= 60) return s;
@@ -1916,7 +2051,7 @@ function _guideCriterion(){
 }
 async function guideTop5(){
   var crit = _guideCriterion();
-  if(!GD_TITLES[crit]) throw new Error("اختر المعيار أولاً من قائمة «توليد مسودة من بيانات الشيت» بالأسفل (أو اكتبه في حقل المعيار).");
+  if(!GD_TITLES[crit]) throw new Error("اختر المعيار أولاً من قائمة التوليد بالأسفل (أو اكتبه في حقل المعيار).");
   if(_guideTopCache && _guideTopCache.crit === crit) return _guideTopCache;
   var d = await api("products");
   var models = cheapestModels(d.rows || []);
@@ -1939,13 +2074,13 @@ async function guideTop5(){
 function _newsQuery(){
   return (_genVal("nw-model") || _genVal("nw-gen-q") || "").trim();
 }
-async function newsBest(){
-  var q = _newsQuery();
+async function newsBest(qOverride){
+  var q = (qOverride != null ? String(qOverride).trim() : _newsQuery());
   if(!q) throw new Error("اكتب اسم الموديل أولاً في حقل «موديل مرتبط» أو في خانة البحث بالأسفل.");
   if(_newsBestCache && (_newsBestCache.q === q || modelSlugFromRow(_newsBestCache.best.row) === q)) return _newsBestCache;
   var d = await api("products", null, {q: q});
   var models = cheapestModels(d.rows || []);
-  if(!models.length) throw new Error("لم نجد الموديل في الشيت — تأكد من الاسم.");
+  if(!models.length) throw new Error("لم نجد الموديل في بيانات المتجر — تأكد من الاسم.");
   models.sort(function(a, b){ return a.price - b.price; });
   var best = models[0];
   var name = best.row[0] || "";
@@ -1955,15 +2090,8 @@ async function newsBest(){
   var diff = oldPrice > price ? oldPrice - price : 0;
   var pct = oldPrice > price ? Math.round(diff / oldPrice * 100) : 0;
   _newsBestCache = {q: q, best: best, name: name, price: price, oldPrice: oldPrice, diff: diff, pct: pct};
+  _newsBestCache.displayName = newsDisplayName(_newsBestCache);
   return _newsBestCache;
-}
-function _newsDesc(n){
-  return "انخفض سعر " + n.name + " إلى " + n.price + " جنيهاً في جوميا مصر" + (n.diff ? " (كان " + n.oldPrice + " جنيهاً) — وفّر " + n.diff + " جنيهاً (" + n.pct + "%)" : "") + ". قارن السعر في جوميا وأمازون ونون قبل الشراء، وتابع الأسعار المحدثة يومياً على عروض أونلاين.";
-}
-function _newsBody(n){
-  return "انخفض سعر هاتف " + n.name + " في مصر إلى " + n.price + " جنيهاً في جوميا مصر" +
-    (n.diff ? "، بعد أن كان سعره " + n.oldPrice + " جنيهاً — أي بانخفاض قدره " + n.diff + " جنيهاً بنسبة " + n.pct + "%." : ".") +
-    " يمكنك مقارنة سعره في جوميا وأمازون ونون من صفحة المنتج قبل الشراء، فالأسعار تتغير باستمرار. [راجع الأرقام قبل النشر — هذه مسودة مولّدة آلياً من بيانات الشيت].";
 }
 async function genField(prefix, field){
   try{
@@ -1975,10 +2103,10 @@ async function genField(prefix, field){
       }else if(field === "meta-title"){
         var gT = await guideTop5();
         var t = _genVal("gd-title") || gT.title;
-        _genSet("gd", "gd-meta-title", _trimMetaTitle(t + " | عروض أونلاين"));
+        _genSet("gd", "gd-meta-title", _metaTitleWithBrand(t));
       }else if(field === "meta-desc"){
         var gD = await guideTop5();
-        var ds = _genVal("gd-desc") || ("دليل شراء محدث بالأسعار الحالية: " + gD.title + " — " + gD.list + ".");
+        var ds = _genVal("gd-desc") || guideDescText(gD);
         _genSet("gd", "gd-meta-desc", _trimMetaDesc(ds));
       }else if(field === "image-alt"){
         var gA = await guideTop5();
@@ -1987,8 +2115,8 @@ async function genField(prefix, field){
       }else{
         var g = await guideTop5();
         if(field === "title"){ _genSet("gd", "gd-title", g.title); }
-        else if(field === "desc"){ _genSet("gd", "gd-desc", "دليل شراء محدث بالأسعار الحالية: " + g.title + " — أفضل 5 هواتف حسب بيانات الشيت: " + g.list + ". الأسعار من جوميا مصر وقد تتغير — راجع السعر قبل الشراء."); }
-        else if(field === "review"){ _genSet("gd", "gd-review", "مسودة مولّدة آلياً — راجعها وعدّلها: اخترنا هذه الهواتف الخمسة لأنها الأفضل حسب المعيار المختار من بين كل موديلات الشيت، مع مراعاة السعر والتقييم. [اكتب هنا تحليلك الشخصي: لماذا كل هاتف؟ وما عيوبه؟ ولمن يناسبه؟] — لا تنشر قبل إكمال هذه الفقرة بصوتك."); }
+        else if(field === "desc"){ _genSet("gd", "gd-desc", guideDescText(g)); }
+        else if(field === "review"){ _genSet("gd", "gd-review", guideReviewText(g)); }
         else if(field === "tags"){
           var brands = [];
           g.top.forEach(function(m){ var b = (m.row && m.row[2]) || ""; if(b && brands.indexOf(b) === -1) brands.push(b); });
@@ -1997,34 +2125,39 @@ async function genField(prefix, field){
         }
         else if(field === "image"){
           var img = g.top[0] && g.top[0].row && g.top[0].row[30];
-          if(!img || String(img).indexOf("http") !== 0) throw new Error("لا توجد صورة لأفضل هاتف في الشيت — أضف رابط صورة يدوياً.");
-          _genSet("gd", "gd-image", String(img));
+          if(!img || String(img).indexOf("http") !== 0) throw new Error("لا توجد صورة لأفضل هاتف في بيانات المتجر — أضف رابط صورة يدوياً.");
+          _genSet("gd", "gd-image", sizedImageUrl(String(img), 800));
         }
       }
     }else{
+      // Any news generation sets today's publish date when empty — one less obstacle.
+      if(!_genVal("nw-date")) document.getElementById("nw-date").value = new Date().toISOString().slice(0, 10);
       if(field === "keyword"){
         var n0 = await newsBest();
-        _genSet("nw", "nw-keyword", "انخفاض سعر " + n0.name);
+        _genSet("nw", "nw-keyword", "انخفاض سعر " + n0.displayName);
       }else if(field === "meta-title"){
         var nb = await newsBest();
-        var t2 = _genVal("nw-title") || ("انخفاض سعر " + nb.name + " إلى " + nb.price + " جنيهاً");
-        _genSet("nw", "nw-meta-title", _trimMetaTitle(t2 + " | عروض أونلاين"));
+        _genSet("nw", "nw-meta-title", newsMetaTitle(nb));
       }else if(field === "meta-desc"){
         var nb2 = await newsBest();
-        var d2 = _genVal("nw-desc") || _newsDesc(nb2);
+        var d2 = _genVal("nw-desc") || newsDescText(nb2);
         _genSet("nw", "nw-meta-desc", _trimMetaDesc(d2));
       }else if(field === "image-alt"){
         var nb3 = await newsBest();
-        var a2 = _genVal("nw-title") || ("انخفاض سعر " + nb3.name);
+        var a2 = _genVal("nw-title") || newsTitleText(nb3);
         _genSet("nw", "nw-image-alt", a2);
       }else if(field === "category"){
         var n3 = await newsBest();
         document.getElementById("nw-category").value = n3.diff > 0 ? "انخفاض سعر" : "إطلاق جديد";
       }else{
         var n = await newsBest();
-        if(field === "title"){ _genSet("nw", "nw-title", "انخفاض سعر " + n.name + " إلى " + n.price + " جنيهاً"); }
-        else if(field === "desc"){ _genSet("nw", "nw-desc", _newsDesc(n)); }
-        else if(field === "body"){ _genSet("nw", "nw-body", _newsBody(n)); }
+        if(field === "title"){
+          _genSet("nw", "nw-title", newsTitleText(n));
+        }
+        else if(field === "desc"){ _genSet("nw", "nw-desc", newsDescText(n)); }
+        else if(field === "body"){
+          _genSet("nw", "nw-body", newsBodyText(n));
+        }
         else if(field === "tags"){
           var br = (n.best.row && n.best.row[2]) || "";
           var tg = [br, "انخفاض الأسعار", "عروض"].filter(Boolean).slice(0, 5);
@@ -2032,8 +2165,8 @@ async function genField(prefix, field){
         }
         else if(field === "image"){
           var im = n.best.row && n.best.row[30];
-          if(!im || String(im).indexOf("http") !== 0) throw new Error("لا توجد صورة لهذا الموديل في الشيت — أضف رابط صورة يدوياً.");
-          _genSet("nw", "nw-image", String(im));
+          if(!im || String(im).indexOf("http") !== 0) throw new Error("لا توجد صورة لهذا الموديل في بيانات المتجر — أضف رابط صورة يدوياً.");
+          _genSet("nw", "nw-image", sizedImageUrl(String(im), 1200));
           document.getElementById("nw-model").value = modelSlugFromRow(n.best.row);
         }
       }
@@ -2080,7 +2213,7 @@ function readNewsForm(){
   var g = function(id){ var el = document.getElementById(id); return el ? el.value.trim() : ""; };
   return {slug: g("nw-slug"), title: g("nw-title"), description: g("nw-desc"),
     body: g("nw-body"), model_slug: g("nw-model"), author: "فريق عروض أونلاين",
-    date_published: g("nw-date"), publish_at: fromLocalInput(g("nw-publish-at")),
+    date_published: g("nw-date") || new Date().toISOString().slice(0,10), publish_at: fromLocalInput(g("nw-publish-at")),
     is_example: false, image: g("nw-image"), image_alt: g("nw-image-alt"),
     keyword: g("nw-keyword"), meta_title: g("nw-meta-title"),
     meta_desc: g("nw-meta-desc"), tags: g("nw-tags"), category: g("nw-category")};
