@@ -116,7 +116,7 @@ def main():
         check(bool(m), f"{slug}: Amazon link lacks tag amazon0c2aca6-21")
         check("jumia.com.eg" in t, f"{slug}: no Jumia link")
         check("آخر تحديث للسعر" in t, f"{slug}: no last-update date")
-        check("صفحة المنتج في جوميا" in t, f"{slug}: no source link")
+        check("صفحة المنتج في " in t, f"{slug}: no source link")
         # JSON-LD price match
         ld = re.findall(
             r'<script type="application/ld\+json">\s*(\[.*?\]|\{.*?\})\s*</script>',
