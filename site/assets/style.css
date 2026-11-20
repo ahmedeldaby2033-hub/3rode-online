@@ -246,7 +246,7 @@ html[data-theme="dark"] .product-img a { color: var(--blue); }
 .deals-filters-row .field:has(#filter-storage) { flex-basis: 100px; }
 .deals-filters-row .field:has(#filter-maxprice) { flex-basis: 110px; }
 .deals-filters-row .field:has(#sort-by) { flex-basis: 110px; }
-.deals-filters-row .field label { font-weight: 700; font-size: .82rem; color: var(--text); opacity: .75; white-space: nowrap; }
+.deals-filters-row .field label { font-weight: 700; font-size: .82rem; color: var(--text); opacity: .75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .deals-filters-row .field input, .deals-filters-row .field select {
   width: 100%; min-width: 0; padding: 9px 10px; border: 1px solid var(--border); border-radius: 10px;
   background: var(--bg); color: var(--text); font-family: inherit; font-size: .9rem;
