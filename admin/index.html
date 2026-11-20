@@ -414,19 +414,56 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
   <section class="tab" id="tab-guides">
     <div class="card"><h2>أدلة الشراء</h2>
       <p class="hint">الأدلة المولَّدة آلياً تبقى <b>مسودات</b> حتى تراجعها أنت بنفسك وتكتب المراجعة البشرية — لا يُنشر دليل قبل ذلك (سياسة المحتوى الموسَّع في Google).</p>
+      <p><input type="text" id="guides-filter" placeholder="بحث بالعنوان…" oninput="renderGuides()"></p>
       <div id="guides-table" class="table-scroll">—</div>
       <h3>إضافة / تعديل دليل</h3>
       <div class="row">
-        <div><label for="gd-slug">الرابط المختصر (slug)</label><input type="text" id="gd-slug" dir="ltr"></div>
+        <div><label for="gd-slug">الرابط المختصر (slug)</label><input type="text" id="gd-slug" dir="ltr">
+        <p><button type="button" class="btn-ghost" onclick="suggestSlug('gd')">اقتراح slug من العنوان</button>
+        <span id="gd-slug-hint" class="hint"></span></p></div>
         <div><label for="gd-title">العنوان</label><input type="text" id="gd-title"></div>
       </div>
-      <label for="gd-criterion">المعيار</label><input type="text" id="gd-criterion">
+      <label for="gd-criterion">المعيار</label><input type="text" id="gd-criterion" placeholder="مثال: under_10000 أو battery أو camera أو gaming">
       <label for="gd-desc">الوصف</label><textarea id="gd-desc"></textarea>
       <label for="gd-review">المراجعة البشرية (إلزامية قبل النشر)</label><textarea id="gd-review"></textarea>
-      <label for="gd-status">الحالة</label>
-      <select id="gd-status"><option value="draft">مسودة</option><option value="published">منشور</option></select>
-      <label for="gd-publish-at">تاريخ ووقت النشر المجدول (اختياري — اتركه فارغاً للنشر الفوري)</label>
-      <input type="datetime-local" id="gd-publish-at" dir="ltr">
+      <div class="row">
+        <div><label for="gd-keyword">الكلمة المفتاحية الرئيسية</label><input type="text" id="gd-keyword" placeholder="مثال: أفضل هاتف تحت 10000"></div>
+        <div><label for="gd-tags">الوسوم (مفصولة بفاصلة)</label><input type="text" id="gd-tags" placeholder="مثال: هواتف اقتصادية، دليل شراء"></div>
+      </div>
+      <div class="row">
+        <div><label for="gd-meta-title">عنوان SEO (meta title) <span class="hint" id="gd-meta-title-count"></span></label><input type="text" id="gd-meta-title"></div>
+        <div><label for="gd-date">تاريخ النشر</label><input type="date" id="gd-date"></div>
+      </div>
+      <label for="gd-meta-desc">وصف SEO (meta description) <span class="hint" id="gd-meta-desc-count"></span></label><textarea id="gd-meta-desc"></textarea>
+      <div class="row">
+        <div><label for="gd-image">رابط الصورة المميزة</label><input type="url" id="gd-image" dir="ltr"></div>
+        <div><label for="gd-image-alt">النص البديل للصورة (alt)</label><input type="text" id="gd-image-alt"></div>
+      </div>
+      <div id="gd-image-preview"></div>
+      <p><input type="url" id="gd-fetch-url" dir="ltr" placeholder="رابط صفحة المنتج في المتجر…" style="max-width:420px;display:inline-block;width:70%">
+      <button type="button" class="btn-ghost" onclick="fetchEditorImage('gd')">⬇ جلب الصورة من رابط</button></p>
+      <p><label style="display:inline;font-weight:400"><input type="checkbox" id="gd-img-rights" onchange="updateSeo('gd')"> أؤكد أن الصورة ملك للموقع أو مرخّصة للاستخدام</label></p>
+      <div class="row">
+        <div><label for="gd-status">الحالة</label>
+        <select id="gd-status"><option value="draft">مسودة</option><option value="published">منشور</option></select></div>
+        <div><label for="gd-publish-at">تاريخ ووقت النشر المجدول (اختياري — اتركه فارغاً للنشر الفوري)</label>
+        <input type="datetime-local" id="gd-publish-at" dir="ltr"></div>
+      </div>
+      <div class="card" style="background:var(--bg,#f4f6fb);margin-top:14px"><h3>فحص الجودة وSEO — مباشر</h3>
+        <div id="gd-seo-score"></div><div id="gd-seo-list"></div><div id="gd-seo-improve"></div></div>
+      <p><button type="button" class="btn-ghost" onclick="spellCheck('gd')">تدقيق إملائي</button>
+      <span class="hint">تدقيق قواعد شائعة — راجع الاقتراحات قبل اعتمادها</span></p>
+      <div id="gd-spell-results"></div>
+      <div class="card" style="background:var(--bg,#f4f6fb);margin-top:14px"><h3>فحوصات إضافية</h3>
+        <p class="hint">فحص التشابه الداخلي، وبحث يدوي عن الانتحال عبر جوجل، ومؤشر تقريبي للكتابة الآلية، وفحص حقوق الصورة — كلها بدون خدمة خارجية مدفوعة.</p>
+        <p><button type="button" class="btn-ghost" onclick="qualityCheck('gd')">تشغيل الفحوصات</button></p>
+        <div id="gd-quality"></div></div>
+      <div class="card" style="background:var(--bg,#f4f6fb);margin-top:14px"><h3>توليد مسودة من بيانات الشيت</h3>
+        <p class="hint">مسودة مولّدة آلياً من بيانات الشيت — راجعها وعدّلها قبل النشر.</p>
+        <label for="gd-gen-criterion">المعيار</label>
+        <select id="gd-gen-criterion"><option value="under_10000">أفضل هواتف تحت 10,000 جنيه</option><option value="battery">أفضل بطارية</option><option value="camera">أفضل كاميرا</option><option value="gaming">أفضل هواتف للألعاب</option></select>
+        <p><button type="button" class="btn" onclick="genGuide()">توليد مسودة الدليل</button></p>
+        <p id="gd-gen-msg" class="hint"></p></div>
       <p><button class="btn-green" onclick="saveGuide()">حفظ الدليل</button></p>
     </div>
     <div class="card"><h2>النشر المجدول ⏰</h2>
@@ -440,10 +477,13 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
   <section class="tab" id="tab-news">
     <div class="card"><h2>الأخبار</h2>
       <p class="hint">قسم /news/ منفصل عن صفحات المنتجات (صفحات المنتجات لا تدخل Google News أبداً). كل خبر يحتاج مراجعة بشرية وصورة 1200px على الأقل.</p>
+      <p><input type="text" id="news-filter" placeholder="بحث بالعنوان…" oninput="renderNews()"></p>
       <div id="news-table" class="table-scroll">—</div>
       <h3>إضافة / تعديل خبر</h3>
       <div class="row">
-        <div><label for="nw-slug">الرابط المختصر (slug)</label><input type="text" id="nw-slug" dir="ltr"></div>
+        <div><label for="nw-slug">الرابط المختصر (slug)</label><input type="text" id="nw-slug" dir="ltr">
+        <p><button type="button" class="btn-ghost" onclick="suggestSlug('nw')">اقتراح slug من العنوان</button>
+        <span id="nw-slug-hint" class="hint"></span></p></div>
         <div><label for="nw-title">العنوان</label><input type="text" id="nw-title"></div>
       </div>
       <label for="nw-desc">الوصف</label><textarea id="nw-desc"></textarea>
@@ -452,8 +492,43 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
         <div><label for="nw-model">موديل مرتبط (اختياري)</label><input type="text" id="nw-model" dir="ltr"></div>
         <div><label for="nw-date">تاريخ النشر</label><input type="date" id="nw-date"></div>
       </div>
+      <div class="row">
+        <div><label for="nw-category">التصنيف</label>
+        <select id="nw-category"><option value="">—</option><option>إطلاق جديد</option><option>انخفاض سعر</option><option>مقارنة</option><option>نصائح</option><option>أخرى</option></select></div>
+        <div><label for="nw-keyword">الكلمة المفتاحية الرئيسية</label><input type="text" id="nw-keyword" placeholder="مثال: انخفاض سعر OPPO A6"></div>
+      </div>
+      <div class="row">
+        <div><label for="nw-meta-title">عنوان SEO (meta title) <span class="hint" id="nw-meta-title-count"></span></label><input type="text" id="nw-meta-title"></div>
+        <div><label for="nw-tags">الوسوم (مفصولة بفاصلة)</label><input type="text" id="nw-tags" placeholder="مثال: انخفاض الأسعار، أوبو"></div>
+      </div>
+      <label for="nw-meta-desc">وصف SEO (meta description) <span class="hint" id="nw-meta-desc-count"></span></label><textarea id="nw-meta-desc"></textarea>
+      <div class="row">
+        <div><label for="nw-image">رابط الصورة المميزة</label><input type="url" id="nw-image" dir="ltr"></div>
+        <div><label for="nw-image-alt">النص البديل للصورة (alt)</label><input type="text" id="nw-image-alt"></div>
+      </div>
+      <div id="nw-image-preview"></div>
+      <p><input type="url" id="nw-fetch-url" dir="ltr" placeholder="رابط صفحة المنتج في المتجر…" style="max-width:420px;display:inline-block;width:70%">
+      <button type="button" class="btn-ghost" onclick="fetchEditorImage('nw')">⬇ جلب الصورة من رابط</button></p>
+      <p><label style="display:inline;font-weight:400"><input type="checkbox" id="nw-img-rights" onchange="updateSeo('nw')"> أؤكد أن الصورة ملك للموقع أو مرخّصة للاستخدام</label></p>
       <label for="nw-publish-at">تاريخ ووقت النشر المجدول (اختياري — اتركه فارغاً للنشر الفوري)</label>
       <input type="datetime-local" id="nw-publish-at" dir="ltr">
+      <div class="card" style="background:var(--bg,#f4f6fb);margin-top:14px"><h3>فحص الجودة وSEO — مباشر</h3>
+        <div id="nw-seo-score"></div><div id="nw-seo-list"></div><div id="nw-seo-improve"></div></div>
+      <p><button type="button" class="btn-ghost" onclick="spellCheck('nw')">تدقيق إملائي</button>
+      <span class="hint">تدقيق قواعد شائعة — راجع الاقتراحات قبل اعتمادها</span></p>
+      <div id="nw-spell-results"></div>
+      <div class="card" style="background:var(--bg,#f4f6fb);margin-top:14px"><h3>فحوصات إضافية</h3>
+        <p class="hint">فحص التشابه الداخلي، وبحث يدوي عن الانتحال عبر جوجل، ومؤشر تقريبي للكتابة الآلية، وفحص حقوق الصورة — كلها بدون خدمة خارجية مدفوعة.</p>
+        <p><button type="button" class="btn-ghost" onclick="qualityCheck('nw')">تشغيل الفحوصات</button></p>
+        <div id="nw-quality"></div></div>
+      <div class="card" style="background:var(--bg,#f4f6fb);margin-top:14px"><h3>توليد مسودة خبر انخفاض سعر</h3>
+        <p class="hint">مسودة مولّدة آلياً من بيانات الشيت — راجعها وعدّلها قبل النشر.</p>
+        <div class="row">
+          <div><label for="nw-gen-q">ابحث عن الموديل</label><input type="text" id="nw-gen-q" placeholder="مثال: OPPO A6"></div>
+          <div><label for="nw-gen-old">السعر القديم (جنيه)</label><input type="number" id="nw-gen-old" placeholder="مثال: 13500"></div>
+        </div>
+        <p><button type="button" class="btn" onclick="genNews()">توليد مسودة الخبر</button></p>
+        <p id="nw-gen-msg" class="hint"></p></div>
       <p><button class="btn-green" onclick="saveNews()">حفظ الخبر</button></p>
     </div>
     <div class="card"><h2>النشر المجدول ⏰</h2>
@@ -670,6 +745,20 @@ function fmtDate(v){
   var s = String(v == null ? "" : v);
   var m = s.match(/^(\d{4}-\d{2}-\d{2})/);
   return m ? m[1] : s;
+}
+
+/* ---- WhatsApp: normalize an Egyptian number and build a wa.me link
+   with a prefilled greeting + subject. waNormalize returns "" for an
+   invalid number (must end as 12 digits starting with 20). ---- */
+function waNormalize(num){
+  var d = String(num == null ? "" : num).replace(/[^0-9]/g, "");
+  if(!d) return "";
+  if(d.charAt(0) === "0") d = "20" + d.slice(1);
+  return (d.length === 12 && d.indexOf("20") === 0) ? d : "";
+}
+function waHref(num, text){
+  var n = waNormalize(num);
+  return n ? "https://wa.me/" + n + "?text=" + encodeURIComponent(text || "") : "";
 }
 
 /* ---------------- setup & connection ---------------- */
@@ -929,7 +1018,17 @@ function renderInbox(){
       kept.map(function(pair){
         var r = pair[0], i = pair[1];
         var linkCell = (linkCol === undefined) ? "" : (r[linkCol] ? "<td><a href=\""+esc(r[linkCol])+"\" target=\"_blank\">فتح المنتج</a></td>" : "<td>—</td>");
-        return "<tr><td>" + esc(r[0]) + "</td><td>" + esc(r[1]) + "</td><td>" + esc(r[2]) + "</td><td>" + esc(r[3]) + "</td>" + linkCell + "<td><button class='btn-ghost' onclick='toggleHandled(\"" + kind + "\"," + i + ")'>" + (isHandled(kind, r) ? "إعادة" : "تمت المعالجة ✓") + "</button></td></tr>";
+        // requests: the WhatsApp number (col 3) is a wa.me link with a
+        // prefilled greeting + the request subject (model + budget).
+        var col3 = esc(r[3]);
+        var col3Attrs = "";
+        if(kind === "req"){
+          col3Attrs = " dir='ltr'";
+          var waText = "مرحباً، أنا من فريق عروض أونلاين 👋 بخصوص طلبك: " + (r[1] || "") + " — الميزانية: " + (r[2] || "") + " جنيه. كيف أقدر أساعدك؟";
+          var wa = waHref(r[3], waText);
+          if(wa) col3 = "<a href='" + wa + "' target='_blank' rel='noopener'>" + esc(r[3]) + "</a>";
+        }
+        return "<tr><td>" + esc(r[0]) + "</td><td>" + esc(r[1]) + "</td><td>" + esc(r[2]) + "</td><td" + col3Attrs + ">" + col3 + "</td>" + linkCell + "<td><button class='btn-ghost' onclick='toggleHandled(\"" + kind + "\"," + i + ")'>" + (isHandled(kind, r) ? "إعادة" : "تمت المعالجة ✓") + "</button></td></tr>";
       }).join("") + "</table>";
   }
   document.getElementById("inbox-requests").innerHTML = table(INBOX_DATA.requests, "req", ["التاريخ", "المنتج", "الميزانية", "تواصل (واتساب)"]);
@@ -1349,29 +1448,518 @@ async function saveSettings(){
   catch(err){toast(err.message)}
 }
 
+/* ---- editor helpers: slug / image preview / SEO / spell / quality ---- */
+function slugifyTitle(t){
+  var s = String(t || "");
+  try{ s = s.normalize("NFKD"); }catch(e){}
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+function suggestSlug(prefix){
+  var slug = slugifyTitle(document.getElementById(prefix + "-title").value);
+  var hint = document.getElementById(prefix + "-slug-hint");
+  if(!slug){
+    if(hint) hint.textContent = "اكتب slug إنجليزي قصير (مثال: oppo-a6-price-drop)";
+    return;
+  }
+  document.getElementById(prefix + "-slug").value = slug;
+  if(hint) hint.textContent = "";
+}
+var IMG_PREVIEW = {};   // prefix -> {w,h} of the loaded featured image
+function renderImagePreview(prefix){
+  var input = document.getElementById(prefix + "-image");
+  var prev = document.getElementById(prefix + "-image-preview");
+  if(!input || !prev) return;
+  var url = input.value.trim();
+  IMG_PREVIEW[prefix] = {w: 0, h: 0};
+  if(!url){ prev.innerHTML = ""; updateSeo(prefix); return; }
+  prev.innerHTML = "<p class='hint'>جارٍ تحميل المعاينة…</p>";
+  var im = new Image();
+  im.onload = function(){
+    IMG_PREVIEW[prefix] = {w: im.naturalWidth, h: im.naturalHeight};
+    var warn = "";
+    if(prefix === "nw" && im.naturalWidth < 1200) warn = " <span class='error'>⚠️ الصورة أضيق من 1200px — أخبار جوجل تحتاج 1200px على الأقل.</span>";
+    prev.innerHTML = "<img src=\"" + esc(url) + "\" style=\"max-width:100%;max-height:180px;border-radius:8px\" alt=\"معاينة الصورة\">" +
+      "<p class='hint'>الأبعاد: " + im.naturalWidth + "×" + im.naturalHeight + "px" + warn + "</p>";
+    updateSeo(prefix);
+  };
+  im.onerror = function(){
+    prev.innerHTML = "<p class='error'>تعذّر تحميل الصورة من هذا الرابط — تأكد من صحته.</p>";
+    updateSeo(prefix);
+  };
+  im.src = url;
+}
+async function fetchEditorImage(prefix){
+  var url = document.getElementById(prefix + "-fetch-url").value.trim();
+  if(!url){ toast("الصق رابط صفحة المنتج أولاً"); return; }
+  try{
+    var r = await api("fetchProductImage", {productUrl: url});
+    document.getElementById(prefix + "-image").value = r.image;
+    renderImagePreview(prefix);
+    toast("تم جلب رابط الصورة — راجعه قبل الحفظ");
+  }catch(err){ toast(err.message); }
+}
+function wordCount(s){ return String(s || "").trim().split(/\s+/).filter(Boolean).length; }
+function countOccurrences(text, kw){
+  if(!kw) return 0;
+  var re = new RegExp(String(kw).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
+  var m = String(text || "").match(re);
+  return m ? m.length : 0;
+}
+function seoFields(prefix){
+  var g = function(id){ var el = document.getElementById(id); return el ? el.value : ""; };
+  if(prefix === "gd"){
+    return {kind: "gd", title: g("gd-title"), keyword: g("gd-keyword").trim(),
+      meta: g("gd-meta-title"), metaDesc: g("gd-meta-desc"), desc: g("gd-desc"),
+      body: g("gd-desc") + "\n" + g("gd-review"), image: g("gd-image").trim(),
+      alt: g("gd-image-alt").trim(), tags: g("gd-tags"), modelSlug: "",
+      publishAt: g("gd-publish-at"), status: g("gd-status"),
+      date: g("gd-date"), slug: g("gd-slug")};
+  }
+  return {kind: "nw", title: g("nw-title"), keyword: g("nw-keyword").trim(),
+    meta: g("nw-meta-title"), metaDesc: g("nw-meta-desc"), desc: g("nw-desc"),
+    body: g("nw-body"), image: g("nw-image").trim(),
+    alt: g("nw-image-alt").trim(), tags: g("nw-tags"),
+    modelSlug: g("nw-model").trim(), publishAt: g("nw-publish-at"),
+    status: "", date: g("nw-date"), slug: g("nw-slug")};
+}
+function seoAnalyze(prefix){
+  var f = seoFields(prefix);
+  var kw = f.keyword;
+  var metaText = (f.metaDesc || f.desc || "");
+  var items = [];
+  function add(label, state, note){ items.push({label: label, state: state, note: note || ""}); }
+  var tl = f.title.trim().length;
+  add("العنوان 40–60 حرفاً", tl >= 40 && tl <= 60 ? "pass" : (tl === 0 ? "fail" : "warn"), tl + " حرفاً");
+  add("الكلمة المفتاحية في العنوان", !kw ? "fail" : (f.title.indexOf(kw) !== -1 ? "pass" : "fail"), kw ? "" : "أضف كلمة مفتاحية");
+  var ml = metaText.trim().length;
+  add("الوصف (meta) 120–160 حرفاً", ml >= 120 && ml <= 160 ? "pass" : (ml === 0 ? "fail" : "warn"), ml + " حرفاً");
+  add("الكلمة المفتاحية في الوصف", !kw ? "fail" : (metaText.indexOf(kw) !== -1 ? "pass" : "fail"), "");
+  var first100 = (f.body || "").slice(0, 100);
+  add("الكلمة المفتاحية في أول 100 حرف من النص", !kw ? "fail" : (first100.indexOf(kw) !== -1 ? "pass" : "fail"), "");
+  var words = wordCount(f.body);
+  var minWords = prefix === "nw" ? 300 : 150;
+  add("طول المحتوى (≥" + minWords + " كلمة)", words >= minWords ? "pass" : "fail", words + " كلمة");
+  var occ = countOccurrences(f.body, kw);
+  var dens = words ? (occ / words * 100) : 0;
+  var dState = !kw ? "fail" : (dens > 3 ? "warn" : (dens >= 0.5 && dens <= 2.5 ? "pass" : "fail"));
+  add("كثافة الكلمة المفتاحية 0.5–2.5%", dState, kw ? (dens.toFixed(1) + "% (" + occ + " مرة)") : "أضف كلمة مفتاحية");
+  add("صورة مميزة + نص بديل (alt)", f.image && f.alt ? "pass" : (f.image ? "warn" : "fail"), f.image ? (f.alt ? "" : "أضف النص البديل") : "لا توجد صورة");
+  var pv = IMG_PREVIEW[prefix] || {w: 0, h: 0};
+  if(!pv.w){ add("عرض الصورة" + (prefix === "nw" ? " ≥1200px" : " ≥800px"), "skip", "لم تُحمَّل المعاينة بعد"); }
+  else if(prefix === "nw"){ add("عرض الصورة ≥1200px", pv.w >= 1200 ? "pass" : "fail", pv.w + "px"); }
+  else{ add("عرض الصورة ≥800px", pv.w >= 800 ? "pass" : "warn", pv.w + "px"); }
+  var tagList = f.tags.split(/[،,]/).map(function(t){ return t.trim(); }).filter(Boolean);
+  add("الوسوم 1–5", tagList.length >= 1 && tagList.length <= 5 ? "pass" : "fail", tagList.length + " وسم");
+  if(prefix === "gd"){ add("رابط داخلي (جدول الأسعار)", "pass", "الدليل يعرض جدول أسعار تلقائياً"); }
+  else{ add("رابط داخلي", (f.modelSlug || (f.body || "").indexOf("/mobiles/") !== -1) ? "pass" : "fail", f.modelSlug ? "موديل مرتبط" : "أضف موديلاً مرتبطاً أو رابط /mobiles/"); }
+  var sents = String(f.body || "").split(/[.!؟\n]+/).map(function(s){ return s.trim(); }).filter(Boolean);
+  var avgLen = sents.length ? sents.reduce(function(a, s){ return a + wordCount(s); }, 0) / sents.length : 0;
+  add("سهولة القراءة (متوسط الجملة ≤25 كلمة)", avgLen <= 25 ? "pass" : "warn", sents.length ? ("متوسط " + avgLen.toFixed(1) + " كلمة / جملة") : "لا يوجد نص");
+  var others = [];
+  (GUIDES_DATA.slice(1) || []).forEach(function(r){ if(String(r[0]) !== f.slug) others.push(String(r[1] || "")); });
+  (NEWS_DATA.slice(1) || []).forEach(function(r){ if(String(r[0]) !== f.slug) others.push(String(r[1] || "")); });
+  var dup = others.some(function(t){ return t.trim() && t.trim() === f.title.trim(); });
+  add("عنوان غير مكرر", f.title.trim() ? (dup ? "fail" : "pass") : "fail", dup ? "يوجد مقال آخر بنفس العنوان" : "");
+  if(prefix === "nw"){ add("تاريخ النشر محدد", f.date ? "pass" : "fail", ""); }
+  else{ add("الحالة: منشور أو مجدول", (f.status === "published" || f.publishAt) ? "pass" : "fail", f.status === "published" ? "منشور" : (f.publishAt ? "مجدول" : "مسودة بلا جدولة")); }
+  return items;
+}
+function updateSeo(prefix){
+  var scoreEl = document.getElementById(prefix + "-seo-score");
+  var listEl = document.getElementById(prefix + "-seo-list");
+  var impEl = document.getElementById(prefix + "-seo-improve");
+  if(!scoreEl || !listEl) return;
+  var items = seoAnalyze(prefix);
+  var counted = items.filter(function(i){ return i.state !== "skip"; });
+  var pts = counted.reduce(function(a, i){ return a + (i.state === "pass" ? 1 : (i.state === "warn" ? 0.5 : 0)); }, 0);
+  var score = counted.length ? Math.round(100 * pts / counted.length) : 0;
+  var color = score >= 80 ? "var(--green)" : (score >= 50 ? "var(--amber)" : "var(--red)");
+  var f = seoFields(prefix);
+  var mc = document.getElementById(prefix + "-meta-title-count");
+  if(mc) mc.textContent = "(" + f.meta.trim().length + " حرفاً — المثالي 40–60)";
+  var dc = document.getElementById(prefix + "-meta-desc-count");
+  if(dc) dc.textContent = "(" + (f.metaDesc || f.desc).trim().length + " حرفاً — المثالي 120–160)";
+  scoreEl.innerHTML = "<p><b>نقاط الجودة: " + score + " / 100</b></p>" +
+    "<div style='background:var(--border,#e4e7ec);border-radius:999px;height:12px;overflow:hidden'><div style='width:" + score + "%;height:100%;background:" + color + "'></div></div>";
+  var mark = function(st){ return st === "pass" ? "✓" : (st === "warn" ? "⚠" : (st === "fail" ? "✗" : "—")); };
+  listEl.innerHTML = "<ul style='list-style:none;padding:0;margin:8px 0'>" + items.map(function(i){
+    return "<li style='margin:4px 0'>" + mark(i.state) + " " + esc(i.label) + (i.note ? " <span class='hint'>(" + esc(i.note) + ")</span>" : "") + "</li>";
+  }).join("") + "</ul>";
+  // copyright warning (not a hard block, not counted in the score)
+  var rightsEl = document.getElementById(prefix + "-img-rights");
+  var imgUrl = f.image;
+  var external = imgUrl && imgUrl.indexOf("http") === 0 && imgUrl.indexOf("3rde.online") === -1;
+  var warnHtml = "";
+  if(external && rightsEl && !rightsEl.checked){
+    warnHtml = "<p class='error'>⚠️ الصورة من رابط خارجي ولم تؤكد حقوق استخدامها — تأكد أنها مرخّصة أو استبدلها بصورة من الموقع.</p>";
+  }
+  var fails = items.filter(function(i){ return i.state === "fail" || i.state === "warn"; });
+  impEl.innerHTML = warnHtml + (fails.length ?
+    "<p><b>نقاط تحسين:</b></p><ul>" + fails.map(function(i){ return "<li>" + esc(i.label) + "</li>"; }).join("") + "</ul>" :
+    "<p class='ok'>ممتاز — كل فحوصات الجودة ناجحة.</p>");
+}
+/* ---- Arabic spelling mini-checker (rule-based, safe suggestions only).
+   IMPORTANT: Arabic-aware word boundaries — JS \b does not work for
+   Arabic letters (\w is Latin-only). Deliberately NO "علي"→"على" rule
+   (علي is also a person's name). ---- */
+var SPELL_RULES = [
+  {from: "الذى", to: "الذي"}, {from: "التى", to: "التي"}, {from: "الى", to: "إلى"},
+  {from: "ايضا", to: "أيضاً"}, {from: "لاكن", to: "لكن"}, {from: "هاذا", to: "هذا"},
+  {from: "ذالك", to: "ذلك"}, {from: "هاؤلاء", to: "هؤلاء"}
+];
+var AR_B = "[\\s.,،؛:!?()\\[\\]\"'«»-]"; // Arabic-aware boundary chars
+var SPELL_LAST = {};
+function spellFindIssues(text){
+  var issues = [];
+  SPELL_RULES.forEach(function(rule, idx){
+    var re = new RegExp("(^|" + AR_B + ")" + rule.from + "(?=" + AR_B + "|$)", "g");
+    var m;
+    while((m = re.exec(text)) !== null){
+      issues.push({rule: idx, kind: "word", found: rule.from, suggestion: rule.to, at: m.index + m[1].length});
+      if(m.index === re.lastIndex) re.lastIndex++;
+    }
+  });
+  var re2 = / {2,}/g, m2;
+  while((m2 = re2.exec(text)) !== null) issues.push({rule: "dblspace", kind: "space", found: m2[0], suggestion: "مسافة واحدة", at: m2.index});
+  var re3 = /\s+([،.؟!])/g, m3;
+  while((m3 = re3.exec(text)) !== null) issues.push({rule: "prespace", kind: "space", found: m3[0], suggestion: m3[1], at: m3.index});
+  var re4 = /([،؟!])(?=[\u0600-\u06FFA-Za-z])/g, m4;
+  while((m4 = re4.exec(text)) !== null) issues.push({rule: "postspace", kind: "space", found: m4[0], suggestion: m4[0] + " ", at: m4.index});
+  var re4b = /(\.)(?=[\u0600-\u06FFA-Za-z])/g, m4b;
+  while((m4b = re4b.exec(text)) !== null) issues.push({rule: "postspace", kind: "space", found: m4b[0], suggestion: m4b[0] + " ", at: m4b.index});
+  var re5 = /([\u0600-\u06FF]+)([ \t]+\1)+/g, m5;
+  while((m5 = re5.exec(text)) !== null) issues.push({rule: "repeat", kind: "repeat", found: m5[0], suggestion: m5[1], at: m5.index});
+  var re6 = /ال\s+([\u0600-\u06FF]+)/g, m6;
+  while((m6 = re6.exec(text)) !== null) issues.push({rule: "alspace", kind: "join", found: m6[0], suggestion: "ال" + m6[1], at: m6.index});
+  return issues;
+}
+function spellTextareas(prefix){
+  return prefix === "gd" ? ["gd-desc", "gd-review"] : ["nw-desc", "nw-body"];
+}
+function spellCheck(prefix){
+  var out = document.getElementById(prefix + "-spell-results");
+  var issues = [];
+  spellTextareas(prefix).forEach(function(id){
+    var el = document.getElementById(id);
+    if(!el) return;
+    spellFindIssues(el.value).forEach(function(it){ it.field = id; issues.push(it); });
+  });
+  SPELL_LAST[prefix] = issues;
+  if(!issues.length){ out.innerHTML = "<p class='ok'>لا توجد أخطاء شائعة في النص.</p>"; return; }
+  out.innerHTML = "<p>وجدنا <b>" + issues.length + "</b> موضعاً مقترحاً — راجع كل اقتراح قبل اعتماده:</p>" +
+    "<table><tr><th>النص</th><th>الاقتراح</th><th></th></tr>" +
+    issues.map(function(it, i){
+      return "<tr><td>" + esc(it.found) + "</td><td>" + esc(it.suggestion) + "</td><td>" +
+        "<button class='btn-ghost' onclick='spellApply(\"" + prefix + "\"," + i + ",false)'>استبدال</button> " +
+        "<button class='btn-ghost' onclick='spellApply(\"" + prefix + "\"," + i + ",true)'>استبدال الكل</button></td></tr>";
+    }).join("") + "</table>";
+}
+function spellApply(prefix, idx, all){
+  var issues = SPELL_LAST[prefix] || [];
+  var it = issues[idx];
+  if(!it) return;
+  var el = document.getElementById(it.field);
+  if(!el) return;
+  var v = el.value;
+  if(it.rule === "dblspace"){ el.value = all ? v.replace(/ {2,}/g, " ") : v.replace(/ {2,}/, " "); }
+  else if(it.rule === "prespace"){ el.value = all ? v.replace(/\s+([،.؟!])/g, "$1") : v.replace(/\s+([،.؟!])/, "$1"); }
+  else if(it.rule === "postspace"){ el.value = all ? v.replace(/([،؟!])(?=[\u0600-\u06FFA-Za-z])/g, "$1 ").replace(/(\.)(?=[\u0600-\u06FFA-Za-z])/g, "$1 ") : v.replace(/([،؟!])(?=[\u0600-\u06FFA-Za-z])/, "$1 ").replace(/(\.)(?=[\u0600-\u06FFA-Za-z])/, "$1 "); }
+  else if(it.rule === "repeat"){ el.value = all ? v.replace(/([\u0600-\u06FF]+)([ \t]+\1)+/g, "$1") : v.replace(/([\u0600-\u06FF]+)([ \t]+\1)+/, "$1"); }
+  else if(it.rule === "alspace"){ el.value = all ? v.replace(/ال\s+([\u0600-\u06FF]+)/g, "ال$1") : v.replace(/ال\s+([\u0600-\u06FF]+)/, "ال$1"); }
+  else{
+    var rule = SPELL_RULES[it.rule];
+    var pat = "(^|" + AR_B + ")" + rule.from + "(?=" + AR_B + "|$)";
+    el.value = all ? v.replace(new RegExp(pat, "g"), "$1" + rule.to)
+                   : v.replace(new RegExp(pat), "$1" + rule.to);
+  }
+  updateSeo(prefix);
+  spellCheck(prefix);
+}
+/* ---- extra quality checks: internal similarity, manual plagiarism
+   search, AI-written heuristic indicator, image copyright ---- */
+function wordShingles(text, n){
+  var words = String(text || "").trim().split(/\s+/).filter(Boolean);
+  var set = {};
+  for(var i = 0; i + n <= words.length; i++) set[words.slice(i, i + n).join(" ")] = 1;
+  return set;
+}
+function jaccard(a, b){
+  var inter = 0, ka = Object.keys(a);
+  ka.forEach(function(k){ if(b[k]) inter++; });
+  var union = ka.length + Object.keys(b).length - inter;
+  return union ? inter / union : 0;
+}
+function articleText(prefix){
+  var f = seoFields(prefix);
+  return (f.title + " " + f.body + " " + (f.desc || "")).trim();
+}
+function qualityCheck(prefix){
+  var out = document.getElementById(prefix + "-quality");
+  if(!out) return;
+  var text = articleText(prefix);
+  var html = "";
+  var mine = wordShingles(text, 3);
+  var sims = [];
+  var all = [];
+  GUIDES_DATA.slice(1).forEach(function(r){ all.push({slug: String(r[0]), title: String(r[1] || ""), text: String(r[1] || "") + " " + String(r[3] || "") + " " + String(r[4] || "")}); });
+  NEWS_DATA.slice(1).forEach(function(r){ all.push({slug: String(r[0]), title: String(r[1] || ""), text: String(r[1] || "") + " " + String(r[2] || "") + " " + String(r[3] || "")}); });
+  var curSlug = document.getElementById(prefix + "-slug").value.trim();
+  all.forEach(function(a){
+    if(a.slug === curSlug) return;
+    var s = jaccard(mine, wordShingles(a.text, 3));
+    if(s > 0.02) sims.push({title: a.title, pct: Math.round(s * 100)});
+  });
+  sims.sort(function(a, b){ return b.pct - a.pct; });
+  html += "<h4>فحص التشابه الداخلي</h4>";
+  if(!sims.length){ html += "<p class='ok'>لا توجد مقالات مشابهة في الموقع (تشابه أقل من 2%).</p>"; }
+  else{
+    html += "<table><tr><th>المقال</th><th>التشابه</th></tr>" + sims.slice(0, 5).map(function(s){
+      return "<tr><td>" + esc(s.title) + "</td><td>" + s.pct + "%" + (s.pct > 40 ? " <span class='error'>⚠️ تشابه عالٍ — أعد صياغة النص</span>" : "") + "</td></tr>";
+    }).join("") + "</table>";
+  }
+  var firstSentence = String(text).split(/[.!؟\n]/).map(function(s){ return s.trim(); }).filter(Boolean)[0] || "";
+  var gq = firstSentence.slice(0, 120);
+  html += "<h4>فحص الانتحال</h4><p class='hint'>فحص يدوي عبر جوجل — لا يوجد فحص انتحال تلقائي بدون خدمة خارجية.</p>" +
+    (gq ? "<p><a class='btn-ghost' href='https://www.google.com/search?q=" + encodeURIComponent('"' + gq + '"') + "' target='_blank' rel='noopener'>🔍 ابحث عن أول جملة في جوجل</a></p>" : "<p class='hint'>اكتب نصاً أولاً.</p>");
+  var sents = String(text).split(/[.!؟\n]+/).map(function(s){ return s.trim(); }).filter(Boolean);
+  var lens = sents.map(wordCount);
+  var mean = lens.length ? lens.reduce(function(a, b){ return a + b; }, 0) / lens.length : 0;
+  var variance = lens.length ? lens.reduce(function(a, l){ return a + (l - mean) * (l - mean); }, 0) / lens.length : 0;
+  var cv = mean ? Math.sqrt(variance) / mean : 0;
+  var aiPhrases = ["في الختام", "من الجدير بالذكر", "تجدر الإشارة إلى", "في عصرنا الحالي", "بالإضافة إلى ذلك"];
+  var hits = aiPhrases.filter(function(ph){ return text.indexOf(ph) !== -1; });
+  var aiNote = "مؤشر تقريبي فقط — ليس كشفاً مؤكداً. ";
+  if(sents.length >= 3 && cv < 0.35 && hits.length >= 2) aiNote += "جمل متساوية الطول نسبياً (" + cv.toFixed(2) + ") + " + hits.length + " عبارات نمطية — النمط يشبه النصوص المولّدة آلياً؛ راجع الصياغة بصوتك الخاص.";
+  else if(hits.length) aiNote += "وجدنا " + hits.length + " عبارة نمطية (" + hits.join("، ") + ") — قلّل منها لصياغة أكثر طبيعية.";
+  else aiNote += "لا توجد عبارات نمطية واضحة، وتباين طول الجمل طبيعي (" + cv.toFixed(2) + ").";
+  html += "<h4>هل النص مكتوب بالذكاء الاصطناعي؟</h4><p>" + esc(aiNote) + "</p>" +
+    "<p><a class='btn-ghost' href='https://gptzero.me' target='_blank' rel='noopener'>فحص عبر GPTZero ↗</a> " +
+    "<a class='btn-ghost' href='https://www.zerogpt.com' target='_blank' rel='noopener'>فحص عبر ZeroGPT ↗</a> " +
+    "<button class='btn-ghost' onclick='copyArticleText(\"" + prefix + "\")'>انسخ النص</button></p>";
+  var f = seoFields(prefix);
+  var imgUrl = f.image;
+  html += "<h4>فحص الصورة والحقوق</h4>";
+  if(imgUrl){
+    html += "<p><a class='btn-ghost' href='https://lens.google.com/uploadbyurl?url=" + encodeURIComponent(imgUrl) + "' target='_blank' rel='noopener'>🔍 بحث عكسي عن الصورة (Google Lens) ↗</a></p>";
+    var rightsEl = document.getElementById(prefix + "-img-rights");
+    var external = imgUrl.indexOf("http") === 0 && imgUrl.indexOf("3rde.online") === -1;
+    if(external && rightsEl && !rightsEl.checked) html += "<p class='error'>⚠️ الصورة من رابط خارجي ولم تؤكد حقوق استخدامها — فعّل خانة التأكيد بعد التحقق، أو استبدلها بصورة من الموقع.</p>";
+    else html += "<p class='ok'>الصورة محلية أو مؤكدة الحقوق.</p>";
+  }else{
+    html += "<p class='hint'>لا توجد صورة مميزة بعد.</p>";
+  }
+  out.innerHTML = html;
+}
+function copyArticleText(prefix){
+  var text = articleText(prefix);
+  if(!text){ toast("لا يوجد نص لنسخه"); return; }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){ toast("تم نسخ النص"); }, function(){ toast("تعذّر النسخ"); });
+  }else{
+    var ta = document.createElement("textarea");
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); toast("تم نسخ النص"); }catch(e){ toast("تعذّر النسخ"); }
+    document.body.removeChild(ta);
+  }
+}
+/* ---- template-based auto-generation from Sheet data ---- */
+function modelKeyFromRow(r){ return [r[2], r[3], r[13], r[14]].join("|"); }
+function modelSlugFromRow(r){ return slugifyTitle([r[2], r[3], r[13], r[14]].join("-")); }
+function cheapestModels(rows){
+  var byKey = {};
+  rows.forEach(function(r){
+    if(!r[0]) return;
+    var k = modelKeyFromRow(r);
+    var price = parseFloat(String(r[7] || "").replace(/[^0-9.]/g, "")) || 0;
+    var rating = parseFloat(String(r[11] || "").replace(/[^0-9.]/g, "")) || 0;
+    if(!byKey[k] || (price && price < byKey[k].price)) byKey[k] = {row: r, price: price, rating: rating};
+  });
+  return Object.keys(byKey).map(function(k){ return byKey[k]; });
+}
+function parseMah(row){
+  var m = String(row[19] || "").match(/(\d[\d,.]*)\s*mAh/i);
+  return m ? parseFloat(m[1].replace(/,/g, "")) : 0;
+}
+function parseMp(row){
+  var m = String(row[17] || "").match(/(\d+)\s*MP/i);
+  return m ? parseFloat(m[1]) : 0;
+}
+function parseRamGb(row){
+  var s = String(row[14] || "").toUpperCase();
+  var m = s.match(/([\d.]+)\s*GB/);
+  if(m) return parseFloat(m[1]);
+  m = s.match(/([\d.]+)\s*MB/);
+  if(m) return parseFloat(m[1]) / 1024;
+  return 0;
+}
+async function genGuide(){
+  var crit = document.getElementById("gd-gen-criterion").value;
+  var msg = document.getElementById("gd-gen-msg");
+  msg.textContent = "جارٍ جلب المنتجات من الشيت…";
+  try{
+    var d = await api("products");
+    var models = cheapestModels(d.rows || []);
+    var top = [];
+    var titles = {
+      under_10000: "أفضل هواتف تحت 10,000 جنيه في مصر 2026",
+      battery: "أفضل هواتف ببطارية كبيرة في مصر 2026",
+      camera: "أفضل هواتف للتصوير في مصر 2026",
+      gaming: "أفضل هواتف للألعاب في مصر 2026"
+    };
+    if(crit === "under_10000"){
+      top = models.filter(function(m){ return m.price && m.price < 10000; })
+        .sort(function(a, b){ return a.price - b.price || b.rating - a.rating; }).slice(0, 5);
+    }else if(crit === "battery"){
+      top = models.slice().sort(function(a, b){ return parseMah(b.row) - parseMah(a.row) || a.price - b.price; }).slice(0, 5);
+    }else if(crit === "camera"){
+      top = models.slice().sort(function(a, b){ return parseMp(b.row) - parseMp(a.row) || a.price - b.price; }).slice(0, 5);
+    }else{
+      top = models.slice().sort(function(a, b){ return parseRamGb(b.row) - parseRamGb(a.row) || b.rating - a.rating || a.price - b.price; }).slice(0, 5);
+    }
+    if(!top.length){ msg.textContent = "لم نجد هواتف مطابقة للمعيار."; return; }
+    var list = top.map(function(m, i){ return (i + 1) + ") " + (m.row[0] || "") + " بسعر " + m.price + " جنيه"; }).join("، ");
+    document.getElementById("gd-criterion").value = crit;
+    document.getElementById("gd-title").value = titles[crit] || "";
+    document.getElementById("gd-desc").value = "دليل شراء محدث بالأسعار الحالية: " + (titles[crit] || "") + " — أفضل 5 هواتف حسب بيانات الشيت: " + list + ". الأسعار من جوميا مصر وقد تتغير — راجع السعر قبل الشراء.";
+    document.getElementById("gd-review").value = "مسودة مولّدة آلياً — راجعها وعدّلها: اخترنا هذه الهواتف الخمسة لأنها الأفضل حسب المعيار المختار من بين كل موديلات الشيت، مع مراعاة السعر والتقييم. [اكتب هنا تحليلك الشخصي: لماذا كل هاتف؟ وما عيوبه؟ ولمن يناسبه؟] — لا تنشر قبل إكمال هذه الفقرة بصوتك.";
+    document.getElementById("gd-status").value = "draft";
+    suggestSlug("gd");
+    renderImagePreview("gd");
+    updateSeo("gd");
+    msg.textContent = "تم توليد المسودة من " + top.length + " هواتف — راجعها وعدّلها قبل الحفظ والنشر.";
+    toast("تم توليد مسودة الدليل");
+  }catch(err){ msg.textContent = err.message; }
+}
+async function genNews(){
+  var q = document.getElementById("nw-gen-q").value.trim();
+  var oldRaw = document.getElementById("nw-gen-old").value.trim();
+  var msg = document.getElementById("nw-gen-msg");
+  if(!q){ msg.textContent = "اكتب اسم الموديل أولاً."; return; }
+  msg.textContent = "جارٍ البحث عن الموديل…";
+  try{
+    var d = await api("products", null, {q: q});
+    var models = cheapestModels(d.rows || []);
+    if(!models.length){ msg.textContent = "لم نجد الموديل في الشيت — تأكد من الاسم."; return; }
+    models.sort(function(a, b){ return a.price - b.price; });
+    var best = models[0];
+    var name = best.row[0] || "";
+    var price = best.price;
+    var oldPrice = parseFloat(oldRaw.replace(/[^0-9.]/g, "")) || 0;
+    var diff = oldPrice > price ? oldPrice - price : 0;
+    var pct = oldPrice > price ? Math.round(diff / oldPrice * 100) : 0;
+    var today = new Date().toISOString().slice(0, 10);
+    document.getElementById("nw-title").value = "انخفاض سعر " + name + " إلى " + price + " جنيهاً";
+    document.getElementById("nw-desc").value = "انخفض سعر " + name + " إلى " + price + " جنيهاً في جوميا مصر" + (diff ? " (كان " + oldPrice + " جنيهاً) — وفّر " + diff + " جنيهاً (" + pct + "%)" : "") + ".";
+    document.getElementById("nw-body").value = "انخفض سعر هاتف " + name + " في مصر إلى " + price + " جنيهاً في جوميا مصر" +
+      (diff ? "، بعد أن كان سعره " + oldPrice + " جنيهاً — أي بانخفاض قدره " + diff + " جنيهاً بنسبة " + pct + "%." : ".") +
+      " يمكنك مقارنة سعره في جوميا وأمازون ونون من صفحة المنتج قبل الشراء، فالأسعار تتغير باستمرار. [راجع الأرقام قبل النشر — هذه مسودة مولّدة آلياً من بيانات الشيت].";
+    document.getElementById("nw-model").value = modelSlugFromRow(best.row);
+    document.getElementById("nw-date").value = today;
+    document.getElementById("nw-category").value = "انخفاض سعر";
+    suggestSlug("nw");
+    renderImagePreview("nw");
+    updateSeo("nw");
+    msg.textContent = "تم توليد مسودة الخبر — راجع الأرقام وعدّلها قبل الحفظ والنشر.";
+    toast("تم توليد مسودة الخبر");
+  }catch(err){ msg.textContent = err.message; }
+}
+
 /* ---------------- guides / news ---------------- */
+var GUIDES_DATA = [];   // full rows incl. header, from api("guides")
+var NEWS_DATA = [];     // full rows incl. header, from api("news")
+function rowVal(r, i){ return (r && r[i] != null) ? String(r[i]) : ""; }
+function guideObjFromRow(r){
+  return {slug: rowVal(r,0), title: rowVal(r,1), criterion: rowVal(r,2),
+    description: rowVal(r,3), human_review: rowVal(r,4),
+    status: rowVal(r,5) || "draft", author: rowVal(r,6) || "فريق عروض أونلاين",
+    date: rowVal(r,7), publish_at: rowVal(r,8), image: rowVal(r,9),
+    image_alt: rowVal(r,10), keyword: rowVal(r,11), meta_title: rowVal(r,12),
+    meta_desc: rowVal(r,13), tags: rowVal(r,14)};
+}
+function newsObjFromRow(r){
+  var ie = r ? r[7] : false;
+  return {slug: rowVal(r,0), title: rowVal(r,1), description: rowVal(r,2),
+    body: rowVal(r,3), model_slug: rowVal(r,4),
+    author: rowVal(r,5) || "فريق عروض أونلاين",
+    date_published: fmtDate(rowVal(r,6)),
+    is_example: ie === true || String(ie).toLowerCase() === "true",
+    publish_at: rowVal(r,8), image: rowVal(r,9), image_alt: rowVal(r,10),
+    keyword: rowVal(r,11), meta_title: rowVal(r,12), meta_desc: rowVal(r,13),
+    tags: rowVal(r,14), category: rowVal(r,15)};
+}
+function readGuideForm(){
+  var g = function(id){ var el = document.getElementById(id); return el ? el.value.trim() : ""; };
+  return {slug: g("gd-slug"), title: g("gd-title"), criterion: g("gd-criterion"),
+    description: g("gd-desc"), human_review: g("gd-review"),
+    status: g("gd-status") || "draft", author: "فريق عروض أونلاين",
+    date: g("gd-date") || new Date().toISOString().slice(0,10),
+    publish_at: fromLocalInput(g("gd-publish-at")),
+    image: g("gd-image"), image_alt: g("gd-image-alt"), keyword: g("gd-keyword"),
+    meta_title: g("gd-meta-title"), meta_desc: g("gd-meta-desc"), tags: g("gd-tags")};
+}
+function readNewsForm(){
+  var g = function(id){ var el = document.getElementById(id); return el ? el.value.trim() : ""; };
+  return {slug: g("nw-slug"), title: g("nw-title"), description: g("nw-desc"),
+    body: g("nw-body"), model_slug: g("nw-model"), author: "فريق عروض أونلاين",
+    date_published: g("nw-date"), publish_at: fromLocalInput(g("nw-publish-at")),
+    is_example: false, image: g("nw-image"), image_alt: g("nw-image-alt"),
+    keyword: g("nw-keyword"), meta_title: g("nw-meta-title"),
+    meta_desc: g("nw-meta-desc"), tags: g("nw-tags"), category: g("nw-category")};
+}
+function guideStatusBadge(r){
+  var st = rowVal(r,5) || "draft";
+  if(st === "published") return "<span class='badge green'>منشور</span>";
+  if(rowVal(r,8)) return "<span class='badge amber'>مجدول " + esc(fmtDate(rowVal(r,8))) + "</span>";
+  return "<span class='badge amber'>مسودة</span>";
+}
+function renderGuides(){
+  var el = document.getElementById("guides-table");
+  if(!el) return;
+  if(!GUIDES_DATA.length){ el.innerHTML = "لا توجد أدلة."; return; }
+  var q = (document.getElementById("guides-filter").value || "").toLowerCase();
+  var rows = GUIDES_DATA.slice(1).filter(function(r){
+    return !q || String(r[1] || "").toLowerCase().indexOf(q) !== -1;
+  });
+  if(!rows.length){ el.innerHTML = "لا توجد أدلة مطابقة للبحث."; return; }
+  el.innerHTML = "<table><tr><th>العنوان</th><th>المعيار</th><th>الحالة</th><th>تاريخ النشر</th><th>مراجعة بشرية</th><th></th></tr>" +
+    rows.map(function(r){
+      var st = rowVal(r,5) || "draft";
+      var pubBtn = st === "published" ? "" : " <button class='btn-green' onclick='publishNow(\"guide\"," + JSON.stringify(r[0]) + ")'>نشر الآن</button>";
+      return "<tr><td>" + esc(r[1]) + "</td><td>" + esc(r[2]) + "</td><td>" + guideStatusBadge(r) + "</td><td>" + esc(fmtDate(rowVal(r,7))) + "</td><td>" + (rowVal(r,4) ? "نعم" : "لا") + "</td><td><button class='btn-ghost' onclick='fillGuide(" + JSON.stringify(r) + ")'>تعديل</button> <button class='btn-danger' onclick='deleteGuide(" + JSON.stringify(r[0]) + ")'>حذف</button>" + pubBtn + "</td></tr>";
+    }).join("") + "</table>";
+}
 async function loadGuides(){
-  try{var d=await api("guides");
-    document.getElementById("guides-table").innerHTML = d.rows.length>1 ?
-      "<table><tr><th>العنوان</th><th>المعيار</th><th>الحالة</th><th>مراجعة بشرية</th><th></th></tr>"+
-      d.rows.slice(1).map(function(r){return "<tr><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td><span class='badge "+(r[5]==="published"?"green":"amber")+"'>"+esc(r[5])+"</span>"+(r[8]?" <span class='badge amber'>مجدول "+esc(fmtDate(r[8]))+"</span>":"")+"</td><td>"+(r[4]?"نعم":"لا")+"</td><td><button class='btn-ghost' onclick='fillGuide("+JSON.stringify(r)+")'>تعديل</button> <button class='btn-danger' onclick='deleteGuide("+JSON.stringify(r[0])+")'>حذف</button></td></tr>"}).join("")+"</table>" : "لا توجد أدلة.";
-  }catch(err){document.getElementById("guides-table").innerHTML='<span class="error">'+err.message+"</span>"}
+  try{
+    var d = await api("guides");
+    GUIDES_DATA = d.rows || [];
+    renderGuides();
+  }catch(err){ document.getElementById("guides-table").innerHTML = '<span class="error">' + esc(err.message) + "</span>"; }
 }
 async function saveGuide(){
-  var g={slug:document.getElementById("gd-slug").value, title:document.getElementById("gd-title").value,
-    criterion:document.getElementById("gd-criterion").value, description:document.getElementById("gd-desc").value,
-    human_review:document.getElementById("gd-review").value, status:document.getElementById("gd-status").value,
-    publish_at:fromLocalInput(document.getElementById("gd-publish-at").value),
-    author:"فريق عروض أونلاين", date:new Date().toISOString().slice(0,10)};
-  if(g.status==="published" && !g.human_review.trim()){toast("لا يمكن النشر قبل كتابة المراجعة البشرية");return;}
-  try{await api("saveGuide",{guide:g}); toast("تم حفظ الدليل"); loadGuides();}
-  catch(err){toast(err.message)}
+  var g = readGuideForm();
+  if(!g.slug){ toast("الرابط المختصر (slug) مطلوب"); return; }
+  if(g.status === "published" && !g.human_review.trim()){ toast("لا يمكن النشر قبل كتابة المراجعة البشرية"); return; }
+  try{ await api("saveGuide", {guide: g}); toast("تم حفظ الدليل"); loadGuides(); }
+  catch(err){ toast(err.message); }
 }
 function fillGuide(r){
-  document.getElementById("gd-slug").value=r[0]; document.getElementById("gd-title").value=r[1];
-  document.getElementById("gd-criterion").value=r[2]; document.getElementById("gd-desc").value=r[3];
-  document.getElementById("gd-review").value=r[4]; document.getElementById("gd-status").value=r[5]||"draft";
-  document.getElementById("gd-publish-at").value=toLocalInput(r[8]);
+  var g = guideObjFromRow(r);
+  document.getElementById("gd-slug").value = g.slug;
+  document.getElementById("gd-title").value = g.title;
+  document.getElementById("gd-criterion").value = g.criterion;
+  document.getElementById("gd-desc").value = g.description;
+  document.getElementById("gd-review").value = g.human_review;
+  document.getElementById("gd-status").value = g.status || "draft";
+  document.getElementById("gd-date").value = fmtDate(g.date);
+  document.getElementById("gd-publish-at").value = toLocalInput(g.publish_at);
+  document.getElementById("gd-image").value = g.image;
+  document.getElementById("gd-image-alt").value = g.image_alt;
+  document.getElementById("gd-keyword").value = g.keyword;
+  document.getElementById("gd-meta-title").value = g.meta_title;
+  document.getElementById("gd-meta-desc").value = g.meta_desc;
+  document.getElementById("gd-tags").value = g.tags;
+  renderImagePreview("gd");
+  updateSeo("gd");
   window.scrollTo(0, document.getElementById("gd-slug").offsetTop);
 }
 async function deleteGuide(slug){
@@ -1379,27 +1967,88 @@ async function deleteGuide(slug){
   try{await api("deleteGuide",{slug:slug}); toast("تم الحذف"); loadGuides();}
   catch(err){toast(err.message)}
 }
+/* Publish now: save with status published (guides) / today's date (news),
+   then trigger the site sync so it actually goes live. */
+async function publishNow(kind, slug){
+  try{
+    if(kind === "guide"){
+      var row = GUIDES_DATA.slice(1).find(function(r){ return String(r[0]) === String(slug); });
+      if(!row){ toast("الدليل غير موجود"); return; }
+      var g = guideObjFromRow(row);
+      if(!g.human_review.trim()){ toast("لا يمكن النشر قبل كتابة المراجعة البشرية"); return; }
+      g.status = "published"; g.publish_at = "";
+      await api("saveGuide", {guide: g});
+      toast("تم نشر الدليل في الشيت");
+      loadGuides();
+    }else{
+      var nrow = NEWS_DATA.slice(1).find(function(r){ return String(r[0]) === String(slug); });
+      if(!nrow){ toast("الخبر غير موجود"); return; }
+      var n = newsObjFromRow(nrow);
+      n.date_published = new Date().toISOString().slice(0,10);
+      n.publish_at = ""; n.is_example = false;
+      await api("saveNews", {news: n});
+      toast("تم نشر الخبر في الشيت");
+      loadNews();
+    }
+    var wh = getWebhook();
+    if(wh.url && wh.token){ syncNow(); }
+    else{ toast("تم الحفظ في الشيت — اضغط «مزامنة الآن» لنشره على الموقع"); }
+  }catch(err){ toast(err.message); }
+}
+function newsIsExample(r){ var ie = r ? r[7] : false; return ie === true || String(ie).toLowerCase() === "true"; }
+function newsStatusBadge(r){
+  if(newsIsExample(r)) return "<span class='badge amber'>مثال</span>";
+  if(rowVal(r,8)) return "<span class='badge amber'>مجدول " + esc(fmtDate(rowVal(r,8))) + "</span>";
+  if(rowVal(r,6)) return "<span class='badge green'>منشور " + esc(fmtDate(rowVal(r,6))) + "</span>";
+  return "<span class='badge amber'>مسودة</span>";
+}
+function renderNews(){
+  var el = document.getElementById("news-table");
+  if(!el) return;
+  if(!NEWS_DATA.length){ el.innerHTML = "لا توجد أخبار."; return; }
+  var q = (document.getElementById("news-filter").value || "").toLowerCase();
+  var rows = NEWS_DATA.slice(1).filter(function(r){
+    return !q || String(r[1] || "").toLowerCase().indexOf(q) !== -1;
+  });
+  if(!rows.length){ el.innerHTML = "لا توجد أخبار مطابقة للبحث."; return; }
+  el.innerHTML = "<table><tr><th>العنوان</th><th>الحالة</th><th>تاريخ النشر</th><th>التصنيف</th><th></th></tr>" +
+    rows.map(function(r){
+      var published = !newsIsExample(r) && !!rowVal(r,6) && !rowVal(r,8);
+      var pubBtn = published ? "" : " <button class='btn-green' onclick='publishNow(\"news\"," + JSON.stringify(r[0]) + ")'>نشر الآن</button>";
+      return "<tr><td>" + esc(r[1]) + "</td><td>" + newsStatusBadge(r) + "</td><td>" + esc(fmtDate(rowVal(r,6))) + "</td><td>" + esc(rowVal(r,15)) + "</td><td><button class='btn-ghost' onclick='fillNews(" + JSON.stringify(r) + ")'>تعديل</button> <button class='btn-danger' onclick='deleteNews(" + JSON.stringify(r[0]) + ")'>حذف</button>" + pubBtn + "</td></tr>";
+    }).join("") + "</table>";
+}
 async function loadNews(){
-  try{var d=await api("news");
-    document.getElementById("news-table").innerHTML = d.rows.length>1 ?
-      "<table><tr><th>العنوان</th><th>التاريخ</th><th>مثال؟</th><th></th></tr>"+
-      d.rows.slice(1).map(function(r){return "<tr><td>"+esc(r[1])+"</td><td>"+esc(fmtDate(r[6]))+(r[8]?" <span class='badge amber'>مجدول</span>":"")+"</td><td>"+(r[7]?"نعم":"لا")+"</td><td><button class='btn-ghost' onclick='fillNews("+JSON.stringify(r)+")'>تعديل</button> <button class='btn-danger' onclick='deleteNews("+JSON.stringify(r[0])+")'>حذف</button></td></tr>"}).join("")+"</table>" : "لا توجد أخبار.";
-  }catch(err){document.getElementById("news-table").innerHTML='<span class="error">'+err.message+"</span>"}
+  try{
+    var d = await api("news");
+    NEWS_DATA = d.rows || [];
+    renderNews();
+  }catch(err){ document.getElementById("news-table").innerHTML = '<span class="error">' + esc(err.message) + "</span>"; }
 }
 async function saveNews(){
-  var n={slug:document.getElementById("nw-slug").value, title:document.getElementById("nw-title").value,
-    description:document.getElementById("nw-desc").value, body:document.getElementById("nw-body").value,
-    model_slug:document.getElementById("nw-model").value, author:"فريق عروض أونلاين",
-    date_published:document.getElementById("nw-date").value,
-    publish_at:fromLocalInput(document.getElementById("nw-publish-at").value), is_example:false};
-  try{await api("saveNews",{news:n}); toast("تم حفظ الخبر"); loadNews();}
-  catch(err){toast(err.message)}
+  var n = readNewsForm();
+  if(!n.slug){ toast("الرابط المختصر (slug) مطلوب"); return; }
+  try{ await api("saveNews", {news: n}); toast("تم حفظ الخبر"); loadNews(); }
+  catch(err){ toast(err.message); }
 }
 function fillNews(r){
-  document.getElementById("nw-slug").value=r[0]; document.getElementById("nw-title").value=r[1];
-  document.getElementById("nw-desc").value=r[2]; document.getElementById("nw-body").value=r[3];
-  document.getElementById("nw-model").value=r[4]; document.getElementById("nw-date").value=fmtDate(r[6]);
-  document.getElementById("nw-publish-at").value=toLocalInput(r[8]);
+  var n = newsObjFromRow(r);
+  document.getElementById("nw-slug").value = n.slug;
+  document.getElementById("nw-title").value = n.title;
+  document.getElementById("nw-desc").value = n.description;
+  document.getElementById("nw-body").value = n.body;
+  document.getElementById("nw-model").value = n.model_slug;
+  document.getElementById("nw-date").value = fmtDate(n.date_published);
+  document.getElementById("nw-publish-at").value = toLocalInput(n.publish_at);
+  document.getElementById("nw-image").value = n.image;
+  document.getElementById("nw-image-alt").value = n.image_alt;
+  document.getElementById("nw-keyword").value = n.keyword;
+  document.getElementById("nw-meta-title").value = n.meta_title;
+  document.getElementById("nw-meta-desc").value = n.meta_desc;
+  document.getElementById("nw-tags").value = n.tags;
+  document.getElementById("nw-category").value = n.category;
+  renderImagePreview("nw");
+  updateSeo("nw");
   window.scrollTo(0, document.getElementById("nw-slug").offsetTop);
 }
 async function deleteNews(slug){
@@ -1407,6 +2056,23 @@ async function deleteNews(slug){
   try{await api("deleteNews",{slug:slug}); toast("تم الحذف"); loadNews();}
   catch(err){toast(err.message)}
 }
+/* live SEO analysis + image preview as the editor is typed in */
+(function(){
+  var gdFields = ["gd-title","gd-desc","gd-review","gd-keyword","gd-meta-title","gd-meta-desc","gd-tags","gd-image","gd-image-alt","gd-status","gd-publish-at","gd-date"];
+  gdFields.forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.addEventListener("input", function(){ updateSeo("gd"); });
+  });
+  var nwFields = ["nw-title","nw-desc","nw-body","nw-keyword","nw-meta-title","nw-meta-desc","nw-tags","nw-image","nw-image-alt","nw-model","nw-publish-at","nw-date"];
+  nwFields.forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.addEventListener("input", function(){ updateSeo("nw"); });
+  });
+  ["gd-image","nw-image"].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.addEventListener("change", function(){ renderImagePreview(id.slice(0, 2)); });
+  });
+})();
 
 /* ---------------- dead models (no clicks in 30 days) ---------------- */
 async function loadDeadModels(){
@@ -1433,9 +2099,12 @@ async function loadStockAlerts(){
     if(!rows.length){ out.innerHTML = "لا توجد تنبيهات توفر بعد."; return; }
     out.innerHTML = "<table><tr><th>التاريخ</th><th>الموديل</th><th>واتساب العميل</th><th></th></tr>" +
       rows.map(function(r){
-        var wa = String(r[2] || "").replace(/[^0-9]/g, "");
-        if(wa && wa.charAt(0) === "0") wa = "20" + wa.slice(1);
-        return "<tr><td>" + esc(r[0]) + "</td><td>" + esc(r[1]) + "</td><td dir='ltr'>" + esc(r[2]) + "</td><td>" + (wa ? "<a class='btn-ghost' href='https://wa.me/" + wa + "' target='_blank' rel='noopener'>فتح واتساب ↗</a>" : "") + "</td></tr>";
+        // r[1] is the model SLUG (the site form sends data-model=model.slug)
+        var slug = String(r[1] || "");
+        var text = "مرحباً، أنا من فريق عروض أونلاين 👋 بخصوص طلبك «أخبرني عند التوفر» للمنتج: " + slug + " — المنتج أصبح متوفراً الآن: https://3rde.online/mobiles/" + slug + "/";
+        var href = waHref(r[2], text);
+        var numCell = href ? "<a href='" + href + "' target='_blank' rel='noopener'>" + esc(r[2]) + "</a>" : esc(r[2]);
+        return "<tr><td>" + esc(r[0]) + "</td><td>" + esc(r[1]) + "</td><td dir='ltr'>" + numCell + "</td><td>" + (href ? "<a class='btn-ghost' href='" + href + "' target='_blank' rel='noopener'>فتح واتساب ↗</a>" : "") + "</td></tr>";
       }).join("") + "</table>";
   }catch(err){ out.innerHTML = '<span class="error">' + esc(err.message) + '</span>'; }
 }

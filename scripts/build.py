@@ -1566,8 +1566,13 @@ def tag_chips(tags):
 
 
 def guide_hero_image(g):
-    """Header image for a guide: the first candidate phone's image
+    """Header image for a guide: the guide's own featured image when set
+    (local path or remote URL), else the first candidate phone's image
     (local watermarked file if present, else its remote URL)."""
+    own = norm(g.get("image", ""))
+    if own:
+        abs_own = (BASE_URL + own) if own.startswith("/") else own
+        return own, abs_own
     cands = guide_candidates(g.get("criterion", ""))
     if not cands:
         return "", ""
@@ -1575,6 +1580,13 @@ def guide_hero_image(g):
     src = local or remote or ""
     abs_src = (BASE_URL + src) if src.startswith("/") else src
     return src, abs_src
+
+
+def guide_is_published(g):
+    """A guide is truly published only when its status is 'published' AND
+    a human review exists (the content policy gate). Anything else is a
+    draft: draft banner + noindex, exactly as before."""
+    return g.get("status") == "published" and bool(norm(g.get("human_review", "")))
 
 
 def build_guide(g):
@@ -1604,14 +1616,14 @@ def build_guide(g):
     hero = ""
     if hero_src:
         hero = (f'<div class="article-hero"><img src="{esc(hero_src)}" '
-                f'alt="{esc(g["title"])}" loading="lazy"></div>')
+                f'alt="{esc(g.get("image_alt", "") or g["title"])}" loading="lazy"></div>')
     else:
         hero = (f'<div class="article-hero article-hero-fallback">'
                 f'<h1 style="margin:0">{esc(g["title"])}</h1></div>')
     tags = guide_tags(g)
     ld = {"@context": "https://schema.org", "@type": "Article",
           "headline": g["title"],
-          "description": g.get("description", ""),
+          "description": g.get("meta_desc", "") or g.get("description", ""),
           "datePublished": g.get("date", TODAY),
           "dateModified": g.get("date", TODAY),
           "author": {"@type": "Organization",
@@ -1623,19 +1635,27 @@ def build_guide(g):
         ld["image"] = [hero_abs]
     if tags:
         ld["keywords"] = ", ".join(tags)
+    published = guide_is_published(g)
+    if published:
+        banner = ""
+        status_label = "منشور"
+    else:
+        banner = f"""<div class="draft-banner">{icon("alert")} مسودة — هذه الصفحة قيد المراجعة البشرية ولم تُنشر بعد لمحركات البحث. الأسعار والجداول مولّدة تلقائياً من بيانات الشيت بتاريخ {esc(g.get('date', TODAY))}.</div>
+"""
+        status_label = "مسودة"
     body = f"""{hero}
-<div class="draft-banner">{icon("alert")} مسودة — هذه الصفحة قيد المراجعة البشرية ولم تُنشر بعد لمحركات البحث. الأسعار والجداول مولّدة تلقائياً من بيانات الشيت بتاريخ {esc(g.get('date', TODAY))}.</div>
-<h1>{esc(g['title'])}</h1>
-<p class="muted">بقلم: {esc(g.get('author', 'فريق ' + SITE_NAME))} • التاريخ: {esc(g.get('date', TODAY))} • الحالة: مسودة</p>
+{banner}<h1>{esc(g['title'])}</h1>
+<p class="muted">بقلم: {esc(g.get('author', 'فريق ' + SITE_NAME))} • التاريخ: {esc(g.get('date', TODAY))} • الحالة: {status_label}</p>
 {tag_chips(tags)}
 <p>{esc(g.get('description', ''))}</p>
 {table}
 {tips_html}
 {review_note}
 <p><a href="/guides/">← كل أدلة الشراء</a></p>"""
-    return page_shell(g["title"] + " | " + SITE_NAME,
-                      g.get("description", ""), BASE_URL + "/guides/" + g["slug"] + "/",
-                      body, noindex=True, json_ld=ld,
+    return page_shell((g.get("meta_title", "") or g["title"]) + " | " + SITE_NAME,
+                      g.get("meta_desc", "") or g.get("description", ""),
+                      BASE_URL + "/guides/" + g["slug"] + "/",
+                      body, noindex=not published, json_ld=ld,
                       og_image=hero_abs or None)
 
 
@@ -1655,7 +1675,7 @@ def build_guides_index(guides):
         items += (f"<article class='article-card'>{img}"
                   f"<div class='article-card-body'>"
                   f"<h3><a href='/guides/{g['slug']}/'>{esc(g['title'])}</a> "
-                  f"<span class='example-tag'>مسودة</span></h3>"
+                  f"<span class='example-tag'>{('منشور' if guide_is_published(g) else 'مسودة')}</span></h3>"
                   f"<p class='excerpt'>{esc(g.get('description', ''))}</p>"
                   f"<p class='meta'>{esc(g.get('date', TODAY))} • "
                   f"{esc(g.get('author', 'فريق ' + SITE_NAME))}</p>"
@@ -1693,17 +1713,29 @@ def build_news_post(p, model=None):
           "description": p.get("description", "")}
     if tags:
         ld["keywords"] = ", ".join(tags)
+    if norm(p.get("category", "")):
+        ld["articleSection"] = norm(p.get("category", ""))
     hero = (f'<div class="article-hero"><img src="{esc(img)}" '
-            f'alt="{esc(p["title"])}" loading="lazy"></div>')
+            f'alt="{esc(p.get("image_alt", "") or p["title"])}" loading="lazy"></div>')
+    cat = norm(p.get("category", ""))
+    cat_chip = (f'<span class="tag-chip" style="background:#eef2f7;color:#101828">'
+                f'{esc(cat)}</span>' if cat else "")
+    chips = tag_chips(news_tags(p, model))
+    if cat_chip:
+        chips = (f'<div class="tag-chips">{cat_chip}</div>' + chips
+                 if chips else f'<div class="tag-chips">{cat_chip}</div>')
+    paras = [seg for seg in (p.get("body", "") or "").split("\n") if norm(seg)]
+    body_html = "".join(f"<p>{esc(seg.strip())}</p>" for seg in paras) or "<p></p>"
     body = f"""{hero}
 <h1>{esc(p['title'])}{example}</h1>
 <p class="news-meta">بقلم: {esc(p.get('author', 'فريق ' + SITE_NAME))} • نُشر في: {esc(p.get('date_published', TODAY)[:10])}</p>
-{tag_chips(tags)}
-<p>{esc(p.get('body', ''))}</p>
+{chips}
+{body_html}
 {f'<p><a class="btn" href="/mobiles/{model.slug}/">قارن سعر {esc(model.name_ar)} الآن</a></p>' if model else ''}
 <p><a href="/news/">← كل الأخبار</a></p>"""
-    return page_shell(p["title"] + " | " + SITE_NAME,
-                      p.get("description", ""), BASE_URL + "/news/" + p["slug"] + "/",
+    return page_shell((p.get("meta_title", "") or p["title"]) + " | " + SITE_NAME,
+                      p.get("meta_desc", "") or p.get("description", ""),
+                      BASE_URL + "/news/" + p["slug"] + "/",
                       body, json_ld=ld, og_image=abs_img)
 
 
@@ -2104,7 +2136,7 @@ def write_sitemap(pages_meta, news_posts):
         + "\n".join(news_urls) + "\n</urlset>\n", encoding="utf-8")
     (SITE / "robots.txt").write_text(
         "User-agent: *\nAllow: /\nDisallow: /adamwnor/\nDisallow: /search/\n"
-        "Disallow: /compare/\nDisallow: /guides/\n"
+        "Disallow: /compare/\n"
         f"Sitemap: {BASE_URL}/sitemap.xml\n", encoding="utf-8")
 
 
@@ -2236,15 +2268,23 @@ def main():
     meta_file.write_text(json.dumps(new_meta, ensure_ascii=False, indent=1),
                          encoding="utf-8")
     # drafts + tools are NOT in the sitemap (but /search/specs/ IS a content
-    # page, so only the bare /search/ tool page is excluded)
+    # page, so only the bare /search/ tool page is excluded).
+    # Published guides ARE in the sitemap; draft guides stay out (and stay
+    # noindex — see build_guide). robots.txt no longer disallows /guides/,
+    # so Google can crawl the published guide pages.
+    published_guide_locs = {f"{BASE_URL}/guides/{g['slug']}/"
+                            for g in guides if guide_is_published(g)}
     sitemap_meta = {loc: m for loc, m in new_meta.items()
-                    if not any(x in loc for x in ("/guides/", "/compare/"))
+                    if ("/guides/" not in loc or loc in published_guide_locs)
+                    and "/compare/" not in loc
                     and not loc.rstrip("/").endswith("/search")}
     write_sitemap(sitemap_meta, news)
 
     print(f"models: {len(MODELS)}  offers: {len(ROWS)}  brands: {len(BRANDS)}")
     print(f"product pages: {len(MODELS)}  brand pages: {len(BRANDS)}  "
-          f"guides: {len(guides)} (drafts, noindex)  news posts: {len(news)}  "
+          f"guides: {len(guides)} ({len(published_guide_locs)} published, "
+          f"{len(guides) - len(published_guide_locs)} drafts, noindex)  "
+          f"news posts: {len(news)}  "
           f"policy pages: {len(policy_map)}")
     print(f"pages emitted: {len(pages)}  sitemap urls: {len(sitemap_meta)}")
     print(f"site written to: {SITE}")
