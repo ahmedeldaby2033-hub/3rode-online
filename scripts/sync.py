@@ -76,10 +76,15 @@ def refresh_from_sheet():
     if cli.exists() and sheet_id:
         for fname, tab in tabs.items():
             try:
+                # valueRenderOption FORMULA: the default FORMATTED_VALUE read
+                # returns STALE values for recently-written cells (verified
+                # 2026-11-20: ratings written minutes earlier read back as
+                # old 1.2/1.3). FORMULA returns the actual stored content.
                 out = subprocess.run(
                     [str(cli), "sheets", "spreadsheets", "values", "get",
                      "--params", json.dumps(
-                         {"spreadsheetId": sheet_id, "range": tab})],
+                         {"spreadsheetId": sheet_id, "range": tab,
+                          "valueRenderOption": "FORMULA"})],
                     capture_output=True, text=True, timeout=60)
                 if out.returncode == 0 and out.stdout.strip():
                     (RAW / fname).write_text(out.stdout, encoding="utf-8")
