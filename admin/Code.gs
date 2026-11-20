@@ -99,6 +99,17 @@ function setupTabs() {
   sheet(SHEET_STOCK_ALERTS, ['timestamp', 'model', 'whatsapp']);
   sheet(SHEET_GUIDES, ['slug', 'title', 'criterion', 'description', 'human_review', 'status', 'author', 'date']);
   sheet(SHEET_NEWS, ['slug', 'title', 'description', 'body', 'model_slug', 'author', 'date_published', 'is_example']);
+  // Scheduled publishing (col 9): guides + news get a publish_at column
+  // (ISO datetime, e.g. 2026-11-25T10:00). publishScheduled() publishes
+  // due rows hourly. Existing sheets created before this column existed
+  // get the 9th header cell appended, like the coupons description fix.
+  (function () {
+    [SHEET_GUIDES, SHEET_NEWS].forEach(function (name) {
+      var sh = ss().getSheetByName(name);
+      var hdr = sh.getRange(1, 1, 1, Math.max(sh.getLastColumn(), 1)).getValues()[0];
+      if (hdr[8] !== 'publish_at') sh.getRange(1, 9).setValue('publish_at');
+    });
+  })();
   sheet(SHEET_HANDLED, ['kind', 'timestamp', 'model']);
   return { ok: true };
 }
@@ -242,6 +253,196 @@ function dayKey(v) {
   return Utilities.formatDate(new Date(v), 'Africa/Cairo', 'yyyy-MM-dd');
 }
 
+/* ---- affiliate-link (AU) alignment check, shared by the panel action
+   and the daily trigger (dailyAffiliateCheck). Same rules as
+   scripts/verify.py: AU must be the JForce-tracked version of column E. */
+function checkAffiliateLogic() {
+  // compare column AU (index 46) with the product URL in column E (index 4)
+  var pv = ss().getSheetByName(SHEET_PRODUCTS).getDataRange().getValues();
+  var mismatched = [], missing = [];
+  for (var ci = 1; ci < pv.length; ci++) {
+    var erow = pv[ci];
+    var eurl = erow[4];
+    if (!eurl || String(eurl).indexOf('jumia.com.eg') === -1) continue;
+    var expected = buildTrackingUrl(eurl);
+    var au = erow[46];
+    if (!au) { missing.push({ row: ci + 1, model: erow[0], url: eurl }); continue; }
+    var auPath = stripTracking(normalizeJumiaUrl(au));
+    var ePath = stripTracking(expected);
+    var hasTracking = String(au).indexOf('utm_source=JFORCE') !== -1;
+    if (auPath !== ePath || !hasTracking) {
+      mismatched.push({ row: ci + 1, model: erow[0], expected: expected, actual: au });
+    }
+  }
+  return { ok: true, total: pv.length - 1, mismatched: mismatched, missing: missing };
+}
+
+/* Daily affiliate check (time trigger): same check as the panel button,
+   but sends a Telegram alert instead of waiting for a manual click. */
+function dailyAffiliateCheck() {
+  var res = checkAffiliateLogic();
+  if (res.mismatched.length || res.missing.length) {
+    sendTelegram('⚠️ فحص روابط الأفلييت اليومي: ' + res.mismatched.length +
+      ' رابط مخالف، ' + res.missing.length + ' بلا رابط أفلييت.\n' +
+      'افتح لوحة التحكم ← الأدوات ← فحص الأفلييت للإصلاح.');
+  }
+  return res;
+}
+
+function deleteTriggersFor(fn) {
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction() === fn) ScriptApp.deleteTrigger(t);
+  });
+}
+
+/* Site slug for a model, mirroring scripts/build.py slugify()
+   (brand-model-storage-ram, lowercase, non-alphanumerics → '-').
+   Collision suffixes (-2, -3…) are NOT reproduced here, so a rare
+   colliding model's «فتح المنتج» link may 404 — the Jumia link is
+   always exact. */
+function slugifyModel(brand, model, storage, ram) {
+  var s = [brand, model, storage, ram].join('-');
+  try { s = s.normalize('NFKD'); } catch (e) {}
+  s = s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  return s || 'item';
+}
+
+/* Fetch a product page (server-side, so no CORS / browser blocks) and
+   extract its og:image (twitter:image as fallback). Returns '' when the
+   page has no usable image (e.g. Cloudflare 403). */
+function fetchOgImage(url) {
+  var resp = UrlFetchApp.fetch(url, {
+    muteHttpExceptions: true, followRedirects: true,
+    validateHttpsCertificates: false,
+    headers: { 'User-Agent': 'Mozilla/5.0 (compatible; 3rde-online-admin/1.0)' }
+  });
+  if (resp.getResponseCode() !== 200) return '';
+  var html = resp.getContentText();
+  var m = html.match(/<meta[^>]+property=["']og:image["'][^>]*content=["']([^"']+)["']/i) ||
+          html.match(/<meta[^>]+content=["']([^"']+)["'][^>]*property=["']og:image["']/i) ||
+          html.match(/<meta[^>]+name=["']twitter:image["'][^>]*content=["']([^"']+)["']/i) ||
+          html.match(/<meta[^>]+content=["']([^"']+)["'][^>]*name=["']twitter:image["']/i);
+  if (!m) return '';
+  var img = m[1].trim();
+  if (img.indexOf('//') === 0) return 'https:' + img;
+  if (img.indexOf('/') === 0) {
+    var origin = url.match(/^(https?:\/\/[^\/]+)/);
+    return origin ? origin[1] + img : img;
+  }
+  return img;
+}
+
+/* Buy-link check over a slice of products (offset/limit, default 100).
+   200/301/302 = OK, 404/410/500 = broken, anything else (e.g. 403 from
+   Cloudflare) = uncertain, never «broken». Uses fetchAll in one batch. */
+function checkBuyLinksLogic(offset, limit) {
+  var s = ss().getSheetByName(SHEET_PRODUCTS);
+  var values = s.getDataRange().getValues();
+  var total = values.length - 1;
+  offset = Math.max(0, offset | 0);
+  limit = Math.min(200, Math.max(1, limit | 0));
+  var end = Math.min(total, offset + limit);
+  var requests = [], meta = [];
+  for (var i = offset + 1; i <= end; i++) {
+    var r = values[i];
+    if (!r[0]) continue;
+    if (r[4]) { requests.push(String(r[4])); meta.push({ row: i + 1, model: r[0], url: String(r[4]), kind: 'رابط المنتج' }); }
+    if (r[46]) { requests.push(String(r[46])); meta.push({ row: i + 1, model: r[0], url: String(r[46]), kind: 'رابط الأفلييت' }); }
+  }
+  var broken = [], uncertain = [], okCount = 0;
+  if (requests.length) {
+    var responses = UrlFetchApp.fetchAll(requests.map(function (u) {
+      return { url: u, muteHttpExceptions: true, followRedirects: true, validateHttpsCertificates: false };
+    }));
+    responses.forEach(function (resp, k) {
+      var code = resp.getResponseCode();
+      var m = meta[k];
+      if (code === 200 || code === 301 || code === 302) okCount++;
+      else if (code === 404 || code === 410 || code === 500) broken.push({ row: m.row, model: m.model, url: m.url, kind: m.kind, status: code });
+      else uncertain.push({ row: m.row, model: m.model, url: m.url, kind: m.kind, status: code });
+    });
+  }
+  return { ok: true, total: total, offset: offset, limit: limit, checked: requests.length,
+    okCount: okCount, broken: broken, uncertain: uncertain, done: end >= total };
+}
+
+/* Daily buy-link check (time trigger): checks the next 100 products each
+   day (offset rotates in Script Properties) and alerts on Telegram only
+   when broken links are found. */
+function dailyBuyLinksCheck() {
+  var props = PropertiesService.getScriptProperties();
+  var offset = parseInt(props.getProperty('buycheck_offset') || '0', 10) || 0;
+  var res = checkBuyLinksLogic(offset, 100);
+  props.setProperty('buycheck_offset', String(res.done ? 0 : offset + 100));
+  if (res.broken.length) {
+    sendTelegram('🔗 روابط شراء مكسورة (' + res.broken.length + ')\n' +
+      res.broken.slice(0, 10).map(function (b) {
+        return '• ' + b.model + ' — ' + b.url + ' (' + b.status + ')';
+      }).join('\n'));
+  }
+  return res;
+}
+
+/* ---- scheduled publishing: guides/news with publish_at (col 9) ---- */
+function publishScheduled() {
+  var now = new Date().getTime();
+  var publishedGuides = 0, publishedNews = 0;
+  var gs = sheet(SHEET_GUIDES);
+  var gv = gs.getDataRange().getValues();
+  for (var i = 1; i < gv.length; i++) {
+    var pa = gv[i][8];
+    if (!pa) continue;
+    var t = new Date(pa).getTime();
+    if (isNaN(t) || t > now) continue;
+    if (gv[i][5] !== 'published') { gs.getRange(i + 1, 6).setValue('published'); publishedGuides++; }
+    gs.getRange(i + 1, 9).setValue('');
+  }
+  var ns = sheet(SHEET_NEWS);
+  var nv = ns.getDataRange().getValues();
+  for (var j = 1; j < nv.length; j++) {
+    var npa = nv[j][8];
+    if (!npa) continue;
+    var nt = new Date(npa).getTime();
+    if (isNaN(nt) || nt > now) continue;
+    ns.getRange(j + 1, 7).setValue(Utilities.formatDate(new Date(npa), 'Africa/Cairo', 'yyyy-MM-dd'));
+    ns.getRange(j + 1, 9).setValue('');
+    publishedNews++;
+  }
+  return { ok: true, publishedGuides: publishedGuides, publishedNews: publishedNews };
+}
+
+/* ---- daily Sheet backup to Google Drive ---- */
+var BACKUP_FOLDER = '3rde.online backups';
+var BACKUP_KEEP = 30;
+function backupSheet() {
+  var folders = DriveApp.getFoldersByName(BACKUP_FOLDER);
+  var folder = folders.hasNext() ? folders.next() : DriveApp.createFolder(BACKUP_FOLDER);
+  var now = new Date();
+  var stamp = Utilities.formatDate(now, 'Africa/Cairo', 'yyyy-MM-dd HH-mm');
+  var name = '3rde.online — ' + stamp;
+  var copy = DriveApp.getFileById(ss().getId()).makeCopy(name, folder);
+  // keep only the newest BACKUP_KEEP copies
+  var files = [];
+  var it = folder.getFiles();
+  while (it.hasNext()) files.push(it.next());
+  files.sort(function (a, b) { return b.getDateCreated().getTime() - a.getDateCreated().getTime(); });
+  files.slice(BACKUP_KEEP).forEach(function (f) { try { f.setTrashed(true); } catch (e) {} });
+  return { ok: true, name: name, url: copy.getUrl(), date: stamp };
+}
+function dailyBackup() { return backupSheet(); }
+function listBackupFiles() {
+  var folders = DriveApp.getFoldersByName(BACKUP_FOLDER);
+  if (!folders.hasNext()) return [];
+  var folder = folders.next();
+  var files = [];
+  var it = folder.getFiles();
+  while (it.hasNext()) files.push(it.next());
+  files.sort(function (a, b) { return b.getDateCreated().getTime() - a.getDateCreated().getTime(); });
+  return files.slice(0, 20).map(function (f) {
+    return { name: f.getName(), date: Utilities.formatDate(f.getDateCreated(), 'Africa/Cairo', 'yyyy-MM-dd HH:mm'), url: f.getUrl() };
+  });
+}
+
 /* ------------------------------------------------------------ doGet */
 function doGet(e) {
   var action = (e.parameter && e.parameter.action) || '';
@@ -316,24 +517,52 @@ function doGet(e) {
       return jsonOut({ ok: true, rows: sheet(SHEET_NEWS).getDataRange().getValues() });
     }
     if (action === 'checkAffiliate') {
-      // compare column AU (index 46) with the product URL in column E (index 4)
+      return jsonOut(checkAffiliateLogic());
+    }
+    if (action === 'affiliateLockStatus') {
+      var locked = false;
+      ss().getSheetByName(SHEET_PRODUCTS).getProtections(SpreadsheetApp.ProtectionType.RANGE)
+        .forEach(function (p) {
+          var rg = p.getRange();
+          if (rg.getColumn() === 47 && rg.getNumColumns() === 1) locked = true;
+        });
+      return jsonOut({ ok: true, locked: locked });
+    }
+    if (action === 'deadModels') {
+      // الموديلات التي لم ينقر أحد على زر شرائها خلال آخر 30 يوماً.
+      // النقرات في تبويب «النقرات» تحمل slug الموديل (data-model في الموقع).
       var pv = ss().getSheetByName(SHEET_PRODUCTS).getDataRange().getValues();
-      var mismatched = [], missing = [];
-      for (var ci = 1; ci < pv.length; ci++) {
-        var erow = pv[ci];
-        var eurl = erow[4];
-        if (!eurl || String(eurl).indexOf('jumia.com.eg') === -1) continue;
-        var expected = buildTrackingUrl(eurl);
-        var au = erow[46];
-        if (!au) { missing.push({ row: ci + 1, model: erow[0], url: eurl }); continue; }
-        var auPath = stripTracking(normalizeJumiaUrl(au));
-        var ePath = stripTracking(expected);
-        var hasTracking = String(au).indexOf('utm_source=JFORCE') !== -1;
-        if (auPath !== ePath || !hasTracking) {
-          mismatched.push({ row: ci + 1, model: erow[0], expected: expected, actual: au });
+      var clicked = {};
+      var cutoff = new Date().getTime() - 30 * 86400000;
+      sheet(SHEET_CLICKS).getDataRange().getValues().slice(1).forEach(function (r) {
+        var t = r[0] ? new Date(r[0]).getTime() : 0;
+        if (t >= cutoff && r[2]) clicked[String(r[2]).trim()] = 1;
+      });
+      var seen = {}, out = [];
+      for (var di = 1; di < pv.length; di++) {
+        var dr = pv[di];
+        if (!dr[0]) continue;
+        var key = dr[2] + '|' + dr[3] + '|' + dr[13] + '|' + dr[14];
+        if (seen[key]) continue;
+        seen[key] = 1;
+        var slug = slugifyModel(dr[2], dr[3], dr[13], dr[14]);
+        if (!clicked[slug]) {
+          out.push({ name: dr[0], brand: dr[2], model: dr[3], price: dr[7],
+            updated: dr[25] || '', url: dr[4] || '', slug: slug });
         }
       }
-      return jsonOut({ ok: true, total: pv.length - 1, mismatched: mismatched, missing: missing });
+      return jsonOut({ ok: true, total: out.length, models: out.slice(0, 300) });
+    }
+    if (action === 'stockAlerts') {
+      return jsonOut({ ok: true, rows: sheet(SHEET_STOCK_ALERTS).getDataRange().getValues().slice(1).reverse() });
+    }
+    if (action === 'listBackups') {
+      return jsonOut({ ok: true, backups: listBackupFiles() });
+    }
+    if (action === 'checkBuyLinks') {
+      var off = parseInt((e.parameter.offset || '0'), 10) || 0;
+      var lim = parseInt((e.parameter.limit || '100'), 10) || 100;
+      return jsonOut(checkBuyLinksLogic(off, lim));
     }
     if (action === 'handled') {
       return jsonOut({ ok: true, rows: sheet(SHEET_HANDLED).getDataRange().getValues().slice(1) });
@@ -488,11 +717,11 @@ function doPost(e) {
         var gr = s.getDataRange().getValues();
         for (i = 1; i < gr.length; i++) {
           if (gr[i][0] === g.slug) {
-            s.getRange(i + 1, 1, 1, 8).setValues([[g.slug, g.title, g.criterion, g.description, g.human_review || '', g.status || 'draft', g.author || 'فريق عروض أونلاين', g.date || '']]);
+            s.getRange(i + 1, 1, 1, 9).setValues([[g.slug, g.title, g.criterion, g.description, g.human_review || '', g.status || 'draft', g.author || 'فريق عروض أونلاين', g.date || '', g.publish_at || '']]);
             return jsonOut({ ok: true, updated: g.slug });
           }
         }
-        s.appendRow([g.slug, g.title, g.criterion, g.description, g.human_review || '', g.status || 'draft', g.author || 'فريق عروض أونلاين', g.date || '']);
+        s.appendRow([g.slug, g.title, g.criterion, g.description, g.human_review || '', g.status || 'draft', g.author || 'فريق عروض أونلاين', g.date || '', g.publish_at || '']);
         return jsonOut({ ok: true, added: true });
       }
       if (action === 'saveNews') {
@@ -501,11 +730,11 @@ function doPost(e) {
         var nr = s.getDataRange().getValues();
         for (i = 1; i < nr.length; i++) {
           if (nr[i][0] === n.slug) {
-            s.getRange(i + 1, 1, 1, 8).setValues([[n.slug, n.title, n.description, n.body, n.model_slug || '', n.author || 'فريق عروض أونلاين', n.date_published || '', !!n.is_example]]);
+            s.getRange(i + 1, 1, 1, 9).setValues([[n.slug, n.title, n.description, n.body, n.model_slug || '', n.author || 'فريق عروض أونلاين', n.date_published || '', !!n.is_example, n.publish_at || '']]);
             return jsonOut({ ok: true, updated: n.slug });
           }
         }
-        s.appendRow([n.slug, n.title, n.description, n.body, n.model_slug || '', n.author || 'فريق عروض أونلاين', n.date_published || '', !!n.is_example]);
+        s.appendRow([n.slug, n.title, n.description, n.body, n.model_slug || '', n.author || 'فريق عروض أونلاين', n.date_published || '', !!n.is_example, n.publish_at || '']);
         return jsonOut({ ok: true, added: true });
       }
       if (action === 'syncNow') {
@@ -556,6 +785,61 @@ function doPost(e) {
         }
         if (body.done) h.appendRow([body.kind || '', new Date(body.timestamp || 0), body.model || '']);
         return jsonOut({ ok: true, done: !!body.done });
+      }
+      if (action === 'fetchProductImage') {
+        var purl = String(body.productUrl || '').trim();
+        if (!purl) throw new Error('رابط المنتج مطلوب — الصق رابط المنتج الأصلي أولاً');
+        var img = fetchOgImage(purl);
+        if (!img) throw new Error('تعذّر العثور على صورة في صفحة المنتج — قد تكون الصفحة محمية (Cloudflare) أو بلا og:image. انسخ رابط الصورة يدوياً من المتجر.');
+        return jsonOut({ ok: true, image: img });
+      }
+      if (action === 'publishScheduled') {
+        return jsonOut(publishScheduled());
+      }
+      if (action === 'setupScheduledPublish') {
+        deleteTriggersFor('publishScheduled');
+        ScriptApp.newTrigger('publishScheduled').timeBased().everyHours(1).create();
+        var now = publishScheduled();
+        return jsonOut({ ok: true, publishedGuides: now.publishedGuides, publishedNews: now.publishedNews });
+      }
+      if (action === 'setupDailyBuyLinksCheck') {
+        deleteTriggersFor('dailyBuyLinksCheck');
+        ScriptApp.newTrigger('dailyBuyLinksCheck').timeBased().everyDays(1).atHour(4).create();
+        return jsonOut({ ok: true });
+      }
+      if (action === 'backupNow') {
+        return jsonOut(backupSheet());
+      }
+      if (action === 'setupDailyBackup') {
+        deleteTriggersFor('dailyBackup');
+        ScriptApp.newTrigger('dailyBackup').timeBased().everyDays(1).atHour(3).create();
+        return jsonOut({ ok: true });
+      }
+      if (action === 'setupDailyAffiliateCheck') {
+        deleteTriggersFor('dailyAffiliateCheck');
+        ScriptApp.newTrigger('dailyAffiliateCheck').timeBased().everyDays(1).atHour(5).create();
+        return jsonOut({ ok: true });
+      }
+      if (action === 'lockAffiliateColumn') {
+        var ls = ss().getSheetByName(SHEET_PRODUCTS);
+        // remove any older AU protection first (protect() on an already
+        // protected range would stack a second protection)
+        ls.getProtections(SpreadsheetApp.ProtectionType.RANGE).forEach(function (p) {
+          var rg = p.getRange();
+          if (rg.getColumn() === 47 && rg.getNumColumns() === 1) p.remove();
+        });
+        ls.getRange(1, 47, Math.max(ls.getLastRow(), 1), 1).protect()
+          .setDescription('عمود روابط الأفلييت (AU) — محمي من التعديل اليدوي والفرز الخاطئ');
+        return jsonOut({ ok: true, locked: true });
+      }
+      if (action === 'unlockAffiliateColumn') {
+        var us = ss().getSheetByName(SHEET_PRODUCTS);
+        var removed = 0;
+        us.getProtections(SpreadsheetApp.ProtectionType.RANGE).forEach(function (p) {
+          var rg = p.getRange();
+          if (rg.getColumn() === 47 && rg.getNumColumns() === 1) { p.remove(); removed++; }
+        });
+        return jsonOut({ ok: true, unlocked: removed });
       }
       if (action === 'setupWeeklyTrigger') {
         return jsonOut(setupWeeklyTrigger());
