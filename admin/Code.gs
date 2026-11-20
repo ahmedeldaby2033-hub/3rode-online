@@ -565,3 +565,28 @@ function setupWeeklyTrigger() {
     .onWeekDay(ScriptApp.WeekDay.SUNDAY).atHour(9).create();
   return { ok: true };
 }
+
+/**
+ * onEdit — auto-stamp «تاريخ آخر تحديث» (column Z, 26) with today's date
+ * whenever ANY other cell in the same product row of الورقة1 is edited.
+ * This is a simple trigger: it runs automatically once this script is
+ * saved in the Sheet's Apps Script project — no install, no deployment.
+ * A plain formula cannot do this (a formula cannot detect edits; TODAY()
+ * would just show the current day for every row, every day).
+ * The date is written as a value in DD-MM-YYYY format, matching the
+ * existing dates in the column.
+ */
+function onEdit(e) {
+  if (!e || !e.range) return;
+  var sh = e.range.getSheet();
+  if (!sh || sh.getName() !== SHEET_PRODUCTS) return;
+  var row = e.range.getRow();
+  if (row < 2) return; // header row
+  var DATE_COL = 26; // Z = «تاريخ آخر تحديث»
+  if (e.range.getColumn() === DATE_COL) return; // editing the date itself: don't loop
+  var today = new Date();
+  var dd = ('0' + today.getDate()).slice(-2);
+  var mm = ('0' + (today.getMonth() + 1)).slice(-2);
+  var yyyy = today.getFullYear();
+  sh.getRange(row, DATE_COL).setValue(dd + '-' + mm + '-' + yyyy);
+}
