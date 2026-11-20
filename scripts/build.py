@@ -647,7 +647,7 @@ def head_html(title, desc, canonical, og_image=None, noindex=False,
 <link rel="apple-touch-icon" href="/assets/icon-192.png">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0b5ed7">
-<link rel="stylesheet" href="/assets/style.css?v=7">
+<link rel="stylesheet" href="/assets/style.css?v=8">
 {verif}{ga}{extra}"""
 
 
@@ -1338,7 +1338,7 @@ def build_deals_page():
 <div class="deals-filters-head"><h2>صفِّ العروض حسب احتياجك</h2>
 <button class="deals-reset" type="button" id="deals-reset">مسح الفلاتر ✕</button></div>
 <div class="deals-filters-row">
-<div class="field field-search"><label for="filter-q">ابحث بالاسم أو الموديل</label>
+<div class="field field-search"><label for="filter-q">ابحث بالاسم</label>
 <input type="search" id="filter-q" placeholder="A56" aria-label="بحث سريع"></div>
 <div class="field"><label for="filter-brand">الماركة</label>
 <select id="filter-brand" aria-label="الماركة"><option value="">كل الماركات</option>{brands_opts}</select></div>
@@ -1346,7 +1346,7 @@ def build_deals_page():
 <select id="filter-ram" aria-label="الرام"><option value="">كل الرامات</option>{ram_opts}</select></div>
 <div class="field"><label for="filter-storage">التخزين</label>
 <select id="filter-storage" aria-label="التخزين"><option value="">كل التخزين</option>{st_opts}</select></div>
-<div class="field"><label for="filter-maxprice">أقصى سعر (جنيه)</label>
+<div class="field"><label for="filter-maxprice">أقصى سعر</label>
 <input type="number" id="filter-maxprice" placeholder="15000" min="0" aria-label="حد أقصى للسعر"></div>
 <div class="field"><label for="sort-by">ترتيب النتائج</label>
 <select id="sort-by" aria-label="ترتيب النتائج"><option value="newest" selected>الأحدث (سنة الإصدار)</option><option value="cheapest">الأرخص أولاً</option><option value="discount">الأكبر خصماً</option><option value="rating">الأعلى تقييماً</option><option value="latest">الأحدث تحديثاً</option></select></div>
@@ -2080,7 +2080,7 @@ def write_manifest():
                   {"src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png"}],
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     (SITE / "sw.js").write_text(
-        "const CACHE='r3de-v6';const CORE=['/','/assets/style.css','/assets/app.js',"
+        "const CACHE='r3de-v7';const CORE=['/','/assets/style.css','/assets/app.js',"
         "'/assets/logo.png','/assets/icon-192.png','/assets/icon-512.png'];\n"
         "self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});\n"
         "self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});\n"
