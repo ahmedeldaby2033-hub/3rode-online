@@ -410,10 +410,9 @@
   "note": "web image search + watermark A"
  },
  "generic-enes": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://static.jazp.com/uploads_700x600/202408/ef4a28082414259ba0a08cdbf6e5b469.jpeg",
+  "note": "downloaded + watermarked A"
  },
  "girasole-g30-32gb-32mb": {
   "local": true,
@@ -451,10 +450,9 @@
   "note": "web image search + watermark A"
  },
  "generic-tend-16gb-2gb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://api.cezma.cloud/storage/thumbnails/products/web/17907827391000097413.png",
+  "note": "downloaded + watermarked A"
  },
  "honor-choice-t10-64gb-4gb": {
   "local": true,
@@ -487,10 +485,9 @@
   "note": "downloaded + watermarked A"
  },
  "tag-phone-specialtagphone-128gb-6gb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://eg.jumia.is/unsafe/fit-in/500x500/filters:fill(white)/product/98/526795/1.jpg?9206",
+  "note": "downloaded + watermarked A"
  },
  "samsung-galaxy-a07-64gb-4gb": {
   "local": true,
@@ -1078,202 +1075,169 @@
   "note": "downloaded + watermarked A"
  },
  "nokia-106": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://avaneed.com/storage/content-media/2026-07-23/media_41253/%D9%82%DB%8C%D9%85%D8%AA-%D9%88-%D8%AE%D8%B1%DB%8C%D8%AF-%DA%AF%D9%88%D8%B4%DB%8C-%D9%86%D9%88%DA%A9%DB%8C%D8%A7-106-2018-3.jpg?v=1784833539",
+  "note": "downloaded + watermarked A"
  },
  "generic-105": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://m.media-amazon.com/images/I/51sk67R+cqL.jpg",
+  "note": "downloaded + watermarked A"
  },
  "girasole-g20": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "http://images.tsawq.net/memories/dec-18/1543777104-91148e6a.jpg",
+  "note": "downloaded + watermarked A"
  },
  "sary-s101": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://mobilaty.com/wp-content/uploads/2026/10/SaryS101Bk_1-1.png",
+  "note": "downloaded + watermarked A"
  },
  "micromax-x412": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://kimostore.net/cdn/shop/files/MicromaxX412DualSIM_32MB32MBRam1.77Inch2G.png?v=1776857046&width=1200",
+  "note": "downloaded + watermarked A"
  },
  "pluzz-hero-32mb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://otc.lk/wp-content/uploads/2023/09/WhatsApp-Image-2024-08-14-at-16.09.41_c163b6ad.jpg",
+  "note": "downloaded + watermarked A"
  },
  "micromax-x415": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://assets.kenzz.com/processed/4f5225553ffdfa1696163966bb4e75e0038f38117aefb852e0f5136d047319f2_1200.webp",
+  "note": "downloaded + watermarked A"
  },
  "sunelan-s550-64mb-32mb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://elghazawy.b-cdn.net/300014/Sunelan-S550-%281%29.webp",
+  "note": "downloaded + watermarked A"
  },
  "sunelan-s550": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://elghazawy.b-cdn.net/300014/Sunelan-S550-%281%29.webp",
+  "note": "downloaded + watermarked A"
  },
  "link-n105": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://down-ph.img.susercontent.com/file/ph-11134207-81ztk-mj5tujhnjls49d@resize_w423_nl.webp",
+  "note": "downloaded + watermarked A"
  },
  "nokia-1208": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://i.ebayimg.com/thumbs/images/g/3YYAAOSwDTJmaFZ3/s-l400.jpg",
+  "note": "downloaded + watermarked A"
  },
  "link-n110": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://mesrshop.com/api/images/uploads/products/c582e8dd-d7c7-4887-842f-5bf7ccffea89/a0c6e0b5311fa58b7d560c57.webp",
+  "note": "downloaded + watermarked A"
  },
  "nokia-130-8mb-4mb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://olcha.uz/image/675x900/products/2018-11-05/nokia-130-2017-black-6057-0.jpg",
+  "note": "downloaded + watermarked A"
  },
  "itel-2165": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://img.kilimall.com/c/obs/seller/100007317/goods_image/250403202001_32e4f3de62a5c442f8afee0c47bc2728.jpg",
+  "note": "downloaded + watermarked A"
  },
  "enes-a2": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://eg.jumia.is/unsafe/fit-in/520x520/filters:fill(white)/product/19/5433531/1.jpg?3189",
+  "note": "downloaded + watermarked A"
  },
  "sunelan-miracle-50": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://image.made-in-china.com/2f0j00rPTvfEBhvYcF/Sunelan-Miracle50-Wholesale-2-8-Mini-Modern-Mobile-Phone-Keyboard-Mobile-Phone-32MB-3000mAh-New-Small-Function-Mobile-Phone.jpg",
+  "note": "downloaded + watermarked A"
  },
  "iku-s1-mini-32mb-32mb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://eg.jumia.is/unsafe/fit-in/500x500/filters:fill(white)/product/26/565143/1.jpg?6069",
+  "note": "downloaded + watermarked A"
  },
  "iku-s1-32mb-32mb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://f.nooncdn.com/p/v1635010122/N51539612A_1.jpg?format=jpg&width=800",
+  "note": "downloaded + watermarked A"
  },
  "enes-a8": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://eg.jumia.is/unsafe/fit-in/520x520/filters:fill(white)/product/62/7333531/2.jpg?2973",
+  "note": "downloaded + watermarked A"
  },
  "iku-s3": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://cdn.primini.tn/400_telephone-portable-iku-s3-gris-1.jpg",
+  "note": "downloaded + watermarked A"
  },
  "darago-f12-32mb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://api-rayashop.freetls.fastly.net/media/catalog/product/cache/4e49ac3a70c0b98a165f3fa6633ffee1/z/k/zkoky5e_xdyglsxddcuigtn5.jpeg",
+  "note": "downloaded + watermarked A"
  },
  "samsung-sm-b310e-512mb-16mb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://images.jdmagicbox.com/quickquotes/images_main/guru-music-2-sm-b310ezwdinu-white-10451978-d4sj4fnh.jpg",
+  "note": "downloaded + watermarked A"
  },
  "nokia-130": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://olcha.uz/image/675x900/products/2018-11-05/nokia-130-2017-black-6057-0.jpg",
+  "note": "downloaded + watermarked A"
  },
  "nokia-215": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "http://www.ventics.com/wp-content/uploads/2015/01/650_1000_nokia-215_dual-sim_group.jpg",
+  "note": "downloaded + watermarked A"
  },
  "nokia-220-4g": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://images.gizbot.com/ph-big/2019/09/nokia-220-4g_156784904860.jpg",
+  "note": "downloaded + watermarked A"
  },
  "itel-2160": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://orifon.co.ke/wp-content/uploads/2025/04/Itel-2160-768x768.jpg",
+  "note": "downloaded + watermarked A"
  },
  "nokia-108-4g": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://imgservice.suning.cn/uimg1/b2c/image/_hUMmNHGp9sqnZq3Yl_RAA.jpg",
+  "note": "downloaded + watermarked A"
  },
  "iku-v100": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://eliraqi.com.eg/images/thumbs/0021968_iku-v100-storge-32mb-ram-32mb_600.jpeg",
+  "note": "downloaded + watermarked A"
  },
  "nokia-105-512mb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://media-ik.croma.com/Croma%20Assets/Communication/Mobiles/Images/274279_fsoyg0.png",
+  "note": "downloaded + watermarked A"
  },
  "nokia-c1-2nd-edition-16gb-1gb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://www.technopro-online.com/84696-large_default/smartphone-nokia-c1-2nd-edition-3g-bleu-nokia-c1-2ndedition-bleu.jpg",
+  "note": "downloaded + watermarked A"
  },
  "itel-a100c-64gb-2gb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://compughana.com/cdn/shop/files/itel_a100c_blue_1.png?v=1772537076&width=533",
+  "note": "downloaded + watermarked A"
  },
  "itel-a50c-64gb-2gb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://primebazar.com/public/uploads/all/yisyNpPd9OizTIGhs8enVKi4qtNFijCpz6PRbAwd.jpg",
+  "note": "downloaded + watermarked A"
  },
  "itel-a100c-128gb-3gb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://compughana.com/cdn/shop/files/itel_a100c_blue_1.png?v=1772537076&width=533",
+  "note": "downloaded + watermarked A"
  },
  "itel-a70-64gb-4gb": {
   "local": true,
@@ -1281,28 +1245,24 @@
   "note": "downloaded + watermarked A"
  },
  "itel-a50-128gb-3gb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://www.naijatechguide.com/wp-content/uploads/2024/08/itel-a50-black.png",
+  "note": "downloaded + watermarked A"
  },
  "itel-a90-64gb-3gb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://www.pointekonline.com/wp-content/uploads/2025/05/itel-A90.png",
+  "note": "downloaded + watermarked A"
  },
  "tecno-spark-go-2-128gb-4gb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://cdnv2.tgdd.vn/mwg-static/tgdd/Products/Images/42/341837/tecno-spark-go-2-xanh-thumb-638899027806878098-600x600.jpg",
+  "note": "downloaded + watermarked A"
  },
  "itel-a90-128gb-3gb": {
-  "local": false,
-  "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "https://www.pointekonline.com/wp-content/uploads/2025/05/itel-A90.png",
+  "note": "downloaded + watermarked A"
  },
  "realme-note-60x-64gb-3gb": {
   "local": true,
@@ -1317,8 +1277,8 @@
  "itel-a90-256gb-4gb": {
   "local": false,
   "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "tried_at": "",
+  "note": "retry with new Sheet image URL (subagent found)"
  },
  "samsung-galaxy-a08-64gb-6gb": {
   "local": true,
@@ -1338,8 +1298,8 @@
  "huawei-nova-14i-256gb-8gb": {
   "local": false,
   "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "tried_at": "",
+  "note": "retry with new Sheet image URL (subagent found)"
  },
  "vivo-y21d-128gb-6gb": {
   "local": true,
@@ -1349,8 +1309,8 @@
  "oppo-a5i-128gb-4gb": {
   "local": false,
   "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "tried_at": "",
+  "note": "retry with new Sheet image URL (subagent found)"
  },
  "vivo-y21-128gb-4gb": {
   "local": true,
@@ -1375,8 +1335,8 @@
  "xiaomi-redmi-15-256gb-8gb": {
   "local": false,
   "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "tried_at": "",
+  "note": "retry with new Sheet image URL (subagent found)"
  },
  "realme-c75-256gb-8gb": {
   "local": true,
@@ -1436,8 +1396,8 @@
  "tecno-camon-50-ultra-256gb-12gb": {
   "local": false,
   "working_url": "",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "tried_at": "",
+  "note": "retry with new Sheet image URL (subagent found)"
  },
  "samsung-galaxy-a56-256gb-12gb": {
   "local": true,
@@ -1507,8 +1467,8 @@
  "apple-iphone-13-pro-max-256gb-6gb": {
   "local": false,
   "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2021/09/iPhone-13-Pro-Max-1.jpg",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "tried_at": "",
+  "note": "retry with new Sheet image URL (subagent found)"
  },
  "apple-iphone-17e-256gb-8gb": {
   "local": true,
