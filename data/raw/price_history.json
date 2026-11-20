@@ -1,7 +1,7 @@
 {
 "majorDimension": "ROWS",
 "range": "'سجل الأسعار'!A1:Z1806",
-"retrieved_at": {"user_local": "2026-11-20T09:04:05.388+02:00", "user_timezone": "Africa/Cairo", "utc": "2026-11-20T07:04:05.388Z"},
+"retrieved_at": {"user_local": "2026-11-20T09:12:14.274+02:00", "user_timezone": "Africa/Cairo", "utc": "2026-11-20T07:12:14.274Z"},
 "values": [
 ["تاريخ التحديث", "اسم الموبايل", "الموديل", "التخزين", "الرام", "المتجر", "البائع", "رابط المنتج", "السعر القديم - جنيه", "السعر الجديد - جنيه", "الفرق - جنيه", "الفرق %"],
 [46345, "OPPO A6 Dual SIM 4G 128GB/4GB - Aurora Gold", "A6", "128GB", "4GB", "جوميا", "elfadymobile", "https://www.jumia.com.eg/ar/oppo-a6-dual-sim-4g-128gb4gb-aurora-gold-134895106.html", 12999, 12999, 0, 0],

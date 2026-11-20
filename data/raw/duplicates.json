@@ -1,7 +1,7 @@
 {
 "majorDimension": "ROWS",
 "range": "'المكرر فقط'!A1:Z1801",
-"retrieved_at": {"user_local": "2026-11-20T09:04:06.117+02:00", "user_timezone": "Africa/Cairo", "utc": "2026-11-20T07:04:06.117Z"},
+"retrieved_at": {"user_local": "2026-11-20T09:12:14.820+02:00", "user_timezone": "Africa/Cairo", "utc": "2026-11-20T07:12:14.820Z"},
 "values": [
 ["اسم الموبايل", "الماركة", "الموديل", "التخزين", "الرام", "المتجر", "البائع", "السعر الحالي - جنيه", "السعر قبل الخصم - جنيه", "نسبة الخصم %", "رابط المنتج", "رقم مجموعة التكرار", "ترتيب السعر"],
 ["OPPO A6 Dual SIM 4G 4GB 128GB - Aurora Gold", "OPPO", "A6", "128GB", "4GB", "جوميا", "Zoonystore1", 12299, 15223, 19, "https://www.jumia.com.eg/ar/a6-dual-sim-4g-4gb-128gb-aurora-gold-oppo-mpg3969931.html", 5, 1],
