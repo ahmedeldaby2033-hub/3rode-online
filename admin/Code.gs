@@ -121,6 +121,24 @@ function readBody(e) {
   try { return JSON.parse(e.postData.contents || '{}'); } catch (err) { return {}; }
 }
 
+// Telegram notifications: reads TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID from
+// Script Properties (Project Settings → Script Properties). Never hardcode
+// the token in this file — the repo is public. Silently no-ops when unset.
+function sendTelegram(text) {
+  try {
+    var props = PropertiesService.getScriptProperties();
+    var token = props.getProperty('TELEGRAM_BOT_TOKEN') || '';
+    var chatId = props.getProperty('TELEGRAM_CHAT_ID') || '';
+    if (!token || !chatId || !text) return;
+    UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
+      method: 'post',
+      contentType: 'application/json',
+      payload: JSON.stringify({ chat_id: chatId, text: String(text) }),
+      muteHttpExceptions: true
+    });
+  } catch (err) { /* notifications must never break the Sheet write */ }
+}
+
 function getSettings() {
   setupTabs();
   var out = {};
@@ -366,16 +384,19 @@ function doPost(e) {
     }
     if (action === 'reportPrice') {
       sheet(SHEET_REPORTS).appendRow([new Date(), body.model || '', body.correctPrice || '', body.note || '']);
+      sendTelegram('⚠️ بلاغ سعر غير صحيح\nالهاتف: ' + (body.model || '') + '\nالسعر الصحيح: ' + (body.correctPrice || '') + '\nملاحظة: ' + (body.note || ''));
       return jsonOut({ ok: true });
     }
     if (action === 'requestProduct') {
       sheet(SHEET_REQUESTS).appendRow([new Date(), body.model || '', body.budget || '', body.email || '']);
+      sendTelegram('📱 طلب منتج جديد\nالمنتج: ' + (body.model || '') + '\nالميزانية: ' + (body.budget || '') + '\nواتساب: ' + (body.email || ''));
       return jsonOut({ ok: true });
     }
     if (action === 'notifyStock') {
       // Back-in-stock alert: the WhatsApp number arrives as body.email
       // (same convention as requestProduct) and as body.whatsapp.
       sheet(SHEET_STOCK_ALERTS).appendRow([new Date(), body.model || '', body.whatsapp || body.email || '']);
+      sendTelegram('🔔 تنبيه توفر\nالهاتف: ' + (body.model || '') + '\nواتساب العميل: ' + (body.whatsapp || body.email || '') + '\nعاد للتوفر — تواصل مع العميل.');
       return jsonOut({ ok: true });
     }
     var auth = tokenOk(e);
