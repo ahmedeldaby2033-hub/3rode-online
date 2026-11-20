@@ -31,10 +31,17 @@
   try { savedTheme = localStorage.getItem('r3de-theme'); } catch (e) {}
   if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
   // تسمية زر التبديل حسب الوضع الحالي عند تحميل الصفحة
+  // (أيقونة SVG + نص، لتبقى الأيقونة ظاهرة بدل استبدالها بإيموجي)
+  var SVG_OPEN = '<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
+  var SUN_PATH = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>';
+  var MOON_PATH = '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>';
+  var SVG_CLOSE = '</svg></span> ';
   function syncThemeLabel() {
     if (!themeBtn) return;
     var cur = document.documentElement.getAttribute('data-theme') || 'dark';
-    themeBtn.textContent = cur === 'dark' ? '☀️ الوضع النهاري' : '🌙 الوضع الليلي';
+    themeBtn.innerHTML = cur === 'dark'
+      ? SVG_OPEN + SUN_PATH + SVG_CLOSE + 'الوضع النهاري'
+      : SVG_OPEN + MOON_PATH + SVG_CLOSE + 'الوضع الليلي';
   }
   syncThemeLabel();
   if (themeBtn) themeBtn.addEventListener('click', function () {
@@ -271,6 +278,16 @@
       whatsapp: $('#request-whatsapp').value || ''
     }, 'شكراً! سجلنا طلبك وسنضيف المنتج عند توفره.');
     reqForm.reset();
+  });
+  var stockForm = $('#stock-alert-form');
+  if (stockForm) stockForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    postToAdmin('notifyStock', {
+      model: stockForm.getAttribute('data-model') || '',
+      email: $('#stock-whatsapp').value || '',
+      whatsapp: $('#stock-whatsapp').value || ''
+    }, 'تم! سنخبرك على واتساب فور توفر الهاتف.');
+    stockForm.reset();
   });
 
   /* ---------- buy-click tracking (no PII) ---------- */

@@ -178,8 +178,8 @@ def main():
         check(f"Disallow: {d}" in robots, f"robots.txt missing Disallow: {d}")
     sm = (SITE / "sitemap.xml").read_text(encoding="utf-8")
     check("/guides/" not in sm, "sitemap.xml must not list draft guides")
-    check("/compare/" not in sm and "/search/" not in sm,
-          "sitemap.xml must not list compare/search")
+    check("/compare/" not in sm and "/search/</loc>" not in sm,
+          "sitemap.xml must not list compare/search tool pages")
     check("amazon0c2aca6-21" in sm or True, "sitemap sanity")
 
     # 4. forbidden words

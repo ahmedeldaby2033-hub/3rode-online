@@ -31,6 +31,7 @@ var SHEET_SYNCLOG = 'سجل المزامنة';
 var SHEET_CLICKS = 'النقرات';
 var SHEET_REPORTS = 'البلاغات';
 var SHEET_REQUESTS = 'الطلبات';
+var SHEET_STOCK_ALERTS = 'تنبيهات التوفر';
 var SHEET_GUIDES = 'الأدلة';
 var SHEET_NEWS = 'الأخبار';
 var SHEET_HANDLED = 'المعالجة';
@@ -95,6 +96,7 @@ function setupTabs() {
   sheet(SHEET_CLICKS, ['timestamp', 'store', 'model', 'url']);
   sheet(SHEET_REPORTS, ['timestamp', 'model', 'correct_price', 'note']);
   sheet(SHEET_REQUESTS, ['timestamp', 'model', 'budget', 'email']);
+  sheet(SHEET_STOCK_ALERTS, ['timestamp', 'model', 'whatsapp']);
   sheet(SHEET_GUIDES, ['slug', 'title', 'criterion', 'description', 'human_review', 'status', 'author', 'date']);
   sheet(SHEET_NEWS, ['slug', 'title', 'description', 'body', 'model_slug', 'author', 'date_published', 'is_example']);
   sheet(SHEET_HANDLED, ['kind', 'timestamp', 'model']);
@@ -354,6 +356,12 @@ function doPost(e) {
     }
     if (action === 'requestProduct') {
       sheet(SHEET_REQUESTS).appendRow([new Date(), body.model || '', body.budget || '', body.email || '']);
+      return jsonOut({ ok: true });
+    }
+    if (action === 'notifyStock') {
+      // Back-in-stock alert: the WhatsApp number arrives as body.email
+      // (same convention as requestProduct) and as body.whatsapp.
+      sheet(SHEET_STOCK_ALERTS).appendRow([new Date(), body.model || '', body.whatsapp || body.email || '']);
       return jsonOut({ ok: true });
     }
     var auth = tokenOk(e);

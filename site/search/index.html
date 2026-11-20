@@ -18,7 +18,7 @@
 <link rel="apple-touch-icon" href="/assets/icon-192.png">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0b5ed7">
-<link rel="stylesheet" href="/assets/style.css?v=4">
+<link rel="stylesheet" href="/assets/style.css?v=5">
 
 
 </head>
@@ -35,6 +35,7 @@
 
 <main class="container wide">
 <h1>ابحث في عروض أونلاين</h1>
+<p>أو جرّب <a href="/search/specs/">البحث بالمواصفات</a> — بطارية، كاميرا، رام، تخزين وسعر.</p>
 <form class="search-box" onsubmit="return false">
 <input type="search" id="search-q" placeholder="ابحث عن هاتف أو ماركة…" aria-label="بحث">
 </form>
@@ -57,7 +58,7 @@
             return '<article class="pcard"><a href="/mobiles/' + p.slug + '/"><img src="' + (p.image || '/images/placeholder.jpg?v=2') + '" alt="هاتف ' + p.name + '" loading="lazy" width="500" height="500"></a><div class="pcard-body"><h3><a href="/mobiles/' + p.slug + '/">' + p.name + '</a></h3>' +
               '<div class="price-row"><span class="price">' + p.price.toLocaleString('en-US') + ' جنيه</span></div>' +
               '<div class="brand-line">' + p.brand + ' • ' + p.storage + ' / ' + p.ram + '</div>' +
-              '<div class="actions"><a class="btn-mini" href="/mobiles/' + p.slug + '/">عرض السعر</a></div></div></article>';
+              '<div class="actions"><a class="btn-mini btn-prices" href="/mobiles/' + p.slug + '/">عرض السعر</a><button class="btn-mini btn-compare" type="button" data-compare="' + p.slug + '">قارن</button></div></div></article>';
           }).join('') + '</div>'
         : '<p>لا توجد نتائج مطابقة لـ "' + input.value + '". جرّب اسماً آخر، أو <a href="/contact/">اطلب الهاتف</a> وسنضيفه.</p>';
     }
@@ -71,7 +72,7 @@
 <div class="cols">
 <div><h3>عروض أونلاين</h3><p>مقارنة أسعار الهواتف في مصر.</p>
 <p class="muted">آخر تحديث للأسعار من الشيت: 2026-11-19 — تُحدَّث كل ساعة.</p></div>
-<div><h3>روابط سريعة</h3><a href="/coupons/">الكوبونات</a><a href="/deals/">أفضل العروض</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/budget/">البحث بالميزانية</a><a href="/compare/">قارن بين الهواتف</a><a href="/about/">من نحن</a><a href="/contact/">اتصل بنا</a></div>
+<div><h3>روابط سريعة</h3><a href="/coupons/">الكوبونات</a><a href="/deals/">أفضل العروض</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/budget/">البحث بالميزانية</a><a href="/search/specs/">بحث بالمواصفات</a><a href="/compare/">قارن بين الهواتف</a><a href="/about/">من نحن</a><a href="/contact/">اتصل بنا</a></div>
 <div><h3>سياسات الموقع</h3><a href="/privacy/">سياسة الخصوصية</a><a href="/terms/">شروط الاستخدام</a><a href="/affiliate-disclosure/">إفصاح التسويق بالعمولة</a><a href="/cookies/">سياسة ملفات تعريف الارتباط</a></div>
 <div><h3>تواصل معنا</h3><a href="mailto:3rdeonline@gmail.com">3rdeonline@gmail.com</a></div>
 </div>
