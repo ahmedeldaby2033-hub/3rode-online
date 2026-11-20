@@ -640,13 +640,13 @@ function doPost(e) {
       if (action === 'saveProduct') {
         headers = productHeaders();
         s = ss().getSheetByName(SHEET_PRODUCTS);
-        row = (body.values || []).slice(0, 46);
-        while (row.length < 46) row.push('');
+        row = (body.values || []).slice(0, 47);
+        while (row.length < 47) row.push('');
         if (!row[4]) throw new Error('رابط المنتج مطلوب');
         var existing = findProductRow(row[4]);
         if (existing > 0) {
           var oldPrice = s.getRange(existing, 8).getValue();
-          s.getRange(existing, 1, 1, 46).setValues([row]);
+          s.getRange(existing, 1, 1, 47).setValues([row]);
           appendPriceHistory(row, oldPrice, row[7]);
           return jsonOut({ ok: true, updated: existing });
         }

@@ -21,7 +21,7 @@ main{max-width:1100px;margin:0 auto;padding:20px}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:16px}
 .card h2{margin:0 0 12px;font-size:18px}
 label{display:block;font-weight:600;margin:10px 0 4px}
-input[type=text],input[type=password],input[type=url],input[type=number],input[type=date],select,textarea{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font:inherit}
+input[type=text],input[type=password],input[type=url],input[type=number],input[type=date],input[type=datetime-local],select,textarea{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font:inherit}
 textarea{min-height:90px}
 [dir=ltr]{direction:ltr;text-align:left}
 button{cursor:pointer;border:0;border-radius:8px;padding:10px 16px;font:inherit;font-weight:600}
@@ -41,11 +41,40 @@ th{background:#f9fafb}
 .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;background:#eef2f7}
 .badge.green{background:#d1fadf;color:var(--green)}
 .badge.amber{background:#fef0c7;color:var(--amber)}
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.tabs button{background:#fff;border:1px solid var(--border);color:var(--text)}
-.tabs button.active{background:var(--accent);color:#fff}
+.tabs{display:none} /* replaced by the sidebar nav (kept for reference) */
 section.tab{display:none}
 section.tab.active{display:block}
+/* ---- sidebar layout (RTL: sidebar on the right) ---- */
+.shell{display:flex;align-items:flex-start;gap:16px}
+#sidebar{width:260px;flex:0 0 260px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 10px;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow-y:auto}
+#sidebar .nav-group{font-size:12px;color:var(--muted);font-weight:700;margin:14px 8px 6px}
+#sidebar .nav-group:first-child{margin-top:2px}
+.nav-item{display:block;width:100%;text-align:right;background:none;border:0;padding:10px 12px;border-radius:8px;color:var(--text);font:inherit;font-weight:600;cursor:pointer}
+.nav-item:hover{background:var(--border)}
+.nav-item.active{background:var(--accent);color:#fff}
+.admin-main{flex:1;min-width:0}
+#sidebar-overlay{display:none}
+#hamburger{display:none}
+/* ---- tables: horizontal scroll instead of overflowing ---- */
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.table-scroll table{min-width:560px}
+/* ---- sticky mobile sync button ---- */
+#mobile-sync-fab{display:none}
+@media(max-width:768px){
+  main{padding:12px}
+  #hamburger{display:inline-block}
+  body:not(.logged-in) #hamburger{display:none}
+  .shell{display:block}
+  #sidebar{position:fixed;top:0;bottom:0;right:0;z-index:60;width:280px;max-width:85vw;flex:none;max-height:none;border-radius:0;transform:translateX(105%);transition:transform .25s ease;box-shadow:-4px 0 24px rgba(0,0,0,.25)}
+  body.sidebar-open #sidebar{transform:none}
+  #sidebar-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:55;opacity:0;pointer-events:none;transition:opacity .25s}
+  body.sidebar-open #sidebar-overlay{opacity:1;pointer-events:auto}
+  .nav-item{min-height:44px}
+  button{min-height:44px}
+  input[type=text],input[type=password],input[type=url],input[type=number],input[type=date],select,textarea{padding:11px 10px}
+  #mobile-sync-fab{display:block;position:fixed;bottom:16px;left:16px;right:16px;z-index:50;width:auto;padding:14px;font-size:16px;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+  body{padding-bottom:76px}
+}
 #toast{position:fixed;bottom:20px;right:20px;background:#101828;color:#fff;padding:12px 18px;border-radius:10px;display:none;z-index:99}
 .error{color:var(--red);font-weight:600}
 .ok{color:var(--green);font-weight:600}
@@ -59,7 +88,7 @@ section.tab.active{display:block}
 </head>
 <body>
 <header>
-  <h1>لوحة تحكم — عروض أونلاين <span style="font-weight:400">3rde.online</span></h1>
+  <h1><button id="hamburger" onclick="toggleSidebar()" aria-label="القائمة" style="background:none;border:0;color:#fff;font-size:22px;padding:4px 8px">☰</button> لوحة تحكم — عروض أونلاين <span style="font-weight:400">3rde.online</span></h1>
   <span><a href="https://3rde.online/" target="_blank" rel="noopener">عرض الموقع ↗</a> &nbsp;·&nbsp; <a href="https://docs.google.com/spreadsheets/d/1VeOXP8ly-W0dwT0QQK9kqf9z_834zok9ekIqGjfPNdE" target="_blank" rel="noopener">فتح الشيت ↗</a> &nbsp;·&nbsp; <label for="admin-theme" style="font-weight:700">المظهر:</label> <select id="admin-theme" onchange="setAdminTheme(this.value)"><option value="">فاتح</option><option value="admin-dark">داكن</option><option value="admin-blue">أزرق</option><option value="admin-green">أخضر</option></select> &nbsp;·&nbsp; <button class="btn-ghost" id="logout-btn" style="display:none" onclick="logout()">تسجيل الخروج</button></span>
 </header>
 <main>
@@ -100,20 +129,35 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
 </div>
 
 <div id="admin" style="display:none">
+  <div id="sidebar-overlay" onclick="closeSidebar()"></div>
+  <div class="shell">
+  <nav id="sidebar" aria-label="القائمة الرئيسية">
+    <div class="nav-group">الرئيسية</div>
+    <button class="nav-item active" data-tab="tab-overview" onclick="navTo('tab-overview')">🏠 نظرة عامة</button>
+    <div class="nav-group">المتجر</div>
+    <button class="nav-item" data-tab="tab-products" onclick="navTo('tab-products')">📱 المنتجات</button>
+    <button class="nav-item" data-tab="tab-coupons" onclick="navTo('tab-coupons')">🎟️ الكوبونات</button>
+    <div class="nav-group">المحتوى</div>
+    <button class="nav-item" data-tab="tab-guides" onclick="navTo('tab-guides')">📚 الأدلة</button>
+    <button class="nav-item" data-tab="tab-news" onclick="navTo('tab-news')">📰 الأخبار</button>
+    <div class="nav-group">العملاء</div>
+    <button class="nav-item" data-tab="tab-inbox" onclick="navTo('tab-inbox')">📥 الطلبات والبلاغات</button>
+    <button class="nav-item" data-tab="tab-stock" onclick="navTo('tab-stock')">🔔 تنبيهات التوفر</button>
+    <div class="nav-group">التحليلات</div>
+    <button class="nav-item" data-tab="tab-logs" onclick="navTo('tab-logs')">📊 النقرات والسجلات</button>
+    <button class="nav-item" data-tab="tab-dead" onclick="navTo('tab-dead')">💀 منتجات بلا نقرات</button>
+    <div class="nav-group">الأدوات</div>
+    <button class="nav-item" data-tab="tab-buylinks" onclick="navTo('tab-buylinks')">🔗 فحص روابط الشراء</button>
+    <button class="nav-item" data-tab="tab-affiliate" onclick="navTo('tab-affiliate')">🛡️ فحص الأفلييت</button>
+    <button class="nav-item" data-tab="tab-backup" onclick="navTo('tab-backup')">💾 النسخ الاحتياطي</button>
+    <div class="nav-group">الإعداد والربط</div>
+    <button class="nav-item" data-tab="tab-setup" onclick="navTo('tab-setup')">🔌 الإعداد والربط</button>
+    <button class="nav-item" data-tab="tab-settings" onclick="navTo('tab-settings')">⚙️ الإعدادات والإعلانات</button>
+  </nav>
+  <div class="admin-main">
   <div id="default-pass-banner" class="warn-banner" style="display:none">⚠️ كلمة مرور لوحة التحكم ما زالت الافتراضية (<b>admin</b>). غيّرها الآن من تبويب «الإعدادات والإعلانات» ← «تغيير كلمة مرور لوحة التحكم». <button class="btn-ghost" onclick="showTab(event,'tab-settings')">تغيير كلمة المرور</button></div>
-  <div class="tabs">
-    <button class="active" onclick="showTab(event,'tab-setup')">الإعداد والربط</button>
-    <button onclick="showTab(event,'tab-overview')">نظرة عامة</button>
-    <button onclick="showTab(event,'tab-products')">المنتجات</button>
-    <button onclick="showTab(event,'tab-inbox')">الطلبات والبلاغات</button>
-    <button onclick="showTab(event,'tab-coupons')">الكوبونات</button>
-    <button onclick="showTab(event,'tab-settings')">الإعدادات والإعلانات</button>
-    <button onclick="showTab(event,'tab-guides')">الأدلة</button>
-    <button onclick="showTab(event,'tab-news')">الأخبار</button>
-    <button onclick="showTab(event,'tab-logs')">سجل المزامنة والأسعار</button>
-  </div>
 
-  <section class="tab active" id="tab-setup">
+  <section class="tab" id="tab-setup">
     <div class="card"><h2>الإعداد والربط — Apps Script</h2>
       <p>حالة الاتصال: <b id="conn-status">غير معروف</b> &nbsp; <button class="btn-ghost" onclick="testConnection()">اختبار الاتصال</button></p>
       <p class="hint">ما هو رابط Apps Script؟ هو عنوان تطبيق الويب الخاص بملف <b>Code.gs</b> المربوط بالشيت — اللوحة تتحدث مع الشيت من خلاله (قراءة وكتابة المنتجات والكوبونات والإعدادات، واستقبال الطلبات والبلاغات). بدونه تعمل اللوحة في وضع العرض فقط وتظهر رسالة «ألصق رابط تطبيق Apps Script أولاً».</p>
@@ -149,7 +193,7 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
     </div>
   </section>
 
-  <section class="tab" id="tab-overview">
+  <section class="tab active" id="tab-overview">
     <div class="card"><h2>نظرة عامة</h2>
       <div class="stat-cards" id="stat-cards"></div>
       <p id="overview-stats">جارٍ التحميل…</p>
@@ -157,13 +201,17 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
       <button class="btn-ghost" onclick="loadOverview()">تحديث الأرقام</button></p>
       <p id="sync-status"></p>
       <p class="hint">زر «مزامنة الآن» يرسل أحدث بيانات الشيت إلى خدمة المزامنة على الخادم، فتحدّث كل المنتجات والواجهة وتنشر الموقع فوراً. إن لم تكن الخدمة مربوطة بعد، يكتفي الزر بتسجيل طلب في سجل المزامنة (انظر تبويب «الإعداد والربط»).</p>
-      <h3>بلاغات أسعار خاطئة</h3><div id="reports-list">—</div>
-      <h3>طلبات منتجات غير موجودة</h3><div id="requests-list">—</div>
+      <h3>بلاغات أسعار خاطئة</h3><div id="reports-list" class="table-scroll">—</div>
+      <h3>طلبات منتجات غير موجودة</h3><div id="requests-list" class="table-scroll">—</div>
+    </div>
+    <div class="card"><h2>كوبونات تنتهي قريباً ⏰</h2>
+      <p class="hint">الكوبونات المفعّلة التي تنتهي خلال 7 أيام أو انتهت بالفعل — جدّدها أو أوقفها قبل أن يجرّب الزوار كوداً لا يعمل.</p>
+      <div id="coupon-expiry-list" class="table-scroll">—</div>
     </div>
     <div class="card"><h2>الاتجاهات — آخر 14 يوماً</h2>
       <canvas id="trend-chart" width="1000" height="240" style="width:100%;height:auto"></canvas>
       <p class="hint"><span style="color:#0b3d91">■</span> تغييرات الأسعار &nbsp; <span style="color:#ea580c">■</span> نقرات الشراء</p>
-      <div id="trend-table">—</div>
+      <div id="trend-table" class="table-scroll">—</div>
     </div>
   </section>
 
@@ -176,7 +224,7 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
       <p><button class="btn" onclick="loadProducts()">بحث</button>
       <button class="btn-ghost" onclick="newProduct()">+ إضافة منتج جديد</button>
       <button class="btn-ghost" onclick="exportProductsCSV()">تصدير CSV</button></p>
-      <div id="products-table">—</div>
+      <div id="products-table" class="table-scroll">—</div>
     </div>
 
     <div class="card" id="product-form-card" style="display:none">
@@ -212,7 +260,8 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
         </div>
         <div class="row">
           <div><label for="product-image">رابط الصورة</label>
-          <input type="url" id="product-image" dir="ltr"></div>
+          <input type="url" id="product-image" dir="ltr">
+          <p><button type="button" class="btn-ghost" id="btn-fetch-image" onclick="fetchProductImage()">⬇ جلب الصورة تلقائياً من صفحة المنتج</button><br><span id="fetch-image-msg" class="hint"></span></p></div>
           <div><label for="product-mobizil">رابط موبيزل</label>
           <input type="url" id="product-mobizil" dir="ltr"></div>
         </div>
@@ -291,17 +340,10 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
       <p><button class="btn" onclick="bulkEdit()">تطبيق على كل منتجات العلامة</button></p>
     </div>
 
-    <div class="card"><h2>فحص روابط الأفلييت (العمود AU)</h2>
-      <p class="hint">يقارن كل رابط أفلييت في العمود AU مع رابط المنتج الأصلي في العمود E، ويتأكد من وجود وسوم تتبع JForce. الإصلاح يعيد كتابة الروابط المخالفة من روابط المنتجات الأصلية (نفس قواعد scripts/verify.py).</p>
-      <p><button class="btn" onclick="checkAffiliate()">فحص الروابط الآن</button>
-      <button class="btn-green" id="btn-fix-au" onclick="fixAffiliate()" style="display:none">إصلاح الروابط المخالفة</button></p>
-      <div id="au-check-results">—</div>
-    </div>
-
     <div class="card"><h2>فحص صور المنتجات</h2>
       <p class="hint">يفحص روابط الصور في الشيت (العمود AE) وصور الموقع المحلية (من خريطة الموقع). الصور الميتة تظهر في الجدول — صحّح رابطها في الشيت أو من نموذج المنتج.</p>
       <p><button class="btn" onclick="checkImages()">فحص الصور الآن</button></p>
-      <div id="image-check-results">—</div>
+      <div id="image-check-results" class="table-scroll">—</div>
     </div>
   </section>
 
@@ -309,17 +351,17 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
     <div class="card"><h2>طلبات منتجات غير موجودة</h2>
       <p><input type="text" id="inbox-q" placeholder="بحث بالمنتج أو رقم التواصل…" oninput="renderInbox()">
       <label style="display:inline;font-weight:400"><input type="checkbox" id="inbox-show-handled" onchange="renderInbox()"> إظهار المعالَجة</label></p>
-      <div id="inbox-requests">—</div>
+      <div id="inbox-requests" class="table-scroll">—</div>
     </div>
     <div class="card"><h2>بلاغات أسعار خاطئة</h2>
-      <div id="inbox-reports">—</div>
+      <div id="inbox-reports" class="table-scroll">—</div>
       <p><button class="btn-ghost" onclick="loadInbox()">تحديث القائمتين</button></p>
     </div>
   </section>
 
   <section class="tab" id="tab-coupons">
     <div class="card"><h2>الكوبونات</h2>
-      <div id="coupons-table">—</div>
+      <div id="coupons-table" class="table-scroll">—</div>
       <h3>إضافة / تعديل كوبون</h3>
       <div class="row">
         <div><label for="cp-title">العنوان</label><input type="text" id="cp-title"></div>
@@ -372,7 +414,7 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
   <section class="tab" id="tab-guides">
     <div class="card"><h2>أدلة الشراء</h2>
       <p class="hint">الأدلة المولَّدة آلياً تبقى <b>مسودات</b> حتى تراجعها أنت بنفسك وتكتب المراجعة البشرية — لا يُنشر دليل قبل ذلك (سياسة المحتوى الموسَّع في Google).</p>
-      <div id="guides-table">—</div>
+      <div id="guides-table" class="table-scroll">—</div>
       <h3>إضافة / تعديل دليل</h3>
       <div class="row">
         <div><label for="gd-slug">الرابط المختصر (slug)</label><input type="text" id="gd-slug" dir="ltr"></div>
@@ -383,14 +425,22 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
       <label for="gd-review">المراجعة البشرية (إلزامية قبل النشر)</label><textarea id="gd-review"></textarea>
       <label for="gd-status">الحالة</label>
       <select id="gd-status"><option value="draft">مسودة</option><option value="published">منشور</option></select>
+      <label for="gd-publish-at">تاريخ ووقت النشر المجدول (اختياري — اتركه فارغاً للنشر الفوري)</label>
+      <input type="datetime-local" id="gd-publish-at" dir="ltr">
       <p><button class="btn-green" onclick="saveGuide()">حفظ الدليل</button></p>
+    </div>
+    <div class="card"><h2>النشر المجدول ⏰</h2>
+      <p class="hint">الأدلة والأخبار التي تحدد لها تاريخ نشر مستقبلي تُنشر تلقائياً عند حلول وقتها (كل ساعة)، بشرط أن تكون حالتها «مسودة». فعّل المشغّل مرة واحدة من هنا.</p>
+      <p><button class="btn" onclick="setupScheduledPublish('sched-msg-g')">تفعيل النشر المجدول (كل ساعة)</button>
+      <button class="btn-ghost" onclick="publishDueNow('sched-msg-g')">نشر المستحق الآن</button></p>
+      <p id="sched-msg-g"></p>
     </div>
   </section>
 
   <section class="tab" id="tab-news">
     <div class="card"><h2>الأخبار</h2>
       <p class="hint">قسم /news/ منفصل عن صفحات المنتجات (صفحات المنتجات لا تدخل Google News أبداً). كل خبر يحتاج مراجعة بشرية وصورة 1200px على الأقل.</p>
-      <div id="news-table">—</div>
+      <div id="news-table" class="table-scroll">—</div>
       <h3>إضافة / تعديل خبر</h3>
       <div class="row">
         <div><label for="nw-slug">الرابط المختصر (slug)</label><input type="text" id="nw-slug" dir="ltr"></div>
@@ -402,23 +452,104 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
         <div><label for="nw-model">موديل مرتبط (اختياري)</label><input type="text" id="nw-model" dir="ltr"></div>
         <div><label for="nw-date">تاريخ النشر</label><input type="date" id="nw-date"></div>
       </div>
+      <label for="nw-publish-at">تاريخ ووقت النشر المجدول (اختياري — اتركه فارغاً للنشر الفوري)</label>
+      <input type="datetime-local" id="nw-publish-at" dir="ltr">
       <p><button class="btn-green" onclick="saveNews()">حفظ الخبر</button></p>
+    </div>
+    <div class="card"><h2>النشر المجدول ⏰</h2>
+      <p class="hint">الأخبار التي تحدد لها تاريخ نشر مستقبلي تُنشر تلقائياً عند حلول وقتها (كل ساعة). فعّل المشغّل مرة واحدة من هنا (نفس مشغّل الأدلة).</p>
+      <p><button class="btn" onclick="setupScheduledPublish('sched-msg-n')">تفعيل النشر المجدول (كل ساعة)</button>
+      <button class="btn-ghost" onclick="publishDueNow('sched-msg-n')">نشر المستحق الآن</button></p>
+      <p id="sched-msg-n"></p>
     </div>
   </section>
 
   <section class="tab" id="tab-logs">
-    <div class="card"><h2>سجل المزامنة</h2><div id="sync-log">—</div></div>
-    <div class="card"><h2>سجل الأسعار (آخر التغييرات)</h2><div id="price-log">—</div></div>
-    <div class="card"><h2>نقرات أزرار الشراء</h2><div id="clicks-stats">—</div></div>
+    <div class="card"><h2>سجل المزامنة</h2><div id="sync-log" class="table-scroll">—</div></div>
+    <div class="card"><h2>سجل الأسعار (آخر التغييرات)</h2><div id="price-log" class="table-scroll">—</div></div>
+    <div class="card"><h2>نقرات أزرار الشراء</h2><div id="clicks-stats" class="table-scroll">—</div></div>
   </section>
+
+  <section class="tab" id="tab-stock">
+    <div class="card"><h2>تنبيهات التوفر — «أخبرني عند التوفر»</h2>
+      <p class="hint">زوار طلبوا منتجاً بعينه وتركوا رقم واتساب — أقرب الزوار للشراء. تواصل معهم فور عودة المنتج للتوفر.</p>
+      <p><button class="btn" onclick="loadStockAlerts()">تحديث القائمة</button></p>
+      <div id="stock-alerts-list" class="table-scroll">—</div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-dead">
+    <div class="card"><h2>منتجات بلا نقرات — المنتجات الميتة 💀</h2>
+      <p class="hint">الموديلات التي لم ينقر أحد على زر شرائها خلال آخر 30 يوماً — سعر خاطئ، أو صورة سيئة، أو موديل لا يبحث عنه أحد. راجعها: خفّض السعر، أو حسّن الصفحة، أو احذفها.</p>
+      <p><button class="btn" onclick="loadDeadModels()">تحديث القائمة</button></p>
+      <div id="dead-models-results" class="table-scroll">—</div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-buylinks">
+    <div class="card"><h2>فحص روابط الشراء المكسورة 🔗</h2>
+      <p class="hint">يفحص رابط المنتج الأصلي (E) ورابط الأفلييت (AU) لكل عرض. 200/301/302 = سليم، 404/410/500 = مكسور، وأي رد آخر (مثل 403 من Cloudflare) يُعرض «غير مؤكد» ولا يُحسب مكسوراً. الفحص يتم على دفعات 100 منتج.</p>
+      <p><button class="btn" id="btn-run-buylinks" onclick="runBuyLinksCheck()">بدء الفحص</button>
+      <button class="btn-green" onclick="setupDailyBuyLinksCheck()">تفعيل الفحص اليومي</button></p>
+      <p id="buylinks-status"></p>
+      <p id="buylinks-progress"></p>
+      <div id="buylinks-results" class="table-scroll">—</div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-affiliate">
+    <div class="card"><h2>فحص روابط الأفلييت (العمود AU)</h2>
+      <p class="hint">يقارن كل رابط أفلييت في العمود AU مع رابط المنتج الأصلي في العمود E، ويتأكد من وجود وسوم تتبع JForce. الإصلاح يعيد كتابة الروابط المخالفة من روابط المنتجات الأصلية (نفس قواعد scripts/verify.py).</p>
+      <p><button class="btn" onclick="checkAffiliate()">فحص الروابط الآن</button>
+      <button class="btn-green" id="btn-fix-au" onclick="fixAffiliate()" style="display:none">إصلاح الروابط المخالفة</button></p>
+      <div id="au-check-results" class="table-scroll">—</div>
+    </div>
+    <div class="card"><h2>الفحص التلقائي اليومي</h2>
+      <p class="hint">فحص يومي تلقائي لروابط الأفلييت (الساعة 5 صباحاً) مع تنبيه تلجرام فوراً عند وجود روابط مخالفة أو مفقودة — بدل اكتشاف المشكلة بالصدفة بعد أيام.</p>
+      <p><button class="btn" onclick="setupDailyAffiliateCheck()">تفعيل الفحص اليومي</button></p>
+      <p id="au-daily-status"></p>
+    </div>
+    <div class="card"><h2>قفل عمود روابط الأفلييت (AU)</h2>
+      <p class="hint">القفل يمنع التعديل اليدوي لعمود AU في الشيت (يظهر تحذير عند محاولة التعديل) — فيمنع انحراف الروابط عند الفرز أو الإضافة. فك الحماية يعيد التعديل اليدوي.</p>
+      <p id="au-lock-status">—</p>
+      <p><button class="btn-green" id="btn-lock-au" onclick="lockAuColumn()">🔒 قفل عمود AU</button>
+      <button class="btn-danger" id="btn-unlock-au" onclick="unlockAuColumn()" style="display:none">🔓 فك حماية عمود AU</button></p>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-backup">
+    <div class="card"><h2>النسخ الاحتياطي 💾</h2>
+      <p class="hint">نسخة كاملة من ملف الشيت تُحفظ في مجلد «3rde.online backups» على Google Drive، مع الاحتفاظ بأحدث 30 نسخة فقط (الأقدم يُحذف تلقائياً).</p>
+      <p><button class="btn" onclick="backupNow()">نسخ احتياطي الآن</button>
+      <button class="btn-green" onclick="setupDailyBackup()">تفعيل النسخ اليومي (3 صباحاً)</button>
+      <button class="btn-ghost" onclick="loadBackups()">تحديث القائمة</button></p>
+      <p id="backup-status"></p>
+      <div id="backups-list" class="table-scroll">—</div>
+    </div>
+  </section>
+  </div><!-- .admin-main -->
+  </div><!-- .shell -->
+  <button id="mobile-sync-fab" class="btn" onclick="syncNow()">⟳ مزامنة الآن</button>
 </div>
 </main>
 <div id="toast"></div>
 
 <script>
 function toast(msg){var t=document.getElementById("toast");t.textContent=msg;t.style.display="block";setTimeout(function(){t.style.display="none"},3000)}
-function showTab(ev,id){document.querySelectorAll(".tabs button").forEach(function(b){b.classList.remove("active")});ev.target.classList.add("active");document.querySelectorAll("section.tab").forEach(function(s){s.classList.remove("active")});document.getElementById(id).classList.add("active");
-  if(id==="tab-coupons")loadCoupons(); if(id==="tab-guides")loadGuides(); if(id==="tab-news")loadNews(); if(id==="tab-logs")loadLogs(); if(id==="tab-inbox")loadInbox(); if(id==="tab-setup")renderSetupStatus();}
+/* ---- sidebar navigation: one function for nav buttons and old callers ---- */
+function activateTab(id){
+  document.querySelectorAll("#sidebar .nav-item").forEach(function(b){ b.classList.toggle("active", b.getAttribute("data-tab") === id); });
+  document.querySelectorAll("section.tab").forEach(function(s){ s.classList.toggle("active", s.id === id); });
+  closeSidebar();
+  if(id==="tab-coupons")loadCoupons(); if(id==="tab-guides")loadGuides(); if(id==="tab-news")loadNews(); if(id==="tab-logs")loadLogs(); if(id==="tab-inbox")loadInbox(); if(id==="tab-setup")renderSetupStatus();
+  if(id==="tab-dead")loadDeadModels(); if(id==="tab-stock")loadStockAlerts(); if(id==="tab-backup")loadBackups();
+  if(id==="tab-affiliate")renderAffiliateLockStatus();
+  if(id==="tab-buylinks")renderBuyLinksStatus();
+}
+function showTab(ev,id){ activateTab(id); } // kept for the password banner + old callers
+function navTo(id){ activateTab(id); }
+function toggleSidebar(){ document.body.classList.toggle("sidebar-open"); }
+function closeSidebar(){ document.body.classList.remove("sidebar-open"); }
 
 function getAppsScriptUrl(){
   var s = "";
@@ -466,6 +597,7 @@ function enterAdmin(){
   document.getElementById("login-card").style.display = "none";
   document.getElementById("admin").style.display = "block";
   document.getElementById("logout-btn").style.display = "";
+  document.body.classList.add("logged-in");
   renderSetupStatus();
   checkDefaultPass();
 }
@@ -624,6 +756,28 @@ async function loadOverview(){
       "<table><tr><th>التاريخ</th><th>الموديل</th><th>السعر الصحيح</th><th>ملاحظة</th></tr>"+reports.rows.slice(0,10).map(function(r){return "<tr><td>"+esc(r[0])+"</td><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td>"+esc(r[3])+"</td></tr>"}).join("")+"</table>" : "لا توجد بلاغات.";
     document.getElementById("requests-list").innerHTML = requests.rows.length ?
       "<table><tr><th>التاريخ</th><th>الموديل</th><th>الميزانية</th><th>تواصل</th></tr>"+requests.rows.slice(0,10).map(function(r){return "<tr><td>"+esc(r[0])+"</td><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td>"+esc(r[3])+"</td></tr>"}).join("")+"</table>" : "لا توجد طلبات.";
+    // كوبونات تنتهي خلال 7 أيام (أو انتهت) — بطاقة تنبيه في نظرة عامة
+    try{
+      var cp = await api("coupons");
+      var nowD = new Date(); nowD.setHours(0,0,0,0);
+      var soon = [];
+      (cp.rows || []).slice(1).forEach(function(r){
+        if(!r[6] || r[7] === false || r[7] === "false") return;
+        var d = new Date(fmtDate(r[6]) + "T00:00:00");
+        if(isNaN(d.getTime())) return;
+        var diff = Math.round((d - nowD) / 86400000);
+        if(diff <= 7) soon.push({title: r[1], code: r[3], diff: diff});
+      });
+      var cel = document.getElementById("coupon-expiry-list");
+      if(cel){
+        cel.innerHTML = soon.length ?
+          "<table><tr><th>الكوبون</th><th>الكود</th><th>المتبقي</th></tr>" + soon.map(function(c){
+            return "<tr><td>" + esc(c.title) + "</td><td dir='ltr'>" + esc(c.code) + "</td><td>" +
+              (c.diff < 0 ? "منتهٍ منذ " + (-c.diff) + " يوم" : (c.diff === 0 ? "ينتهي اليوم" : "ينتهي خلال " + c.diff + " يوم")) + "</td></tr>";
+          }).join("") + "</table>" :
+          "<p class='ok'>لا توجد كوبونات تنتهي خلال 7 أيام.</p>";
+      }
+    }catch(e2){ var cel2 = document.getElementById("coupon-expiry-list"); if(cel2) cel2.innerHTML = "—"; }
   }catch(err){document.getElementById("overview-stats").innerHTML='<span class="error">'+err.message+"</span>"}
 }
 /* ---------------- instant sync (webhook) ---------------- */
@@ -988,6 +1142,25 @@ async function checkImages(){
   out.innerHTML = html;
 }
 
+/* ---------------- fetch product image (og:image from the store page) ---- */
+async function fetchProductImage(){
+  var url = document.getElementById("product-url").value.trim();
+  var msg = document.getElementById("fetch-image-msg");
+  var btn = document.getElementById("btn-fetch-image");
+  if(!url){ msg.textContent = "الصق رابط المنتج الأصلي أولاً."; return; }
+  btn.disabled = true; msg.textContent = "جارٍ جلب الصورة من صفحة المنتج…";
+  try{
+    var r = await api("fetchProductImage", {productUrl: url});
+    document.getElementById("product-image").value = r.image;
+    msg.textContent = "تم جلب الصورة ✓ — راجع الرابط قبل الحفظ.";
+    toast("تم جلب رابط الصورة");
+  }catch(err){
+    msg.textContent = err.message;
+    toast(err.message);
+  }
+  btn.disabled = false;
+}
+
 /* ---------------- coupons ---------------- */
 async function loadCoupons(){
   try{var d=await api("coupons");
@@ -1180,13 +1353,14 @@ async function loadGuides(){
   try{var d=await api("guides");
     document.getElementById("guides-table").innerHTML = d.rows.length>1 ?
       "<table><tr><th>العنوان</th><th>المعيار</th><th>الحالة</th><th>مراجعة بشرية</th><th></th></tr>"+
-      d.rows.slice(1).map(function(r){return "<tr><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td><span class='badge "+(r[5]==="published"?"green":"amber")+"'>"+esc(r[5])+"</span></td><td>"+(r[4]?"نعم":"لا")+"</td><td><button class='btn-ghost' onclick='fillGuide("+JSON.stringify(r)+")'>تعديل</button> <button class='btn-danger' onclick='deleteGuide("+JSON.stringify(r[0])+")'>حذف</button></td></tr>"}).join("")+"</table>" : "لا توجد أدلة.";
+      d.rows.slice(1).map(function(r){return "<tr><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td><span class='badge "+(r[5]==="published"?"green":"amber")+"'>"+esc(r[5])+"</span>"+(r[8]?" <span class='badge amber'>مجدول "+esc(fmtDate(r[8]))+"</span>":"")+"</td><td>"+(r[4]?"نعم":"لا")+"</td><td><button class='btn-ghost' onclick='fillGuide("+JSON.stringify(r)+")'>تعديل</button> <button class='btn-danger' onclick='deleteGuide("+JSON.stringify(r[0])+")'>حذف</button></td></tr>"}).join("")+"</table>" : "لا توجد أدلة.";
   }catch(err){document.getElementById("guides-table").innerHTML='<span class="error">'+err.message+"</span>"}
 }
 async function saveGuide(){
   var g={slug:document.getElementById("gd-slug").value, title:document.getElementById("gd-title").value,
     criterion:document.getElementById("gd-criterion").value, description:document.getElementById("gd-desc").value,
     human_review:document.getElementById("gd-review").value, status:document.getElementById("gd-status").value,
+    publish_at:fromLocalInput(document.getElementById("gd-publish-at").value),
     author:"فريق عروض أونلاين", date:new Date().toISOString().slice(0,10)};
   if(g.status==="published" && !g.human_review.trim()){toast("لا يمكن النشر قبل كتابة المراجعة البشرية");return;}
   try{await api("saveGuide",{guide:g}); toast("تم حفظ الدليل"); loadGuides();}
@@ -1196,6 +1370,7 @@ function fillGuide(r){
   document.getElementById("gd-slug").value=r[0]; document.getElementById("gd-title").value=r[1];
   document.getElementById("gd-criterion").value=r[2]; document.getElementById("gd-desc").value=r[3];
   document.getElementById("gd-review").value=r[4]; document.getElementById("gd-status").value=r[5]||"draft";
+  document.getElementById("gd-publish-at").value=toLocalInput(r[8]);
   window.scrollTo(0, document.getElementById("gd-slug").offsetTop);
 }
 async function deleteGuide(slug){
@@ -1207,14 +1382,15 @@ async function loadNews(){
   try{var d=await api("news");
     document.getElementById("news-table").innerHTML = d.rows.length>1 ?
       "<table><tr><th>العنوان</th><th>التاريخ</th><th>مثال؟</th><th></th></tr>"+
-      d.rows.slice(1).map(function(r){return "<tr><td>"+esc(r[1])+"</td><td>"+esc(fmtDate(r[6]))+"</td><td>"+(r[7]?"نعم":"لا")+"</td><td><button class='btn-ghost' onclick='fillNews("+JSON.stringify(r)+")'>تعديل</button> <button class='btn-danger' onclick='deleteNews("+JSON.stringify(r[0])+")'>حذف</button></td></tr>"}).join("")+"</table>" : "لا توجد أخبار.";
+      d.rows.slice(1).map(function(r){return "<tr><td>"+esc(r[1])+"</td><td>"+esc(fmtDate(r[6]))+(r[8]?" <span class='badge amber'>مجدول</span>":"")+"</td><td>"+(r[7]?"نعم":"لا")+"</td><td><button class='btn-ghost' onclick='fillNews("+JSON.stringify(r)+")'>تعديل</button> <button class='btn-danger' onclick='deleteNews("+JSON.stringify(r[0])+")'>حذف</button></td></tr>"}).join("")+"</table>" : "لا توجد أخبار.";
   }catch(err){document.getElementById("news-table").innerHTML='<span class="error">'+err.message+"</span>"}
 }
 async function saveNews(){
   var n={slug:document.getElementById("nw-slug").value, title:document.getElementById("nw-title").value,
     description:document.getElementById("nw-desc").value, body:document.getElementById("nw-body").value,
     model_slug:document.getElementById("nw-model").value, author:"فريق عروض أونلاين",
-    date_published:document.getElementById("nw-date").value, is_example:false};
+    date_published:document.getElementById("nw-date").value,
+    publish_at:fromLocalInput(document.getElementById("nw-publish-at").value), is_example:false};
   try{await api("saveNews",{news:n}); toast("تم حفظ الخبر"); loadNews();}
   catch(err){toast(err.message)}
 }
@@ -1222,12 +1398,174 @@ function fillNews(r){
   document.getElementById("nw-slug").value=r[0]; document.getElementById("nw-title").value=r[1];
   document.getElementById("nw-desc").value=r[2]; document.getElementById("nw-body").value=r[3];
   document.getElementById("nw-model").value=r[4]; document.getElementById("nw-date").value=fmtDate(r[6]);
+  document.getElementById("nw-publish-at").value=toLocalInput(r[8]);
   window.scrollTo(0, document.getElementById("nw-slug").offsetTop);
 }
 async function deleteNews(slug){
   if(!confirm("حذف هذا الخبر؟"))return;
   try{await api("deleteNews",{slug:slug}); toast("تم الحذف"); loadNews();}
   catch(err){toast(err.message)}
+}
+
+/* ---------------- dead models (no clicks in 30 days) ---------------- */
+async function loadDeadModels(){
+  var out = document.getElementById("dead-models-results");
+  out.innerHTML = "جارٍ التحميل…";
+  try{
+    var d = await api("deadModels");
+    if(!d.models.length){ out.innerHTML = "<p class='ok'>لا توجد منتجات بلا نقرات خلال آخر 30 يوماً — كل الموديلات تحصل على نقرات.</p>"; return; }
+    out.innerHTML = "<p>موديلات بلا أي نقرة خلال آخر 30 يوماً: <b>" + d.total + "</b></p>" +
+      "<table><tr><th>الموديل</th><th>العلامة</th><th>السعر</th><th>آخر تحديث</th><th></th></tr>" +
+      d.models.map(function(m){
+        return "<tr><td>" + esc(m.name) + "</td><td>" + esc(m.brand) + "</td><td>" + esc(m.price) + "</td><td>" + esc(m.updated) + "</td><td><a class='btn-ghost' href='https://3rde.online/mobiles/" + esc(m.slug) + "/' target='_blank' rel='noopener'>فتح المنتج ↗</a>" + (m.url ? " <a class='btn-ghost' href='" + esc(m.url) + "' target='_blank' rel='noopener'>جوميا ↗</a>" : "") + "</td></tr>";
+      }).join("") + "</table>";
+  }catch(err){ out.innerHTML = '<span class="error">' + esc(err.message) + '</span>'; }
+}
+
+/* ---------------- stock alerts («أخبرني عند التوفر») ---------------- */
+async function loadStockAlerts(){
+  var out = document.getElementById("stock-alerts-list");
+  out.innerHTML = "جارٍ التحميل…";
+  try{
+    var d = await api("stockAlerts");
+    var rows = d.rows || [];
+    if(!rows.length){ out.innerHTML = "لا توجد تنبيهات توفر بعد."; return; }
+    out.innerHTML = "<table><tr><th>التاريخ</th><th>الموديل</th><th>واتساب العميل</th><th></th></tr>" +
+      rows.map(function(r){
+        var wa = String(r[2] || "").replace(/[^0-9]/g, "");
+        if(wa && wa.charAt(0) === "0") wa = "20" + wa.slice(1);
+        return "<tr><td>" + esc(r[0]) + "</td><td>" + esc(r[1]) + "</td><td dir='ltr'>" + esc(r[2]) + "</td><td>" + (wa ? "<a class='btn-ghost' href='https://wa.me/" + wa + "' target='_blank' rel='noopener'>فتح واتساب ↗</a>" : "") + "</td></tr>";
+      }).join("") + "</table>";
+  }catch(err){ out.innerHTML = '<span class="error">' + esc(err.message) + '</span>'; }
+}
+
+/* ---------------- buy-link checker ---------------- */
+var BUYLINKS = {running:false, offset:0, total:0, broken:[], uncertain:[]};
+async function runBuyLinksCheck(){
+  if(BUYLINKS.running) return;
+  BUYLINKS.running = true; BUYLINKS.offset = 0; BUYLINKS.broken = []; BUYLINKS.uncertain = [];
+  var prog = document.getElementById("buylinks-progress");
+  var out = document.getElementById("buylinks-results");
+  var btn = document.getElementById("btn-run-buylinks");
+  if(btn) btn.disabled = true;
+  try{
+    while(true){
+      var d = await api("checkBuyLinks", null, {offset: BUYLINKS.offset, limit: 100});
+      BUYLINKS.total = d.total;
+      BUYLINKS.broken = BUYLINKS.broken.concat(d.broken || []);
+      BUYLINKS.uncertain = BUYLINKS.uncertain.concat(d.uncertain || []);
+      BUYLINKS.offset += 100;
+      prog.innerHTML = "تم فحص " + Math.min(BUYLINKS.offset, d.total) + " / " + d.total + " عرضاً — مكسور: " + BUYLINKS.broken.length + " · غير مؤكد: " + BUYLINKS.uncertain.length;
+      if(d.done) break;
+    }
+    renderBuyLinksResults();
+  }catch(err){
+    out.innerHTML = '<span class="error">' + esc(err.message) + '</span>';
+  }
+  BUYLINKS.running = false;
+  if(btn) btn.disabled = false;
+}
+function renderBuyLinksResults(){
+  var out = document.getElementById("buylinks-results");
+  var b = BUYLINKS.broken, u = BUYLINKS.uncertain;
+  var html = "<p>سليم: <b>" + Math.max(0, BUYLINKS.total - b.length - u.length) + "</b> · مكسور: <b>" + b.length + "</b> · غير مؤكد (مثال 403 من Cloudflare — ليست مكسورة بالضرورة): <b>" + u.length + "</b></p>";
+  if(b.length){
+    html += "<h3>روابط مكسورة</h3><table><tr><th>الصف</th><th>المنتج</th><th>النوع</th><th>الحالة</th><th>الرابط</th></tr>" +
+      b.map(function(x){ return "<tr><td>" + x.row + "</td><td>" + esc(x.model) + "</td><td>" + esc(x.kind) + "</td><td>" + x.status + "</td><td dir='ltr' style='word-break:break-all'>" + esc(x.url) + "</td></tr>"; }).join("") + "</table>";
+  }
+  if(u.length){
+    html += "<h3>غير مؤكد</h3><p class='hint'>" + u.slice(0, 20).map(function(x){ return esc(x.model) + " (" + x.status + ")"; }).join("، ") + (u.length > 20 ? "…" : "") + "</p>";
+  }
+  if(!b.length && !u.length) html += "<p class='ok'>كل روابط الشراء سليمة.</p>";
+  out.innerHTML = html;
+}
+function renderBuyLinksStatus(){
+  var el = document.getElementById("buylinks-status");
+  if(el && !el.textContent) el.textContent = "—";
+}
+async function setupDailyBuyLinksCheck(){
+  var el = document.getElementById("buylinks-status");
+  try{ await api("setupDailyBuyLinksCheck", {}); el.innerHTML = '<span class="ok">تم تفعيل الفحص اليومي — يُفحص 100 منتج كل يوم (الساعة 4 صباحاً) ويصلك تنبيه تلجرام عند وجود روابط مكسورة.</span>'; }
+  catch(err){ el.innerHTML = '<span class="error">' + esc(err.message) + '</span>'; }
+}
+
+/* ---------------- backup ---------------- */
+async function loadBackups(){
+  var out = document.getElementById("backups-list");
+  out.innerHTML = "جارٍ التحميل…";
+  try{
+    var d = await api("listBackups");
+    var list = d.backups || [];
+    out.innerHTML = list.length ? "<table><tr><th>الاسم</th><th>التاريخ</th><th></th></tr>" +
+      list.map(function(b){ return "<tr><td>" + esc(b.name) + "</td><td dir='ltr'>" + esc(b.date) + "</td><td><a class='btn-ghost' href='" + esc(b.url) + "' target='_blank' rel='noopener'>فتح ↗</a></td></tr>"; }).join("") + "</table>" : "لا توجد نسخ احتياطية بعد.";
+  }catch(err){ out.innerHTML = '<span class="error">' + esc(err.message) + '</span>'; }
+}
+async function backupNow(){
+  var el = document.getElementById("backup-status");
+  el.textContent = "جارٍ إنشاء النسخة الاحتياطية…";
+  try{ var r = await api("backupNow", {}); el.innerHTML = '<span class="ok">تم إنشاء النسخة: ' + esc(r.name) + ' — <a href="' + esc(r.url) + '" target="_blank" rel="noopener">فتح النسخة ↗</a></span>'; loadBackups(); }
+  catch(err){ el.innerHTML = '<span class="error">' + esc(err.message) + '</span>'; }
+}
+async function setupDailyBackup(){
+  var el = document.getElementById("backup-status");
+  try{ await api("setupDailyBackup", {}); el.innerHTML = '<span class="ok">تم تفعيل النسخ الاحتياطي اليومي — نسخة كل يوم الساعة 3 صباحاً في مجلد «3rde.online backups» على Drive، مع الاحتفاظ بأحدث 30 نسخة.</span>'; }
+  catch(err){ el.innerHTML = '<span class="error">' + esc(err.message) + '</span>'; }
+}
+
+/* ---------------- affiliate tools: daily check + AU lock ---------------- */
+async function renderAffiliateLockStatus(){
+  var el = document.getElementById("au-lock-status");
+  if(!el) return;
+  try{
+    var d = await api("affiliateLockStatus");
+    el.innerHTML = d.locked ? '<span class="ok">عمود AU مقفل حالياً (محمي من التعديل اليدوي).</span>' : 'عمود AU غير مقفل — يمكن تعديله باليد (خطر الانحراف عند الفرز).';
+    document.getElementById("btn-lock-au").style.display = d.locked ? "none" : "";
+    document.getElementById("btn-unlock-au").style.display = d.locked ? "" : "none";
+  }catch(err){ el.innerHTML = '<span class="hint">حالة القفل غير متاحة في نسخة Apps Script الحالية — حدّث Code.gs وأعد النشر.</span>'; }
+}
+async function lockAuColumn(){
+  try{ await api("lockAffiliateColumn", {}); toast("تم قفل عمود AU"); renderAffiliateLockStatus(); }
+  catch(err){ toast(err.message); }
+}
+async function unlockAuColumn(){
+  if(!confirm("فك حماية عمود AU؟ سيصبح قابلاً للتعديل اليدوي من جديد.")) return;
+  try{ await api("unlockAffiliateColumn", {}); toast("تم فك حماية عمود AU"); renderAffiliateLockStatus(); }
+  catch(err){ toast(err.message); }
+}
+async function setupDailyAffiliateCheck(){
+  var el = document.getElementById("au-daily-status");
+  try{ await api("setupDailyAffiliateCheck", {}); el.innerHTML = '<span class="ok">تم تفعيل الفحص اليومي لروابط الأفلييت — كل يوم الساعة 5 صباحاً، مع تنبيه تلجرام عند أي خلل.</span>'; }
+  catch(err){ el.innerHTML = '<span class="error">' + esc(err.message) + '</span>'; }
+}
+
+/* ---------------- scheduled publishing ---------------- */
+function toLocalInput(v){
+  if(!v) return "";
+  var d = new Date(v);
+  if(isNaN(d.getTime())) return "";
+  var p = function(n){ return ("0" + n).slice(-2); };
+  return d.getFullYear() + "-" + p(d.getMonth()+1) + "-" + p(d.getDate()) + "T" + p(d.getHours()) + ":" + p(d.getMinutes());
+}
+function fromLocalInput(v){
+  if(!v) return "";
+  var d = new Date(v);
+  return isNaN(d.getTime()) ? "" : d.toISOString();
+}
+async function setupScheduledPublish(msgId){
+  var el = document.getElementById(msgId);
+  try{
+    var r = await api("setupScheduledPublish", {});
+    el.innerHTML = '<span class="ok">تم تفعيل النشر المجدول — يُفحص كل ساعة ويُنشر ما حان وقته.' + ((r.publishedGuides || r.publishedNews) ? " (نُشر الآن: " + (r.publishedGuides||0) + " دليل، " + (r.publishedNews||0) + " خبر)" : "") + '</span>';
+    loadGuides(); loadNews();
+  }catch(err){ el.innerHTML = '<span class="error">' + esc(err.message) + '</span>'; }
+}
+async function publishDueNow(msgId){
+  var el = document.getElementById(msgId);
+  try{
+    var r = await api("publishScheduled", {});
+    el.innerHTML = '<span class="ok">تم النشر المستحق: ' + (r.publishedGuides||0) + ' دليل، ' + (r.publishedNews||0) + ' خبر.</span>';
+    loadGuides(); loadNews();
+  }catch(err){ el.innerHTML = '<span class="error">' + esc(err.message) + '</span>'; }
 }
 
 /* ---------------- logs ---------------- */
