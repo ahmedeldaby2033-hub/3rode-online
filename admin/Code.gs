@@ -94,7 +94,7 @@ function setupTabs() {
   })();
   sheet(SHEET_SYNCLOG, ['timestamp', 'action', 'details']);
   sheet(SHEET_CLICKS, ['timestamp', 'store', 'model', 'url']);
-  sheet(SHEET_REPORTS, ['timestamp', 'model', 'correct_price', 'note']);
+  sheet(SHEET_REPORTS, ['timestamp', 'model', 'correct_price', 'note', 'product_url']);
   sheet(SHEET_REQUESTS, ['timestamp', 'model', 'budget', 'email']);
   sheet(SHEET_STOCK_ALERTS, ['timestamp', 'model', 'whatsapp']);
   sheet(SHEET_GUIDES, ['slug', 'title', 'criterion', 'description', 'human_review', 'status', 'author', 'date']);
@@ -109,6 +109,13 @@ function setupTabs() {
       var hdr = sh.getRange(1, 1, 1, Math.max(sh.getLastColumn(), 1)).getValues()[0];
       if (hdr[8] !== 'publish_at') sh.getRange(1, 9).setValue('publish_at');
     });
+  })();
+  // Reports (col 5): product_url — the product page link on the site,
+  // sent with every wrong-price report. Old sheets get the header appended.
+  (function () {
+    var sh = ss().getSheetByName(SHEET_REPORTS);
+    var hdr = sh.getRange(1, 1, 1, Math.max(sh.getLastColumn(), 1)).getValues()[0];
+    if (hdr[4] !== 'product_url') sh.getRange(1, 5).setValue('product_url');
   })();
   sheet(SHEET_HANDLED, ['kind', 'timestamp', 'model']);
   return { ok: true };
@@ -612,8 +619,8 @@ function doPost(e) {
       return jsonOut({ ok: true });
     }
     if (action === 'reportPrice') {
-      sheet(SHEET_REPORTS).appendRow([new Date(), body.model || '', body.correctPrice || '', body.note || '']);
-      sendTelegram('⚠️ بلاغ سعر غير صحيح\nالهاتف: ' + (body.model || '') + '\nالسعر الصحيح: ' + (body.correctPrice || '') + '\nملاحظة: ' + (body.note || ''));
+      sheet(SHEET_REPORTS).appendRow([new Date(), body.model || '', body.correctPrice || '', body.note || '', body.url || '']);
+      sendTelegram('⚠️ بلاغ سعر غير صحيح\nالهاتف: ' + (body.model || '') + '\nالسعر الصحيح: ' + (body.correctPrice || '') + '\nملاحظة: ' + (body.note || '') + '\nالرابط: ' + (body.url || ''));
       return jsonOut({ ok: true });
     }
     if (action === 'requestProduct') {
