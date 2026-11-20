@@ -266,7 +266,8 @@
     postToAdmin('reportPrice', {
       model: reportForm.getAttribute('data-model') || '',
       note: $('#report-note').value || '',
-      correctPrice: $('#report-price').value || ''
+      correctPrice: $('#report-price').value || '',
+      url: window.location.href
     }, 'شكراً! وصل بلاغك وسنراجع السعر.');
     reportForm.reset();
   });
@@ -281,7 +282,7 @@
       // (and as whatsapp for forward-compatibility).
       email: $('#request-whatsapp').value || '',
       whatsapp: $('#request-whatsapp').value || ''
-    }, 'شكراً! سجلنا طلبك وسنضيف المنتج عند توفره.');
+    }, 'تم تسجيل طلبك، سيتم التواصل معك قريباً');
     reqForm.reset();
   });
   var stockForm = $('#stock-alert-form');
