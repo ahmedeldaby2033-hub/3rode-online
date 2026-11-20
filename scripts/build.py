@@ -97,8 +97,10 @@ _ICON_PATHS = {
     "sun": '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
     # install app
     "download": '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>',
-    # cheapest store badge
+    # best price badge (confirmation)
     "trophy": '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
+    # best price badge (check in a circle)
+    "check-circle": '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
     # draft warning
     "alert": '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
 }
@@ -260,11 +262,21 @@ def noon_url(model_display):
     return f"https://www.noon.com/egypt-en/search/?q={quote_plus(model_display)}"
 
 
-def buy_buttons(model_slug, model_display, jumia_href):
-    """The 3 buy buttons (templates/buy-buttons.html structure)."""
+def buy_buttons(model_slug, model_display, jumia_href, cheapest_store=""):
+    """The 3 buy buttons (templates/buy-buttons.html structure).
+    cheapest_store: store of the cheapest tracked offer ('جوميا' / 'أمازون' / 'نون').
+    The '(أفضل سعر حالياً)' badge goes on the cheapest store's button — NEVER on
+    the Noon button; if Noon is the cheapest, no badge is shown on any button."""
+    s = (cheapest_store or "").strip().lower()
+    is_jumia = s in ("جوميا", "jumia")
+    is_amazon = s in ("أمازون", "amazon")
+    # Noon never gets the badge, even if it is the cheapest.
+    badge = f' <span class="best-price-badge">{icon("check-circle")} (أفضل سعر حالياً)</span>'
+    jumia_badge = badge if is_jumia else ""
+    amazon_badge = badge if is_amazon else ""
     return f"""<div class="buy-buttons" data-model="{esc(model_slug)}">
-  <a class="btn-buy btn-jumia" href="{esc(jumia_href)}" {SPONSORED} data-store="jumia" data-model="{esc(model_slug)}" data-event="buy-click">اشترِ من جوميا مصر</a>
-  <a class="btn-buy btn-amazon" href="{esc(amazon_url(model_display, model_slug))}" {SPONSORED} data-store="amazon" data-model="{esc(model_slug)}" data-event="buy-click">اشترِ من أمازون مصر</a>
+  <a class="btn-buy btn-jumia" href="{esc(jumia_href)}" {SPONSORED} data-store="jumia" data-model="{esc(model_slug)}" data-event="buy-click">اشترِ من جوميا مصر{jumia_badge}</a>
+  <a class="btn-buy btn-amazon" href="{esc(amazon_url(model_display, model_slug))}" {SPONSORED} data-store="amazon" data-model="{esc(model_slug)}" data-event="buy-click">اشترِ من أمازون مصر{amazon_badge}</a>
   <a class="btn-buy btn-noon" href="{esc(noon_url(model_display))}" {SPONSORED} data-store="noon" data-model="{esc(model_slug)}" data-event="buy-click">اشترِ من نون مصر</a>
   <p class="affiliate-note">روابط شراء بالعمولة — <a href="/affiliate-disclosure/">اقرأ الإفصاح</a></p>
 </div>"""
@@ -1166,7 +1178,7 @@ def build_product(model):
 <p>{badge_html}</p>
 <p>{'★ ' + str(model.rating) + f' ({model.rating_count} تقييمات)' if model.rating else ''} • التوفر: {esc(availability_ar(c(cheapest, 'التوفر')))}</p>
 <p class="muted">آخر تحديث للسعر: <strong>{model.last_update}</strong> — المصدر: <a href="{esc(cheapest_url)}" rel="nofollow noopener" target="_blank">صفحة المنتج في جوميا</a></p>
-{buy_buttons(model.slug, model.display, cheapest_url)}
+{buy_buttons(model.slug, model.display, cheapest_url, norm(c(cheapest, "المتجر (جوميا / أمازون)")))}
 <div class="share-row">
 <a class="share-wa" href="https://wa.me/?text={share_text}%20{quote_plus(share_url)}" rel="nofollow noopener" target="_blank">مشاركة واتساب</a>
 <a class="share-tg" href="https://t.me/share/url?url={quote_plus(share_url)}&amp;text={share_text}" rel="nofollow noopener" target="_blank">مشاركة تليجرام</a>
