@@ -775,8 +775,8 @@ def build_index():
     brands_opts = "".join(
         f'<option value="{esc(b)}">{esc(b)} ({sum(1 for m in MODELS if m.brand == b)})</option>'
         for b in BRANDS)
-    rams = sorted({m.ram for m in MODELS})
-    storages = sorted({m.storage for m in MODELS})
+    rams = filter_size_opts({m.ram for m in MODELS}, 1)
+    storages = filter_size_opts({m.storage for m in MODELS}, 32)
     ram_opts = "".join(f'<option value="{esc(r)}">{esc(r)}</option>' for r in rams)
     st_opts = "".join(f'<option value="{esc(s)}">{esc(s)}</option>' for s in storages)
     brand_chips = "".join(
@@ -1327,8 +1327,8 @@ def build_deals_page():
     brands_opts = "".join(
         f'<option value="{esc(b)}">{esc(b)} ({sum(1 for m in MODELS if m.brand == b)})</option>'
         for b in BRANDS)
-    rams = sorted({m.ram for m in MODELS})
-    storages = sorted({m.storage for m in MODELS})
+    rams = filter_size_opts({m.ram for m in MODELS}, 1)
+    storages = filter_size_opts({m.storage for m in MODELS}, 32)
     ram_opts = "".join(f'<option value="{esc(r)}">{esc(r)}</option>' for r in rams)
     st_opts = "".join(f'<option value="{esc(s)}">{esc(s)}</option>' for s in storages)
     # best deals first: newest (release year), then cheapest
@@ -2001,6 +2001,42 @@ def parse_rear_camera_mp(text):
     if m:
         return float(m.group(1))
     return 0
+
+
+def size_to_gb(text):
+    """Parse a size string ('4GB', '512MB', '1TB', '<1GB') into GB (float).
+    Returns None if unparseable. '<1GB' counts as below 1GB."""
+    if not text:
+        return None
+    s = str(text).strip().upper()
+    if s.startswith("<"):
+        return 0.5
+    m = re.match(r"^([\d.]+)\s*(TB|GB|MB|KB)?$", s)
+    if not m:
+        return None
+    val = float(m.group(1))
+    unit = m.group(2) or "GB"
+    if unit == "TB":
+        return val * 1024
+    if unit == "GB":
+        return val
+    if unit == "MB":
+        return val / 1024
+    if unit == "KB":
+        return val / (1024 * 1024)
+    return None
+
+
+def filter_size_opts(values, min_gb):
+    """Filter size strings to >= min_gb and sort ascending by numeric size.
+    Returns the original display strings in ascending order."""
+    parsed = []
+    for v in values:
+        gb = size_to_gb(v)
+        if gb is not None and gb >= min_gb:
+            parsed.append((gb, v))
+    parsed.sort(key=lambda x: (x[0], x[1]))
+    return [v for _, v in parsed]
 
 
 def products_json():
