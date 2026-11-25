@@ -242,7 +242,7 @@
     var end = new Date(el.getAttribute('data-countdown') + 'T23:59:59+02:00').getTime();
     function tick() {
       var d = end - Date.now();
-      if (d <= 0) { el.textContent = 'انتهى العرض'; return; }
+      if (d <= 0) { el.textContent = 'انتهى العرض'; var b = el.closest('.wf-banner'); if (b) b.style.display = 'none'; return; }
       var days = Math.floor(d / 864e5), h = Math.floor(d % 864e5 / 36e5),
           m = Math.floor(d % 36e5 / 6e4), s = Math.floor(d % 6e4 / 1e3);
       el.textContent = 'متبقٍ ' + days + ' يوم و' + h + ' ساعة و' + m + ' دقيقة';
