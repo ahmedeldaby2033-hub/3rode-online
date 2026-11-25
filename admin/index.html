@@ -210,11 +210,13 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
     <button class="nav-item" data-tab="tab-guides" onclick="navTo('tab-guides')"><span class="nav-icon">📚</span><span class="nav-label">الأدلة</span></button>
     <button class="nav-item" data-tab="tab-news" onclick="navTo('tab-news')"><span class="nav-icon">📰</span><span class="nav-label">الأخبار</span></button>
     <button class="nav-item" data-tab="tab-seo" onclick="navTo('tab-seo')"><span class="nav-icon">🔍</span><span class="nav-label">فحص SEO</span></button>
+    <button class="nav-item" data-tab="tab-health" onclick="navTo('tab-health')"><span class="nav-icon">💚</span><span class="nav-label">صحة الموقع</span></button>
     <div class="nav-group">العملاء</div>
     <button class="nav-item" data-tab="tab-inbox" onclick="navTo('tab-inbox')"><span class="nav-icon">📥</span><span class="nav-label">الطلبات والبلاغات</span><span class="menu-badge" id="badge-inbox" style="display:none"></span></button>
     <button class="nav-item" data-tab="tab-stock" onclick="navTo('tab-stock')"><span class="nav-icon">🔔</span><span class="nav-label">تنبيهات التوفر</span></button>
     <div class="nav-group">التحليلات</div>
     <button class="nav-item" data-tab="tab-logs" onclick="navTo('tab-logs')"><span class="nav-icon">📊</span><span class="nav-label">النقرات والسجلات</span></button>
+    <button class="nav-item" data-tab="tab-clicks" onclick="navTo('tab-clicks')"><span class="nav-icon">📈</span><span class="nav-label">تحليل النقرات</span></button>
     <button class="nav-item" data-tab="tab-dead" onclick="navTo('tab-dead')"><span class="nav-icon">💀</span><span class="nav-label">منتجات بلا نقرات</span></button>
     <div class="nav-group">الأدوات</div>
     <button class="nav-item" data-tab="tab-buylinks" onclick="navTo('tab-buylinks')"><span class="nav-icon">🔗</span><span class="nav-label">فحص روابط الشراء</span></button>
@@ -528,6 +530,30 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
   <section class="tab" id="tab-guides">
     <div class="card"><h2>أدلة الشراء</h2>
       <p class="hint">النصوص المولَّدة جاهزة للنشر بعد مراجعتك البصرية فقط — المراجعة البشرية تُكتب تلقائياً بأسلوب احترافي. لا يُنشر دليل قبل مراجعتك (سياسة المحتوى الموسَّع في Google).</p>
+      <div class="card" style="background:var(--bg,#f4f6fb);margin-bottom:14px"><h3>✍️ مساعد الكتابة — مسودة كاملة من موديل واحد</h3>
+        <p class="hint">اكتب اسم الموديل، اختر نوع المسودة، وسيولّد المساعد الدليل أو الخبر كاملاً من الأسعار الحية والمواصفات — ثم راجعه بصرياً قبل الحفظ. (عناوين الأخبار لا تحتوي سعراً أبداً، ولا يُذكر الشيت كمصدر.)</p>
+        <div class="filters">
+          <input type="text" id="wa-model" placeholder="مثال: OPPO A6 أو Galaxy A07">
+          <select id="wa-type">
+            <option value="guide">دليل شراء للموديل</option>
+            <option value="news-drop">خبر انخفاض سعر</option>
+            <option value="news-launch">خبر وصول جديد</option>
+          </select>
+          <button class="btn" onclick="runWritingAssistant()">✦ ولّد المسودة</button>
+        </div>
+        <p id="wa-msg" class="hint"></p>
+      </div>
+      <div class="card" style="background:var(--bg,#f4f6fb);margin-bottom:14px"><h3>🔍 معاينة المقارنة قبل النشر</h3>
+        <p class="hint">اختر هاتفين أو ثلاثة وشاهد جدول المقارنة كما سيظهر في الموقع تماماً (نفس أعمدة صفحة /compare/، مع تمييز الأرخص والأقوى في كل صف). استخدمها قبل نشر دليل أو خبر مقارنة.</p>
+        <div class="filters">
+          <input type="text" id="cp-m1" placeholder="الهاتف الأول — مثال: Galaxy A07">
+          <input type="text" id="cp-m2" placeholder="الهاتف الثاني — مثال: OPPO A6">
+          <input type="text" id="cp-m3" placeholder="الهاتف الثالث (اختياري)">
+          <button class="btn" onclick="previewCompare()">عرض المقارنة</button>
+        </div>
+        <div id="cp-table" class="table-scroll">—</div>
+        <p id="cp-links" class="hint"></p>
+      </div>
       <div class="filters">
         <input type="text" id="guides-filter" placeholder="بحث بالعنوان…" oninput="gdFilterChanged()">
         <select id="gd-f-status" onchange="gdFilterChanged()"><option value="">كل الحالات</option><option value="published">منشور</option><option value="draft">مسودة</option><option value="scheduled">مجدول</option></select>
@@ -580,6 +606,10 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
         <p class="hint">فحص التشابه الداخلي، وبحث يدوي عن الانتحال عبر جوجل، ومؤشر تقريبي للكتابة الآلية، وفحص حقوق الصورة — كلها بدون خدمة خارجية مدفوعة.</p>
         <p><button type="button" class="btn-ghost" onclick="qualityCheck('gd')">تشغيل الفحوصات</button></p>
         <div id="gd-quality"></div></div>
+      <div class="card" style="background:var(--bg,#f4f6fb);margin-top:14px"><h3>🔗 اقتراحات الربط الداخلي</h3>
+        <p class="hint">أدلة ومنتجات وأخبار وصفحات ذات صلة بهذا الدليل (نفس المعيار، كلمات مفتاحية مشتركة، نفس الماركة) — انسخ الروابط لاستخدامها عند الكتابة. روابط «أدلة ذات صلة» تُضاف تلقائياً في صفحة الدليل المنشورة.</p>
+        <p><button type="button" class="btn" onclick="suggestInternalLinks()">عرض الاقتراحات</button></p>
+        <div id="gd-links"></div></div>
       <div class="card" style="background:var(--bg,#f4f6fb);margin-top:14px"><h3>توليد تلقائي من أسعار السوق المصري</h3>
         <p class="hint">توليد تلقائي من أسعار السوق المصري — راجع النص بصرياً قبل النشر.</p>
         <label for="gd-gen-criterion">المعيار</label>
@@ -692,6 +722,18 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
     </div>
   </section>
 
+  <section class="tab" id="tab-health">
+    <div class="card">
+      <h2>صحة الموقع 💚</h2>
+      <p class="hint">يفحص الموقع الحي مباشرة من متصفحك: الصفحة الرئيسية وحداثة الأسعار، خريطة الموقع وrobots.txt، الصفحات الرئيسية، تطبيق المزامنة، روابط الأفلييت، وads.txt. الفحص يشتغل تلقائياً عند فتح التبويب.</p>
+      <div class="filters">
+        <button class="btn" onclick="runSiteHealth()">🔄 إعادة الفحص</button>
+      </div>
+      <p id="sh-summary" class="muted">—</p>
+      <div id="sh-table" class="table-scroll">—</div>
+    </div>
+  </section>
+
   <section class="tab" id="tab-logs">
     <div class="card"><h2>سجل المزامنة</h2><div id="sync-log" class="table-scroll">—</div></div>
     <div class="card"><h2>سجل الأسعار (آخر التغييرات)</h2><div id="price-log" class="table-scroll">—</div></div>
@@ -713,6 +755,31 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
       <p class="hint">زوار طلبوا منتجاً بعينه وتركوا رقم واتساب — أقرب الزوار للشراء. تواصل معهم فور عودة المنتج للتوفر.</p>
       <p><button class="btn" onclick="loadStockAlerts()">تحديث القائمة</button></p>
       <div id="stock-alerts-list" class="table-scroll">—</div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-clicks">
+    <div class="card">
+      <h2>تحليل النقرات لكل منتج 📈</h2>
+      <p class="hint">من تبويب «النقرات»: أكثر المنتجات نقراً، وأي متجر يكسب النقرات لكل منتج، والمنتجات المعروضة التي لم ينقر عليها أحد في الفترة. (يتطلب نشر Code.gs كإصدار V9 — نفس إصدار زر «أكمل تلقائياً».)</p>
+      <div class="filters">
+        <select id="ca-f-days" onchange="CA_PAGE=1; loadClickAnalytics()">
+          <option value="7">آخر 7 أيام</option>
+          <option value="30" selected>آخر 30 يوماً</option>
+          <option value="90">آخر 90 يوماً</option>
+          <option value="0">كل الوقت</option>
+        </select>
+        <select id="ca-f-view" onchange="caFilterChanged()">
+          <option value="all">كل المنتجات المنقورة</option>
+          <option value="top">الأكثر نقراً (أول 20)</option>
+          <option value="zero">بلا أي نقرة</option>
+        </select>
+        <select id="ca-f-store" onchange="caFilterChanged()"><option value="">كل المتاجر</option></select>
+        <button class="btn-ghost" onclick="loadClickAnalytics()">🔄 تحديث</button>
+      </div>
+      <p id="ca-summary" class="muted">—</p>
+      <div id="ca-table" class="table-scroll">—</div>
+      <div id="ca-pagination"></div>
     </div>
   </section>
 
@@ -782,7 +849,7 @@ function activateTab(id){
   closeSidebar();
   if(id==="tab-coupons")loadCoupons(); if(id==="tab-guides")loadGuides(); if(id==="tab-news")loadNews(); if(id==="tab-logs")loadLogs(); if(id==="tab-inbox")loadInbox(); if(id==="tab-setup")renderSetupStatus();
   if(id==="tab-dead")loadDeadModels(); if(id==="tab-stock")loadStockAlerts(); if(id==="tab-backup")loadBackups();
-  if(id==="tab-affiliate")renderAffiliateLockStatus(); if(id==="tab-seo")loadSeoAudit(); if(id==="tab-dataquality")loadDataQuality();
+  if(id==="tab-affiliate")renderAffiliateLockStatus(); if(id==="tab-seo")loadSeoAudit(); if(id==="tab-dataquality")loadDataQuality(); if(id==="tab-clicks")loadClickAnalytics(); if(id==="tab-health")runSiteHealth();
   if(id==="tab-buylinks")renderBuyLinksStatus();
 }
 function showTab(ev,id){ activateTab(id); } // kept for the password banner + old callers
@@ -1281,7 +1348,7 @@ async function loadDataQuality(){
   var el = document.getElementById("dq-table");
   if(el) el.innerHTML = "جارٍ تحميل المنتجات…";
   try{
-    var d = await api("products");
+    var d = await api("products", null, {full: "1"});
     DQ_ROWS = d.rows || [];
     renderDataQuality();
   }catch(err){ if(el) el.innerHTML = '<span class="error">' + esc(err.message) + "</span>"; }
@@ -1358,7 +1425,7 @@ async function loadDqWidget(){
   var w = document.getElementById("dq-widget");
   if(w) w.textContent = "جارٍ الفحص…";
   try{
-    if(!DQ_ROWS.length){ var d = await api("products"); DQ_ROWS = d.rows || []; }
+    if(!DQ_ROWS.length){ var d = await api("products", null, {full: "1"}); DQ_ROWS = d.rows || []; }
     var noimg = 0, noyear = 0, nospecs = 0;
     DQ_ROWS.forEach(function(r){ var g = dqGaps(r); if(g.noImage) noimg++; if(g.noYear) noyear++; if(g.missingSpecs.length) nospecs++; });
     if(w) w.innerHTML = "بلا صورة: <b>" + noimg + "</b> • بلا سنة إصدار: <b>" + noyear + "</b> • ناقص مواصفات: <b>" + nospecs + "</b>";
@@ -2274,6 +2341,332 @@ function newsBodyText(n){
   P.push("تابع عروض أونلاين لأسعار الهواتف المحدثة يومياً في السوق المصري، وقارن دائماً بين جوميا وأمازون ونون قبل كل عملية شراء — فالفرق بين المتاجر على نفس الهاتف قد يصل إلى مئات الجنيهات.");
   return P.join("\n\n");
 }
+/* ---- Writing assistant: full draft (guide or news) from ONE model + live prices ---- */
+function modelSpecsLine(row){
+  var screen = _spec(row, 15), cpu = _spec(row, 16), ram = _spec(row, 14), storage = _spec(row, 13);
+  var mp = _mp(row), fmp = _frontMp(row), mah = _mah(row), charge = _spec(row, 20), os = _spec(row, 22);
+  var sp = [];
+  if(screen) sp.push("شاشة " + screen);
+  if(cpu) sp.push("معالج " + cpu);
+  if(ram || storage) sp.push("رام " + (ram || "—") + " وتخزين " + (storage || "—"));
+  if(mp) sp.push("كاميرا خلفية " + mp + " ميجابكسل");
+  if(fmp) sp.push("كاميرا أمامية " + fmp + " ميجابكسل");
+  if(mah) sp.push("بطارية " + mah + " مللي أمبير");
+  if(charge) sp.push("شحن بقدرة " + charge);
+  if(os) sp.push("نظام " + os);
+  return sp.length ? "يأتي بـ" + sp.join("، ") + "." : "";
+}
+function modelShortName(row, fallback){
+  return ((_spec(row, 2) || "") + " " + (_spec(row, 3) || "")).trim() || fallback || "";
+}
+function modelGuideTitle(n){
+  var short = modelShortName(n.best.row, n.displayName);
+  var t = "دليل شراء " + short + ": السعر والمواصفات 2026";
+  if(t.length > 65) t = "دليل شراء " + short + " 2026";
+  if(t.length > 65) t = "دليل شراء " + short;
+  return t;
+}
+function modelGuideDesc(n){
+  var row = n.best.row || [];
+  var store = _spec(row, 5) || "جوميا مصر";
+  return "دليل شراء " + n.displayName + " في مصر 2026: أرخص سعر " + n.price + " جنيهاً في " + store + (n.diff ? " (كان " + n.oldPrice + " جنيهاً)" : "") + "، المواصفات الكاملة، المميزات والعيوب، وهل يستحق الشراء؟ قارن الأسعار في جوميا وأمازون ونون.";
+}
+function modelGuideMetaTitle(n){
+  return _trimMetaTitle(modelShortName(n.best.row, n.displayName) + " | السعر والمواصفات | عروض أونلاين");
+}
+function modelGuideKeyword(n){
+  return "سعر " + modelShortName(n.best.row, n.displayName) + " في مصر";
+}
+function modelGuideTags(n){
+  var short = modelShortName(n.best.row, n.displayName);
+  return ["دليل شراء", _spec(n.best.row, 2), "سعر " + short, "مواصفات " + short].filter(Boolean).join("، ");
+}
+function modelGuideReview(n, offers){
+  var row = n.best.row || [];
+  var name = n.displayName;
+  var store = _spec(row, 5) || "جوميا مصر";
+  var P = [];
+  var specs = modelSpecsLine(row);
+  P.push(name + " متوفر في مصر بسعر يبدأ من " + n.price + " جنيهاً في " + store + (n.diff ? "، بعد انخفاض من " + n.oldPrice + " جنيهاً (وفّر " + n.diff + " جنيهاً)" : "") + "." + (specs ? " " + specs : ""));
+  var pros = _spec(row, 40);
+  if(pros){
+    P.push("من أبرز مميزات " + name + ": " + pros.split("؛").slice(0, 3).join("؛ ") + ".");
+  } else {
+    var strengths = [];
+    if(_mah(row)) strengths.push("بطارية " + _mah(row) + " مللي أمبير تكفي ليوم كامل");
+    if(_mp(row)) strengths.push("كاميرا خلفية " + _mp(row) + " ميجابكسل بتفاصيل واضحة");
+    if(_spec(row, 16)) strengths.push("معالج " + _spec(row, 16));
+    P.push(strengths.length ? ("من أبرز نقاط قوة " + name + ": " + strengths.join("، ") + ".") : (name + " يقدم مواصفات متوازنة في فئته السعرية."));
+  }
+  var cons = _spec(row, 41);
+  if(cons){
+    P.push("أما العيوب المسجلة على " + name + " فهي: " + cons.split("؛").slice(0, 3).join("؛ ") + ".");
+  } else {
+    P.push("لم تُسجَّل عيوب جوهرية على " + name + " في فئته السعرية، لكن راجع جدول المواصفات الكاملة في صفحة المنتج قبل الشراء، خاصة تفاصيل الشاشة والشحن.");
+  }
+  var lines = [];
+  (offers || []).slice().sort(function(a, b){
+    return (parseFloat(String(a[7] || "").replace(/[^0-9.]/g, "")) || 0) - (parseFloat(String(b[7] || "").replace(/[^0-9.]/g, "")) || 0);
+  }).forEach(function(o){
+    var p = parseFloat(String(o[7] || "").replace(/[^0-9.]/g, "")) || 0;
+    lines.push((o[5] || "متجر") + " " + p + " جنيهاً" + (String(o[10] || "") === "غير متوفر" ? " (غير متوفر حالياً)" : ""));
+  });
+  if(lines.length) P.push("الأسعار الحية لـ" + name + ": " + lines.join("، ") + ". قارن بين المتاجر في جدول الأسعار أسفل صفحة المنتج، فالفرق قد يصل إلى مئات الجنيهات.");
+  var verdict;
+  if(n.price < 10000) verdict = "بسعره الحالي، يعد " + name + " خياراً اقتصادياً قوياً لمن يريد هاتفاً عملياً دون إنفاق كبير.";
+  else if(n.price < 25000) verdict = "بسعره الحالي، يعد " + name + " خياراً متوازناً في الفئة المتوسطة — مواصفات قوية مقابل سعر معقول.";
+  else verdict = "بسعره الحالي، ينافس " + name + " في الفئة العليا — تأكد أن المواصفات التي تدفع ثمنها هي ما تحتاجه فعلاً قبل الشراء.";
+  P.push(verdict + " وقبل أن تقرر، حدّد أولوياتك (البطارية، الكاميرا، الأداء) وقارن " + name + " بمنافسيه في نفس الفئة السعرية على عروض أونلاين.");
+  return P.join("\n\n");
+}
+function fillModelGuide(n, offers){
+  var row = n.best.row || [];
+  var title = modelGuideTitle(n);
+  document.getElementById("gd-criterion").value = "model-review";
+  document.getElementById("gd-title").value = title;
+  document.getElementById("gd-desc").value = modelGuideDesc(n);
+  document.getElementById("gd-review").value = modelGuideReview(n, offers);
+  document.getElementById("gd-status").value = "draft";
+  document.getElementById("gd-date").value = new Date().toISOString().slice(0, 10);
+  document.getElementById("gd-keyword").value = modelGuideKeyword(n);
+  document.getElementById("gd-tags").value = modelGuideTags(n);
+  document.getElementById("gd-meta-title").value = modelGuideMetaTitle(n);
+  document.getElementById("gd-meta-desc").value = _trimMetaDesc(modelGuideDesc(n));
+  document.getElementById("gd-slug").value = modelSlugFromRow(row) + "-buying-guide";
+  var im = row[30];
+  if(im && String(im).indexOf("http") === 0){
+    document.getElementById("gd-image").value = sizedImageUrl(String(im), 800);
+    document.getElementById("gd-image-alt").value = title;
+  }
+  renderImagePreview("gd");
+  updateSeo("gd");
+}
+function launchDescText(n){
+  var row = n.best.row || [];
+  var store = _spec(row, 5) || "جوميا مصر";
+  return n.displayName + " وصل إلى مصر بسعر " + n.price + " جنيهاً في " + store + ". تعرف على المواصفات الكاملة والمميزات والعيوب، وقارن سعره في جوميا وأمازون ونون على عروض أونلاين.";
+}
+function launchBodyText(n){
+  var row = n.best.row || [];
+  var name = n.displayName;
+  var store = _spec(row, 5) || "جوميا مصر";
+  var P = [];
+  P.push("وصل " + name + " إلى السوق المصري بسعر " + n.price + " جنيهاً في " + store + ". " + modelSpecsLine(row));
+  P.push("يأتي " + name + " بمواصفات تجعله منافساً قوياً في فئته السعرية، من الشاشة إلى البطارية إلى الكاميرات. وقبل الشراء، قارن سعره في جوميا وأمازون ونون من صفحة المنتج على عروض أونلاين: https://3rde.online/mobiles/" + modelSlugFromRow(row) + "/ — فالأسعار تختلف بين المتاجر وقد تتغير خلال اليوم.");
+  if(_mp(row)) P.push("كاميرا " + name + " الخلفية بدقة " + _mp(row) + " ميجابكسل تلتقط صوراً واضحة التفاصيل في الإضاءة الجيدة." + (_frontMp(row) ? " أما الكاميرا الأمامية " + _frontMp(row) + " ميجابكسل فتكفي لمكالمات الفيديو وصور السيلفي اليومية." : ""));
+  if(_mah(row)) P.push("بطارية " + name + " بسعة " + _mah(row) + " مللي أمبير تمنحك يوماً كاملاً من الاستخدام العادي دون الحاجة إلى شاحن." + (_spec(row, 20) ? " كما يدعم الشحن بقدرة " + _spec(row, 20) + " ليعيد شحن البطارية بسرعة." : ""));
+  P.push("إذا كنت تفكر في شراء " + name + "، رتّب أولوياتك: البطارية لمن يستخدم الهاتف طوال اليوم، والكاميرا لمن يصور كثيراً، والرام والمعالج لمن يلعب أو يفتح تطبيقات كثيرة في نفس الوقت. ولا تنظر إلى رقم واحد فقط — قارن المواصفات الكاملة في صفحة المنتج قبل أن تقرر.");
+  P.push("اشترِ دائماً من متجر موثوق، وتحقق من الضمان وسياسة الإرجاع قبل الدفع. وتابع عروض أونلاين لأسعار الهواتف المحدثة يومياً في السوق المصري.");
+  return P.join("\n\n");
+}
+function fillNewsLaunch(n){
+  var row = n.best.row || [];
+  var short = modelShortName(row, n.displayName);
+  var title = short + " يصل مصر — السعر والمواصفات";
+  if(title.length > 60) title = short + " يصل مصر";
+  document.getElementById("nw-title").value = title;
+  document.getElementById("nw-desc").value = launchDescText(n);
+  document.getElementById("nw-body").value = launchBodyText(n);
+  document.getElementById("nw-model").value = modelSlugFromRow(row);
+  document.getElementById("nw-date").value = new Date().toISOString().slice(0, 10);
+  document.getElementById("nw-category").value = "إطلاق جديد";
+  document.getElementById("nw-keyword").value = short + " في مصر";
+  document.getElementById("nw-tags").value = ["إطلاق جديد", _spec(row, 2), short].filter(Boolean).join("، ");
+  document.getElementById("nw-meta-title").value = _trimMetaTitle(short + " يصل مصر | عروض أونلاين");
+  document.getElementById("nw-meta-desc").value = _trimMetaDesc(launchDescText(n));
+  document.getElementById("nw-slug").value = modelSlugFromRow(row) + "-egypt-launch";
+  var im = row[30];
+  if(im && String(im).indexOf("http") === 0){
+    document.getElementById("nw-image").value = sizedImageUrl(String(im), 1200);
+    document.getElementById("nw-image-alt").value = title;
+  }
+  renderImagePreview("nw");
+  updateSeo("nw");
+}
+async function runWritingAssistant(){
+  var q = document.getElementById("wa-model").value.trim();
+  var type = document.getElementById("wa-type").value;
+  var msg = document.getElementById("wa-msg");
+  if(!q){ msg.textContent = "اكتب اسم الموديل أولاً."; return; }
+  msg.textContent = "جارٍ جلب أسعار الموديل الحية…";
+  try{
+    _newsBestCache = null;
+    var n = await newsBest(q);
+    var row = n.best.row || [];
+    var oldP = parseFloat(String(row[8] || "").replace(/[^0-9.]/g, "")) || 0;
+    if(oldP > n.price){ n.oldPrice = oldP; n.diff = oldP - n.price; n.pct = Math.round(n.diff / oldP * 100); }
+    var d = await api("products", null, {q: q});
+    var key = modelKeyFromRow(row);
+    var offers = (d.rows || []).filter(function(r){ return modelKeyFromRow(r) === key; });
+    if(type === "guide"){
+      fillModelGuide(n, offers);
+      msg.textContent = "تم توليد دليل الشراء — راجعه في النموذج بالأسفل قبل الحفظ.";
+      document.getElementById("gd-slug").scrollIntoView({block: "nearest"});
+    } else if(type === "news-drop"){
+      if(!n.diff){ msg.textContent = "لا يوجد انخفاض مسجل لهذا الموديل (السعر الحالي يساوي السعر القديم) — جرّب «خبر وصول جديد» بدلاً من ذلك."; return; }
+      document.getElementById("nw-gen-q").value = q;
+      document.getElementById("nw-gen-old").value = String(n.oldPrice);
+      _newsBestCache = null;
+      await genNews();
+      await genField("nw", "keyword");
+      await genField("nw", "tags");
+      await genField("nw", "meta-title");
+      await genField("nw", "meta-desc");
+      navTo("tab-news");
+      document.getElementById("nw-gen-msg").textContent = "تم توليد الخبر من مساعد الكتابة — راجع الأرقام بصرياً قبل الحفظ والنشر.";
+    } else {
+      fillNewsLaunch(n);
+      navTo("tab-news");
+      document.getElementById("nw-gen-msg").textContent = "تم توليد خبر الوصول من مساعد الكتابة — راجع الأرقام بصرياً قبل الحفظ والنشر.";
+    }
+    toast("تم توليد المسودة");
+  }catch(err){ msg.textContent = err.message; }
+}
+/* ---- Compare preview: same table as /compare/ on the live site ---- */
+async function previewCompare(){
+  var qs = [1, 2, 3].map(function(i){ return document.getElementById("cp-m" + i).value.trim(); }).filter(Boolean);
+  var el = document.getElementById("cp-table");
+  var links = document.getElementById("cp-links");
+  if(links) links.innerHTML = "";
+  if(qs.length < 2){ el.innerHTML = "اختر هاتفين على الأقل للمقارنة."; return; }
+  el.innerHTML = "جارٍ جلب الأسعار الحية…";
+  try{
+    var items = [];
+    for(var i = 0; i < qs.length; i++){
+      var n = await newsBest(qs[i]);
+      items.push(n);
+    }
+    renderComparePreview(items);
+  }catch(err){ el.innerHTML = '<span class="error">' + esc(err.message) + "</span>"; }
+}
+function renderComparePreview(items){
+  var el = document.getElementById("cp-table");
+  var rows = items.map(function(n){ return n.best.row || []; });
+  var prices = items.map(function(n){ return n.price || 0; });
+  var minPrice = Math.min.apply(null, prices.filter(function(p){ return p > 0; }));
+  var mahs = rows.map(function(r){ return parseMah(r); });
+  var maxMah = Math.max.apply(null, mahs);
+  var mps = rows.map(function(r){ return parseMp(r); });
+  var maxMp = Math.max.apply(null, mps);
+  function bestCell(v, isBest){ return isBest ? "<b class='seo-ok'>" + esc(v) + " ✓</b>" : esc(v); }
+  var h = '<table><thead><tr><th>المواصفة</th>' +
+    items.map(function(n){
+      var r = n.best.row || [];
+      return '<th><a href="https://3rde.online/mobiles/' + modelSlugFromRow(r) + '/" target="_blank" rel="noopener">' + esc(n.displayName) + '</a></th>';
+    }).join('') + '</tr></thead><tbody>';
+  h += '<tr><td><strong>الصورة</strong></td>' + rows.map(function(r){
+    var im = r[30];
+    return '<td>' + (im && String(im).indexOf("http") === 0 ? '<img src="' + esc(sizedImageUrl(String(im), 300)) + '" alt="" loading="lazy" style="max-width:130px;height:auto;display:block;margin:0 auto">' : '—') + '</td>';
+  }).join('') + '</tr>';
+  h += '<tr><td><strong>السعر</strong></td>' + items.map(function(n){
+    return '<td>' + bestCell((n.price ? n.price.toLocaleString("en-US") : "—") + ' جنيه', n.price === minPrice && n.price > 0) + '</td>';
+  }).join('') + '</tr>';
+  var specRows = [
+    ['الماركة', function(r){ return _spec(r, 2) || '—'; }, null],
+    ['التخزين / الرام', function(r){ return (_spec(r, 13) || '—') + ' / ' + (_spec(r, 14) || '—'); }, null],
+    ['الشاشة', function(r){ return _spec(r, 15) || '—'; }, null],
+    ['المعالج', function(r){ return _spec(r, 16) || '—'; }, null],
+    ['البطارية', function(r){ return _spec(r, 19) || '—'; }, function(i){ return mahs[i] === maxMah && maxMah > 0; }],
+    ['الكاميرا الخلفية', function(r){ return _spec(r, 17) || '—'; }, function(i){ return mps[i] === maxMp && maxMp > 0; }],
+    ['يدعم 5G', function(r){ return String(r[31] || '').trim() === 'نعم' ? 'نعم' : 'لا'; }, null],
+    ['التقييم', function(r){ return _spec(r, 11) ? ('★ ' + _spec(r, 11) + ' (' + (_spec(r, 12) || 0) + ')') : '—'; }, null]
+  ];
+  specRows.forEach(function(sr){
+    h += '<tr><td><strong>' + sr[0] + '</strong></td>' + rows.map(function(r, i){
+      var v = sr[1](r);
+      return '<td>' + (sr[2] ? bestCell(v, sr[2](i)) : esc(v)) + '</td>';
+    }).join('') + '</tr>';
+  });
+  h += '</tbody></table>';
+  el.innerHTML = h;
+  var slugs = items.map(function(n){ return modelSlugFromRow(n.best.row || []); });
+  var url = "https://3rde.online/compare/?m=" + slugs.join(",");
+  var links = document.getElementById("cp-links");
+  if(links) links.innerHTML = '<a href="' + url + '" target="_blank" rel="noopener">فتح المقارنة في الموقع ↗</a> · <button type="button" class="btn-ghost" onclick="navigator.clipboard.writeText(\'' + url + '\').then(function(){toast(\'تم نسخ رابط المقارنة\')})">نسخ رابط المقارنة</button>';
+}
+/* ---- Internal linking suggestions for the current guide ---- */
+var IL_PRODUCTS = null;
+function ilTokens(s){
+  return String(s || "").toLowerCase().replace(/[^a-z0-9\u0600-\u06FF]+/g, " ").split(" ").filter(function(w){ return w.length > 2; });
+}
+async function suggestInternalLinks(){
+  var el = document.getElementById("gd-links");
+  el.innerHTML = "جارٍ حساب الاقتراحات…";
+  try{
+    if(!GUIDES_DATA.length) await loadGuides();
+    if(!NEWS_DATA.length) await loadNews();
+    if(!IL_PRODUCTS){ var d = await api("products", null, {full: "1"}); IL_PRODUCTS = d.rows || []; }
+    var g = readGuideForm();
+    var crit = String(g.criterion || "").trim();
+    var kw = ilTokens(g.keyword + " " + g.tags + " " + g.title);
+    var brands = [];
+    IL_PRODUCTS.forEach(function(r){ var b = String(r[2] || "").trim(); if(b && brands.indexOf(b) === -1) brands.push(b); });
+    var brandTok = "";
+    brands.forEach(function(b){
+      if(kw.indexOf(b.toLowerCase()) !== -1 || String(g.title || "").toLowerCase().indexOf(b.toLowerCase()) !== -1) brandTok = b;
+    });
+    var guides = [];
+    GUIDES_DATA.slice(1).forEach(function(r){
+      if(String(r[0]) === g.slug) return;
+      var score = 0;
+      if(crit && String(r[2]) === crit) score += 3;
+      var t2 = ilTokens(r[11] + " " + r[14] + " " + r[1]);
+      var shared = kw.filter(function(w){ return t2.indexOf(w) !== -1; }).length;
+      score += Math.min(shared, 3);
+      if(score > 0) guides.push({score: score, slug: String(r[0]), title: String(r[1] || "")});
+    });
+    guides.sort(function(a, b){ return b.score - a.score; });
+    var prods = [];
+    try{
+      if(GD_TITLES[crit]){ var gt = await guideTop5(); prods = gt.top.map(function(m){ return {slug: modelSlugFromRow(m.row), title: m.row[0] || ""}; }); }
+    }catch(_){}
+    if(!prods.length && brandTok){
+      var byKey = {};
+      IL_PRODUCTS.forEach(function(r){
+        if(String(r[2]) !== brandTok) return;
+        var k = modelKeyFromRow(r);
+        var price = parseFloat(String(r[7] || "").replace(/[^0-9.]/g, "")) || 0;
+        if(!byKey[k] || (price && price < byKey[k].price)) byKey[k] = {row: r, price: price, rating: parseFloat(String(r[11] || "").replace(/[^0-9.]/g, "")) || 0};
+      });
+      prods = Object.keys(byKey).map(function(k){ return byKey[k]; })
+        .sort(function(a, b){ return b.rating - a.rating || a.price - b.price; }).slice(0, 5)
+        .map(function(m){ return {slug: modelSlugFromRow(m.row), title: m.row[0] || ""}; });
+    }
+    var prodSlugs = {};
+    prods.forEach(function(p){ prodSlugs[p.slug] = 1; });
+    var news = [];
+    NEWS_DATA.slice(1).forEach(function(r){
+      if(String(r[7]) === "true" || String(r[7]) === "TRUE") return;
+      var sc = 0;
+      if(prodSlugs[String(r[4] || "")]) sc += 3;
+      if(brandTok && String(r[1] || "").toLowerCase().indexOf(brandTok.toLowerCase()) !== -1) sc += 2;
+      if(sc > 0) news.push({score: sc, slug: String(r[0]), title: String(r[1] || "")});
+    });
+    news.sort(function(a, b){ return b.score - a.score; });
+    var pages = [];
+    if(crit === "under_10000") pages.push({title: "أفضل الهواتف تحت 10,000 جنيه", url: "/budget/under-10000/"});
+    else if(crit === "under_15000") pages.push({title: "أفضل الهواتف تحت 15,000 جنيه", url: "/budget/under-15000/"});
+    else if(crit === "under_20000") pages.push({title: "أفضل الهواتف تحت 20,000 جنيه", url: "/budget/under-20000/"});
+    if(brandTok) pages.push({title: "كل هواتف " + brandTok, url: "/brand/" + slugifyTitle(brandTok) + "/"});
+    pages.push({title: "أفضل العروض", url: "/deals/"});
+    renderIlSuggestions(guides.slice(0, 5), prods.slice(0, 5), news.slice(0, 5), pages);
+  }catch(err){ el.innerHTML = '<span class="error">' + esc(err.message) + "</span>"; }
+}
+function renderIlSuggestions(guides, prods, news, pages){
+  var el = document.getElementById("gd-links");
+  function sec(label, items, prefix){
+    if(!items.length) return "";
+    return "<h4>" + label + " (" + items.length + ")</h4><ul>" + items.map(function(it){
+      var url = it.url || (prefix + it.slug + "/");
+      return "<li><b>" + esc(it.title) + "</b> — <a href='https://3rde.online" + url + "' target='_blank' rel='noopener'>" + url + "</a> " +
+        "<button type='button' class='btn-ghost' onclick=\"navigator.clipboard.writeText('https://3rde.online" + url + "').then(function(){toast('تم النسخ')})\">نسخ</button></li>";
+    }).join("") + "</ul>";
+  }
+  var html = sec("📖 أدلة ذات صلة", guides, "/guides/") + sec("📱 منتجات ذات صلة", prods, "/mobiles/") + sec("📰 أخبار ذات صلة", news, "/news/") + sec("🌐 صفحات الموقع", pages, "");
+  if(!html) html = "لا توجد اقتراحات لهذا الدليل بعد — جرّب كتابة المعيار أو الكلمة المفتاحية أولاً.";
+  else html += "<p class='hint'>روابط «أدلة ذات صلة» تُضاف تلقائياً في صفحة الدليل المنشورة (قسم بنفس الاسم)؛ باقي الروابط للاستخدام عند كتابة المراجعة أو في أدلة أخرى.</p>";
+  el.innerHTML = html;
+}
 async function genGuide(){
   var msg = document.getElementById("gd-gen-msg");
   msg.textContent = "جارٍ جلب المنتجات من السوق المصري…";
@@ -2566,8 +2959,9 @@ function paginationHtml(prefix, page, totalPages, total, start, end){
 function setPage(prefix, n){
   if(prefix === "gd"){ GD_PAGE = n; renderGuides(); }
   else if(prefix === "dq"){ DQ_PAGE = n; renderDataQuality(); }
+  else if(prefix === "ca"){ CA_PAGE = n; renderClickAnalytics(); }
   else { NW_PAGE = n; renderNews(); }
-  var t = prefix === "gd" ? "guides-table" : (prefix === "dq" ? "dq-table" : "news-table");
+  var t = prefix === "gd" ? "guides-table" : (prefix === "dq" ? "dq-table" : (prefix === "ca" ? "ca-table" : "news-table"));
   var el = document.getElementById(t); if(el) el.scrollIntoView({block:"nearest"});
 }
 function sortRows(rows, sort, dateIdx, titleIdx){
@@ -3038,6 +3432,169 @@ async function publishDueNow(msgId){
 }
 
 /* ---------------- logs ---------------- */
+/* ---- Click analytics: per-product clicks, store winner, zero-click models ---- */
+var CA_DATA = null;
+var CA_PRODUCTS = [];
+var CA_PAGE = 1;
+function caFilterChanged(){ CA_PAGE = 1; renderClickAnalytics(); }
+async function loadClickAnalytics(){
+  var el = document.getElementById("ca-table");
+  if(el) el.innerHTML = "جارٍ تحميل النقرات…";
+  try{
+    var days = document.getElementById("ca-f-days").value;
+    CA_DATA = await api("clickAnalytics", null, {days: days});
+    if(!CA_PRODUCTS.length){ var d = await api("products", null, {full: "1"}); CA_PRODUCTS = d.rows || []; }
+    renderClickAnalytics();
+  }catch(err){ if(el) el.innerHTML = '<span class="error">' + esc(err.message) + "</span>"; }
+}
+function caStoreList(){
+  var names = Object.keys((CA_DATA && CA_DATA.byStore) || {});
+  names.sort(function(a,b){ return CA_DATA.byStore[b] - CA_DATA.byStore[a]; });
+  return names.slice(0, 4);
+}
+function caTopStore(byStore){
+  var best = "", n = 0;
+  for (var s in byStore) if(byStore[s] > n){ n = byStore[s]; best = s; }
+  return best;
+}
+function renderClickAnalytics(){
+  var el = document.getElementById("ca-table");
+  if(!el || !CA_DATA) return;
+  var pg = document.getElementById("ca-pagination");
+  var view = document.getElementById("ca-f-view").value;
+  var storeF = document.getElementById("ca-f-store").value;
+  var stores = caStoreList();
+  fillSelectOptions("ca-f-store", stores, storeF, "كل المتاجر");
+  var prodBySlug = {}, seen = {};
+  CA_PRODUCTS.forEach(function(r){
+    if(!r[0]) return;
+    var key = r[2] + "|" + r[3] + "|" + r[13] + "|" + r[14];
+    if(seen[key]) return; seen[key] = 1;
+    var slug = modelSlugFromRow(r);
+    if(!prodBySlug[slug]) prodBySlug[slug] = r;
+  });
+  var clicked = {};
+  CA_DATA.models.forEach(function(m){ clicked[m.slug] = m; });
+  var zeroCount = 0;
+  Object.keys(prodBySlug).forEach(function(s){ if(!clicked[s]) zeroCount++; });
+  var total = CA_DATA.total;
+  var sm = document.getElementById("ca-summary");
+  if(sm){
+    var byStoreTxt = Object.keys(CA_DATA.byStore).map(function(s){
+      var n = CA_DATA.byStore[s];
+      return esc(s) + ": " + n + " (" + (total ? Math.round(n/total*100) : 0) + "%)";
+    }).join(" · ");
+    var top = CA_DATA.models[0];
+    var topTxt = top ? ("الأكثر نقراً: " + esc((prodBySlug[top.slug]||[""])[0] || top.slug) + " (" + top.total + ")") : "لا توجد نقرات في الفترة";
+    sm.innerHTML = "إجمالي النقرات (" + CA_DATA.days + " يوم): <b>" + total + "</b> — " + byStoreTxt + "<br>" + topTxt + " — منتجات بلا أي نقرة: <b class='seo-bad'>" + zeroCount + "</b>";
+  }
+  var rows = [];
+  if(view === "zero"){
+    Object.keys(prodBySlug).forEach(function(slug){
+      if(clicked[slug]) return;
+      var r = prodBySlug[slug];
+      rows.push({ slug: slug, name: r[0], brand: r[2], price: r[7], total: 0, byStore: {}, last: 0, url: r[4] });
+    });
+    rows.sort(function(a,b){ return String(b.price||"").localeCompare(String(a.price||"")); });
+  } else {
+    CA_DATA.models.forEach(function(m){
+      var r = prodBySlug[m.slug];
+      if(storeF && !(m.byStore[storeF] > 0)) return;
+      rows.push({ slug: m.slug, name: r ? r[0] : m.slug, brand: r ? r[2] : "—", price: r ? r[7] : "", total: m.total, byStore: m.byStore, last: m.last, url: r ? r[4] : "" });
+    });
+    if(view === "top") rows = rows.slice(0, 20);
+  }
+  if(!rows.length){ el.innerHTML = view === "zero" ? "لا توجد منتجات بلا نقرات في هذه الفترة 🎉" : "لا توجد نقرات مطابقة للفلتر."; if(pg) pg.innerHTML=""; return; }
+  var totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  if(CA_PAGE > totalPages) CA_PAGE = totalPages;
+  if(CA_PAGE < 1) CA_PAGE = 1;
+  var start = (CA_PAGE-1)*PAGE_SIZE, pageRows = rows.slice(start, start+PAGE_SIZE);
+  var head = "<table><tr><th>المنتج</th><th>الماركة</th><th>السعر</th><th>النقرات</th>" +
+    stores.map(function(s){ return "<th>" + esc(s) + "</th>"; }).join("") +
+    "<th>المتجر الفائز</th><th>آخر نقرة</th><th></th></tr>";
+  el.innerHTML = head + pageRows.map(function(x){
+    var cells = stores.map(function(s){ return "<td>" + (x.byStore[s] || 0) + "</td>"; }).join("");
+    var win = x.total ? caTopStore(x.byStore) : "—";
+    var last = x.last ? fmtDate(new Date(x.last).toISOString().slice(0,10)) : "—";
+    var open = x.url ? "<a href='" + esc(x.url) + "' target='_blank' rel='noopener'>المنتج ↗</a>" : "";
+    return "<tr><td>" + esc(x.name) + "</td><td>" + esc(x.brand) + "</td><td>" + esc(String(x.price||"")) + "</td><td><b>" + x.total + "</b></td>" + cells + "<td>" + esc(win) + "</td><td>" + last + "</td><td>" + open + "</td></tr>";
+  }).join("") + "</table>";
+  if(pg) pg.innerHTML = paginationHtml("ca", CA_PAGE, totalPages, rows.length, start+1, Math.min(start+PAGE_SIZE, rows.length));
+}
+/* ---- Site Health: live checks of the public site, the sync app and affiliates ---- */
+var SH_LAST = null;
+async function shProbe(url){
+  try{
+    var c = new AbortController();
+    var t = setTimeout(function(){ c.abort(); }, 15000);
+    var r = await fetch(url, {signal: c.signal});
+    clearTimeout(t);
+    return {status: r.status, text: r.ok ? await r.text() : ""};
+  }catch(e){ return {status: 0, text: "", error: String((e && e.message) || e)}; }
+}
+async function runSiteHealth(){
+  var el = document.getElementById("sh-table");
+  if(el) el.innerHTML = "جارٍ فحص الموقع…";
+  var rows = [];
+  function row(name, status, detail){ rows.push({name: name, status: status, detail: detail}); }
+  var home = await shProbe("https://3rde.online/");
+  if(home.status === 200){
+    row("الصفحة الرئيسية", "ok", "HTTP 200");
+    var m = home.text.match(/آخر تحديث للأسعار من الشيت:\s*(\d{4}-\d{2}-\d{2})/);
+    if(m){
+      var days = Math.floor((Date.now() - new Date(m[1] + "T00:00:00").getTime()) / 86400000);
+      row("حداثة الأسعار", days <= 2 ? "ok" : (days <= 7 ? "warn" : "fail"),
+          "آخر تحديث: " + m[1] + " (منذ " + days + " يوم)");
+    } else {
+      row("حداثة الأسعار", "warn", "لم نعثر على تاريخ التحديث في الصفحة الرئيسية");
+    }
+  } else {
+    row("الصفحة الرئيسية", "fail", home.status ? ("HTTP " + home.status) : "تعذر الوصول — " + (home.error || ""));
+    row("حداثة الأسعار", "warn", "تخطَّينا الفحص لأن الرئيسية غير متاحة");
+  }
+  var sm = await shProbe("https://3rde.online/sitemap.xml");
+  if(sm.status === 200){
+    var n = (sm.text.match(/<loc>/g) || []).length;
+    row("خريطة الموقع (sitemap)", n > 0 ? "ok" : "warn", n + " رابط");
+  } else row("خريطة الموقع (sitemap)", "fail", sm.status ? ("HTTP " + sm.status) : "تعذر الوصول");
+  var rb = await shProbe("https://3rde.online/robots.txt");
+  if(rb.status === 200) row("robots.txt", /sitemap/i.test(rb.text) ? "ok" : "warn", /sitemap/i.test(rb.text) ? "يحتوي رابط الخريطة" : "لا يحتوي رابط الخريطة");
+  else row("robots.txt", "fail", rb.status ? ("HTTP " + rb.status) : "تعذر الوصول");
+  var pages = [["أفضل العروض", "/deals/"], ["أدلة الشراء", "/guides/"], ["الأخبار", "/news/"], ["قارن بين الهواتف", "/compare/"], ["الكوبونات", "/coupons/"], ["البحث بالميزانية", "/budget/"]];
+  for(var i = 0; i < pages.length; i++){
+    var p = await shProbe("https://3rde.online" + pages[i][1]);
+    row(pages[i][0], p.status === 200 ? "ok" : "fail", p.status ? ("HTTP " + p.status) : "تعذر الوصول");
+  }
+  var sync = await shProbe("https://sync.3rde.online/health");
+  if(sync.status === 200) row("تطبيق المزامنة", "ok", "يستجيب (health: ok)");
+  else row("تطبيق المزامنة", "fail", sync.status ? ("HTTP " + sync.status) : "تعذر الوصول — تحقق من Coolify");
+  try{
+    var aff = await api("checkAffiliate");
+    var bad = (aff.mismatched || []).length + (aff.missing || []).length;
+    row("روابط الأفلييت (JForce)", bad === 0 ? "ok" : "warn", bad === 0 ? ("سليمة — " + (aff.total || 0) + " صف") : (bad + " رابط مخالف/ناقص من " + (aff.total || 0)));
+  }catch(e){ row("روابط الأفلييت (JForce)", "warn", "تعذر الفحص: " + e.message); }
+  var ads = await shProbe("https://3rde.online/ads.txt");
+  if(ads.status === 200) row("ads.txt", "ok", "موجود");
+  else row("ads.txt", "warn", "غير موجود — يلزم عند تفعيل AdSense");
+  renderSiteHealth(rows);
+}
+function renderSiteHealth(rows){
+  var el = document.getElementById("sh-table");
+  if(!el) return;
+  var ok = rows.filter(function(r){ return r.status === "ok"; }).length;
+  var warn = rows.filter(function(r){ return r.status === "warn"; }).length;
+  var fail = rows.filter(function(r){ return r.status === "fail"; }).length;
+  var icons = {ok: "✅ سليم", warn: "⚠️ تحذير", fail: "❌ خطأ"};
+  var cls = {ok: "seo-ok", warn: "", fail: "seo-bad"};
+  SH_LAST = new Date();
+  document.getElementById("sh-summary").innerHTML =
+    "سليم: <b class='seo-ok'>" + ok + "</b> · تحذير: <b>" + warn + "</b> · خطأ: <b class='seo-bad'>" + fail + "</b>" +
+    " — آخر فحص: " + SH_LAST.toLocaleString("ar-EG");
+  el.innerHTML = "<table><tr><th>الفحص</th><th>الحالة</th><th>التفاصيل</th></tr>" +
+    rows.map(function(r){
+      return "<tr><td>" + esc(r.name) + "</td><td class='" + cls[r.status] + "'><b>" + icons[r.status] + "</b></td><td>" + esc(r.detail) + "</td></tr>";
+    }).join("") + "</table>";
+}
 async function loadLogs(){
   try{
     var sl=await api("syncLog");
