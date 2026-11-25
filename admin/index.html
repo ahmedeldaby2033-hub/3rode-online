@@ -631,7 +631,7 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
       <div class="card" style="background:var(--bg,#f4f6fb);margin-top:14px"><h3>توليد تلقائي من أسعار السوق المصري</h3>
         <p class="hint">توليد تلقائي من أسعار السوق المصري — راجع النص بصرياً قبل النشر.</p>
         <label for="gd-gen-criterion">المعيار</label>
-        <select id="gd-gen-criterion"><option value="under_10000">أفضل هواتف تحت 10,000 جنيه</option><option value="battery">أفضل بطارية</option><option value="camera">أفضل كاميرا</option><option value="gaming">أفضل هواتف للألعاب</option></select>
+        <select id="gd-gen-criterion"><option value="under_5000">أفضل هواتف تحت 5,000 جنيه</option><option value="under_7000">أفضل هواتف تحت 7,000 جنيه</option><option value="under_10000">أفضل هواتف تحت 10,000 جنيه</option><option value="under_12000">أفضل هواتف تحت 12,000 جنيه</option><option value="under_15000">أفضل هواتف تحت 15,000 جنيه</option><option value="under_20000">أفضل هواتف تحت 20,000 جنيه</option><option value="under_25000">أفضل هواتف تحت 25,000 جنيه</option><option value="under_30000">أفضل هواتف تحت 30,000 جنيه</option><option value="under_40000">أفضل هواتف تحت 40,000 جنيه</option><option value="under_50000">أفضل هواتف تحت 50,000 جنيه</option><option value="battery">أفضل بطارية</option><option value="camera">أفضل كاميرا</option><option value="gaming">أفضل هواتف للألعاب</option></select>
         <p><button type="button" class="btn" onclick="genGuide()">توليد مسودة الدليل</button></p>
         <p id="gd-gen-msg" class="hint"></p></div>
       <p><button class="btn-green" onclick="saveGuide()">حفظ الدليل</button> <button class="btn" onclick="previewGuide()">👁 معاينة قبل النشر</button> <button class="btn" onclick="humanizeGuide()">✨ Humanize — طبيعي أكثر</button></p>
@@ -2284,18 +2284,36 @@ function _mah(row){ var m = String((row && row[19]) || "").match(/(\d[\d,.]*)\s*
 function _mp(row){ var m = String((row && row[17]) || "").match(/(\d+)\s*MP/i); return m ? m[1] : ""; }
 function _frontMp(row){ var m = String((row && row[18]) || "").match(/(\d+)\s*MP/i); return m ? m[1] : ""; }
 var GD_TITLES = {
+  under_5000: "أفضل هواتف تحت 5,000 جنيه في مصر 2026 — دليل الشراء",
+  under_7000: "أفضل هواتف تحت 7,000 جنيه في مصر 2026 — دليل الشراء",
   under_10000: "أفضل هواتف تحت 10,000 جنيه في مصر 2026 — دليل الشراء",
+  under_12000: "أفضل هواتف تحت 12,000 جنيه في مصر 2026 — دليل الشراء",
+  under_15000: "أفضل هواتف تحت 15,000 جنيه في مصر 2026 — دليل الشراء",
+  under_20000: "أفضل هواتف تحت 20,000 جنيه في مصر 2026 — دليل الشراء",
+  under_25000: "أفضل هواتف تحت 25,000 جنيه في مصر 2026 — دليل الشراء",
+  under_30000: "أفضل هواتف تحت 30,000 جنيه في مصر 2026 — دليل الشراء",
+  under_40000: "أفضل هواتف تحت 40,000 جنيه في مصر 2026 — دليل الشراء",
+  under_50000: "أفضل هواتف تحت 50,000 جنيه في مصر 2026 — دليل الشراء",
   battery: "أفضل هواتف ببطارية كبيرة في مصر 2026 — دليل الشراء",
   camera: "أفضل هواتف للتصوير في مصر 2026 — دليل الشراء",
   gaming: "أفضل هواتف للألعاب في مصر 2026 — دليل الشراء"
 };
 var GD_KEYWORDS = {
+  under_5000: "أفضل هواتف تحت 5,000 جنيه",
+  under_7000: "أفضل هواتف تحت 7,000 جنيه",
   under_10000: "أفضل هواتف تحت 10,000 جنيه",
+  under_12000: "أفضل هواتف تحت 12,000 جنيه",
+  under_15000: "أفضل هواتف تحت 15,000 جنيه",
+  under_20000: "أفضل هواتف تحت 20,000 جنيه",
+  under_25000: "أفضل هواتف تحت 25,000 جنيه",
+  under_30000: "أفضل هواتف تحت 30,000 جنيه",
+  under_40000: "أفضل هواتف تحت 40,000 جنيه",
+  under_50000: "أفضل هواتف تحت 50,000 جنيه",
   battery: "أفضل هواتف ببطارية كبيرة",
   camera: "أفضل هواتف للتصوير",
   gaming: "أفضل هواتف للألعاب"
 };
-var GD_CRIT_LABEL = {under_10000: "هواتف اقتصادية", battery: "بطارية كبيرة", camera: "تصوير", gaming: "ألعاب"};
+var GD_CRIT_LABEL = {under_5000: "هواتف اقتصادية", under_7000: "هواتف اقتصادية", under_10000: "هواتف اقتصادية", under_12000: "هواتف اقتصادية", under_15000: "هواتف اقتصادية", under_20000: "هواتف اقتصادية", under_25000: "هواتف اقتصادية", under_30000: "هواتف اقتصادية", under_40000: "هواتف اقتصادية", under_50000: "هواتف اقتصادية", battery: "بطارية كبيرة", camera: "تصوير", gaming: "ألعاب"};
 function guideDescText(g){
   return "دليل شراء محدث بالأسعار الحالية في السوق المصري: " + g.title + " — أفضل 5 هواتف حسب الأسعار والتقييمات: " + g.list + ". الأسعار من جوميا مصر وقد تتغير — راجع السعر قبل الشراء.";
 }
@@ -2839,8 +2857,10 @@ async function guideTop5(){
   var d = await api("products", null, {full: "1"});
   var models = cheapestModels(d.rows || []);
   var top = [];
-  if(crit === "under_10000"){
-    top = models.filter(function(m){ return m.price && m.price < 10000; })
+  var underM = crit.match(/^under_(\d+)$/);
+  if(underM){
+    var cap = parseInt(underM[1], 10);
+    top = models.filter(function(m){ return m.price && m.price < cap; })
       .sort(function(a, b){ return a.price - b.price || b.rating - a.rating; }).slice(0, 5);
   }else if(crit === "battery"){
     top = models.slice().sort(function(a, b){ return parseMah(b.row) - parseMah(a.row) || a.price - b.price; }).slice(0, 5);
