@@ -63,6 +63,22 @@ SPONSORED = affiliate_link_attrs()        # rel="sponsored noopener" target="_bl
 FORBIDDEN_WORDS = ["وهمي", "مزيف", "خدعة", "احتيال"]
 
 
+# Canonical display names for brands (Sheet values vary in case:
+# XIAOMI vs Xiaomi, Itel vs itel, Iku vs iKU). Grouping + display use
+# the canonical form so filters and brand pages never duplicate a brand.
+# Audit 2026-11-25: brand filters showed Xiaomi/XIAOMI, itel/Itel, iKU/Iku
+# as separate brands.
+BRAND_CANONICAL = {
+    "xiaomi": "Xiaomi",
+    "itel": "itel",
+    "iku": "iKU",
+}
+
+
+def canonical_brand(b):
+    return BRAND_CANONICAL.get(norm(b).lower(), norm(b))
+
+
 # ------------------------------------------------------------------ utils
 def load_json(path):
     return json.loads(Path(path).read_text(encoding="utf-8"))
@@ -421,7 +437,10 @@ class Model:
         cheapest = self.offers[0]
         self.cheapest_price = num(c(cheapest, "السعر الحالي (بعد الخصم) - جنيه"))
         self.old_price = num(c(cheapest, "السعر قبل الخصم - جنيه"))
-        self.discount = max(offer_discount(r) for r in self.offers)
+        self.discount = offer_discount(cheapest)
+        # Audit 2026-11-25: discount MUST come from the same (cheapest)
+        # offer as the displayed price/old price. The old max() across
+        # all offers showed e.g. 71% next to 870/1000 (=13%).
         self.rating = num(c(cheapest, "التقييم"))
         self.rating_count = int(num(c(cheapest, "عدد التقييمات"), 0) or 0)
         self.name_en = f"{self.brand} {self.model} {self.storage}/{self.ram}"
@@ -456,7 +475,7 @@ class Model:
 def build_models():
     groups = defaultdict(list)
     for r in ROWS:
-        key = (norm(c(r, "الماركة")), norm(c(r, "الموديل")),
+        key = (canonical_brand(c(r, "الماركة")), norm(c(r, "الموديل")),
                norm(c(r, "التخزين")), norm(c(r, "الرام")))
         if not key[0] or not key[1]:
             continue
@@ -684,6 +703,7 @@ def head_html(title, desc, canonical, og_image=None, noindex=False,
 {robots}
 <link rel="canonical" href="{esc(canonical)}">
 <link rel="alternate" hreflang="ar-eg" href="{esc(canonical)}">
+<link rel="alternate" hreflang="x-default" href="{esc(canonical)}">
 <meta property="og:locale" content="ar_EG">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="{esc(SITE_NAME)}">
@@ -1007,11 +1027,9 @@ def build_index():
         f"{SITE_NAME} | قارن أسعار الهواتف في مصر — جوميا وأمازون ونون",
         f"قارن أسعار {len(MODELS)} موديل هاتف في جوميا مصر وأمازون مصر ونون مصر، وتابع أكبر التخفيضات وأحدث انخفاضات الأسعار.",
         BASE_URL + "/", body, hero=hero, body_class=body_cls,
+        og_image=BASE_URL + "/assets/logo.png",
         json_ld=[org_ld(), {"@context": "https://schema.org", "@type": "WebSite",
-                             "name": SITE_NAME, "url": BASE_URL + "/",
-                             "potentialAction": {"@type": "SearchAction",
-                                               "target": BASE_URL + "/search/?q={search_term_string}",
-                                               "query-input": "required name=search_term_string"}},
+                             "name": SITE_NAME, "url": BASE_URL + "/"},
                  faq_ld, itemlist_ld])
 
 
@@ -1049,9 +1067,10 @@ def price_chart_svg(model):
 
 def faqs_for(model):
     cheapest = model.offers[0]
+    cheapest_store = store_display_name(norm(c(cheapest, "المتجر (جوميا / أمازون)")))
     faqs = [
         (f"ما سعر {model.name_ar} في مصر؟",
-         f"أرخص سعر حالي هو {fmt_price(model.cheapest_price)} جنيه في جوميا مصر (البائع: {norm(c(cheapest, 'البائع'))})، وآخر تحديث للسعر في {model.last_update}. السعر النهائي هو سعر المتجر وقت الشراء."),
+         f"أرخص سعر حالي هو {fmt_price(model.cheapest_price)} جنيه في {cheapest_store} (البائع: {norm(c(cheapest, 'البائع'))})، وآخر تحديث للسعر في {model.last_update}. السعر النهائي هو سعر المتجر وقت الشراء."),
         (f"هل يدعم {model.name_ar} شبكة 5G؟",
          f"{'نعم، يدعم هذا الهاتف شبكات الجيل الخامس 5G.' if model.g5 else 'لا، هذا الهاتف لا يدعم شبكات الجيل الخامس 5G.'}"),
         (f"ما سعة بطارية {model.name_ar}؟",
@@ -1174,8 +1193,11 @@ def build_product(model):
         for q, a in faqs)
     share_url = f"{BASE_URL}/mobiles/{model.slug}/"
     share_text = quote_plus(f"سعر {model.name_ar} في مصر: {fmt_price(model.cheapest_price)} جنيه — قارن الأسعار على {SITE_NAME}")
+    cheapest_store = store_display_name(norm(c(cheapest, "المتجر (جوميا / أمازون)")))
+    # Audit 2026-11-25: meta description trimmed to ~155 chars and it names
+    # the store that actually has the cheapest price (was hardcoded Jumia).
     desc = (f"سعر {model.name_ar} في مصر: أرخص سعر {fmt_price(model.cheapest_price)} جنيه "
-            f"في جوميا مصر. قارن بين جوميا وأمازون ونون، وتابع تاريخ السعر والمواصفات الكاملة والمميزات والعيوب.")
+            f"في {cheapest_store}. قارن الأسعار بين جوميا وأمازون ونون.")
     check_no_forbidden(desc, f"product {model.slug}")
     # JSON-LD
     offers_ld = []
@@ -1189,6 +1211,7 @@ def build_product(model):
             "seller": {"@type": "Organization", "name": norm(c(r, "البائع")) or store_display_name(norm(c(r, "المتجر (جوميا / أمازون)")))},
         })
     product_ld = {
+        "@context": "https://schema.org",
         "@type": "Product", "name": model.name_ar,
         "alternateName": model.name_en,
         "image": abs_image(model), "description": desc,
@@ -1272,7 +1295,9 @@ def build_product(model):
 </form></section>
 {f'<div class="section-head"><h2>هواتف {esc(model.brand)} أخرى</h2></div><div class="grid">{rel_html}</div>' if related else ''}"""
     return page_shell(
-        f"سعر {model.name_ar} في مصر {model.last_update[:4]} — {fmt_price(model.cheapest_price)} جنيه | {SITE_NAME}",
+        # Audit 2026-11-25: price removed from <title> — it went stale
+        # between rebuilds and pushed 311/367 titles over 65 chars.
+        f"سعر {model.name_ar} في مصر {model.last_update[:4]} | {SITE_NAME}",
         desc, share_url, body, json_ld=json_ld, og_image=abs_image(model))
 
 
@@ -1786,7 +1811,9 @@ def build_news_post(p, model=None):
     return page_shell((p.get("meta_title", "") or p["title"]) + " | " + SITE_NAME,
                       p.get("meta_desc", "") or p.get("description", ""),
                       BASE_URL + "/news/" + p["slug"] + "/",
-                      body, json_ld=ld, og_image=abs_img)
+                      # Audit 2026-11-25: example posts must never be indexed
+                      # (the OPPO A6 example was in sitemap.xml + news-sitemap).
+                      body, noindex=bool(p.get("is_example")), json_ld=ld, og_image=abs_img)
 
 
 def build_news_index(posts):
@@ -2184,10 +2211,14 @@ def write_sitemap(pages_meta, news_posts):
         '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
         'xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">\n'
         + "\n".join(news_urls) + "\n</urlset>\n", encoding="utf-8")
-    (SITE / "robots.txt").write_text(
-        "User-agent: *\nAllow: /\nDisallow: /adamwnor/\nDisallow: /search/\n"
-        "Disallow: /compare/\n"
-        f"Sitemap: {BASE_URL}/sitemap.xml\n", encoding="utf-8")
+    # Audit 2026-11-25: reference the news sitemap only when it actually
+    # lists real news (an empty/example-only news sitemap helps no one).
+    robots = ("User-agent: *\nAllow: /\nDisallow: /adamwnor/\nDisallow: /search/\n"
+              "Disallow: /compare/\n"
+              f"Sitemap: {BASE_URL}/sitemap.xml\n")
+    if news_urls:
+        robots += f"Sitemap: {BASE_URL}/news-sitemap.xml\n"
+    (SITE / "robots.txt").write_text(robots, encoding="utf-8")
 
 
 def write_manifest():
@@ -2198,10 +2229,11 @@ def write_manifest():
         "dir": "rtl", "lang": "ar",
         "background_color": "#0a2540", "theme_color": "#0b5ed7",
         "icons": [{"src": "/assets/icon-192.png", "sizes": "192x192", "type": "image/png"},
-                  {"src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png"}],
+                  {"src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png",
+                   "purpose": "any maskable"}],
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     (SITE / "sw.js").write_text(
-        "const CACHE='r3de-v11';const CORE=['/','/assets/style.css','/assets/app.js',"
+        "const CACHE='r3de-v12';const CORE=['/','/assets/style.css','/assets/app.js',"
         "'/assets/logo.png','/assets/icon-192.png','/assets/icon-512.png'];\n"
         "self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});\n"
         "self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});\n"
@@ -2324,11 +2356,18 @@ def main():
     # so Google can crawl the published guide pages.
     published_guide_locs = {f"{BASE_URL}/guides/{g['slug']}/"
                             for g in guides if guide_is_published(g)}
+    # Audit 2026-11-25: example news posts stay out of the sitemap too
+    # (their pages are noindex — see build_news_post).
+    example_news_locs = {f"{BASE_URL}/news/{p['slug']}/"
+                         for p in news if p.get("is_example")}
     sitemap_meta = {loc: m for loc, m in new_meta.items()
                     if ("/guides/" not in loc or loc in published_guide_locs)
+                    and loc not in example_news_locs
                     and "/compare/" not in loc
                     and not loc.rstrip("/").endswith("/search")}
-    write_sitemap(sitemap_meta, news)
+    write_sitemap(sitemap_meta,
+                  # Audit 2026-11-25: example posts stay out of both sitemaps.
+                  [p for p in news if not p.get("is_example")])
 
     print(f"models: {len(MODELS)}  offers: {len(ROWS)}  brands: {len(BRANDS)}")
     print(f"product pages: {len(MODELS)}  brand pages: {len(BRANDS)}  "
