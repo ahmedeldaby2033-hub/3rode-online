@@ -207,7 +207,8 @@ ADS_SLOTS = {n: _ads_slot(n) for n in ("top", "in_list", "in_product", "bottom")
 _AN = SETTINGS.get("analytics", {})
 ANALYTICS = {
     "google_analytics_id": _AN.get("google_analytics_id", ""),
-    "google_search_console_verification": _AN.get("google_search_console_verification", ""),
+    "google_search_console_verification": (_AN.get("search_console_verification", "")
+                                          or _AN.get("google_search_console_verification", "")),
     "bing_webmaster_verification": (_AN.get("bing_webmaster_verification", "")
                                     or _AN.get("bing_verification", "")),
 }
