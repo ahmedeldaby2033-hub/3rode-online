@@ -1810,9 +1810,16 @@ def guide_specs_table(cands):
         ("يدعم 5G", lambda m: "نعم" if m.g5 else "لا"),
     ]
     head = "".join(f"<th><a href='/mobiles/{m.slug}/'>{esc(m.name_ar)}</a></th>" for m in cands)
+    def _img_cell(m):
+        # No backslashes inside f-string expressions: the VPS Python is
+        # older than 3.12 and rejects them (SyntaxError at build time).
+        if not m.image:
+            return "<td>—</td>"
+        return ('<td><a href="/mobiles/' + m.slug + '/">'
+                '<img src="' + esc(m.image) + '" alt="' + esc(m.name_ar) + '" loading="lazy" '
+                'style="max-width:90px;height:auto;display:block;margin:0 auto"></a></td>')
     img_row = ("<tr><td><strong>الصورة</strong></td>" + "".join(
-        f"<td>{f'<a href=\"/mobiles/{m.slug}/\"><img src=\"{esc(m.image)}\" alt=\"{esc(m.name_ar)}\" loading=\"lazy\" style=\"max-width:90px;height:auto;display:block;margin:0 auto\"></a>' if m.image else '—'}</td>"
-        for m in cands) + "</tr>")
+        _img_cell(m) for m in cands) + "</tr>")
     price_row = ("<tr><td><strong>أرخص سعر</strong></td>" + "".join(
         f"<td><strong>{fmt_price(m.cheapest_price)} جنيه</strong></td>" for m in cands) + "</tr>")
     rows_html = ""
