@@ -14,9 +14,14 @@
 set -e
 cd "$(dirname "$0")/.."
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
+# settings.json is rewritten from the Sheet on every sync and must
+# never block the pull: discard the local copy first (the Sheet is
+# its source of truth; sync.py re-adopts it below). A dirty
+# settings.json broke pulls on 2026-11-25.
+git checkout -- settings.json 2>/dev/null || true
 git pull --ff-only origin "$BRANCH"
 python3 scripts/sync.py >> data/sync-cron.log 2>&1 || true
-git add site data
+git add site data settings.json
 # logs change every run — never commit them
 git reset -q -- data/sync-log.json data/sync-cron.log 2>/dev/null || true
 if ! git diff --cached --quiet; then

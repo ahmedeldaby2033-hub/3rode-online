@@ -106,6 +106,15 @@ def ensure_repo(job):
             raise RuntimeError("git clone failed: " + r.stderr[-500:])
     else:
         log(job, "سحب آخر نسخة من GitHub…")
+        # settings.json is rewritten from the Sheet on every sync
+        # (home_layout / stores / brand_order adoption) and is never
+        # committed by push_changes, so a local copy always drifts.
+        # Discard it before pulling — the Sheet is its source of truth
+        # and the sync below re-adopts it. Without this, any repo-side
+        # edit to settings.json makes every later pull fail with
+        # "local changes would be overwritten" (hit 2026-11-25).
+        run(["git", "checkout", "--", "settings.json"],
+            cwd=WORKDIR, env=env)
         r = run(["git", "pull", "--ff-only", "origin", REPO_BRANCH],
                 cwd=WORKDIR, env=env, timeout=300)
         if r.returncode != 0:
@@ -187,7 +196,11 @@ def run_sync_loop(job):
 
 def push_changes(job):
     env = git_env()
-    run(["git", "add", "site", "data"], cwd=WORKDIR, env=env)
+    # settings.json IS committed: sync.py / write_export adopt Sheet
+    # settings into it, and leaving it uncommitted is what dirties
+    # the clone and breaks the next pull (2026-11-25).
+    run(["git", "add", "site", "data", "settings.json"], cwd=WORKDIR,
+        env=env)
     # Logs change every run — never commit them.
     run(["git", "reset", "-q", "--", "data/sync-log.json",
          "data/sync-cron.log"], cwd=WORKDIR, env=env)
