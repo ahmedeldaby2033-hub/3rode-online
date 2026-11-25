@@ -131,6 +131,21 @@ _EXTRACT_JS = r"""
     const m = document.documentElement.innerHTML.match(/"price"\s*:\s*"?([\d,]+\.?\d*)"?/);
     if (m) price = num(m[1]);
   }
+  // 4) rendered-text fallback (verified live 2026-11-25 on Jumia): under the
+  //    product title the FIRST "X جنيه" is the current price, the second is
+  //    the old price, followed by "-N%". JSON-LD could not be confirmed on
+  //    the live page, so this order is the safety net.
+  if (price === null || oldPrice === null) {
+    const amounts = [];
+    const re = /([\d,]+(?:\.\d+)?)\s*جنيه/g;
+    let mm;
+    while ((mm = re.exec(document.body.innerText)) !== null && amounts.length < 4) {
+      const v = num(mm[1]);
+      if (v !== null) amounts.push(v);
+    }
+    if (price === null && amounts.length) price = amounts[0];
+    if (oldPrice === null && amounts.length > 1 && amounts[1] > price) oldPrice = amounts[1];
+  }
   let inStock = null;
   if (avail) {
     if (/InStock/i.test(avail)) inStock = true;
