@@ -129,6 +129,8 @@ body.wp-collapsed .menu-badge{display:none}
 .page-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 .page-btn:disabled{opacity:.45;cursor:default}
 .page-info{color:var(--muted);font-size:13px;margin-inline-start:4px}
+.seo-bad{color:#d63638;font-weight:700}
+.seo-ok{color:#1a7f37;font-weight:700}
 /* ---- WP dark admin menu (desktop) ---- */
 #sidebar-collapse{display:none}
 @media(min-width:769px){
@@ -206,6 +208,7 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
     <div class="nav-group">المحتوى</div>
     <button class="nav-item" data-tab="tab-guides" onclick="navTo('tab-guides')"><span class="nav-icon">📚</span><span class="nav-label">الأدلة</span></button>
     <button class="nav-item" data-tab="tab-news" onclick="navTo('tab-news')"><span class="nav-icon">📰</span><span class="nav-label">الأخبار</span></button>
+    <button class="nav-item" data-tab="tab-seo" onclick="navTo('tab-seo')"><span class="nav-icon">🔍</span><span class="nav-label">فحص SEO</span></button>
     <div class="nav-group">العملاء</div>
     <button class="nav-item" data-tab="tab-inbox" onclick="navTo('tab-inbox')"><span class="nav-icon">📥</span><span class="nav-label">الطلبات والبلاغات</span><span class="menu-badge" id="badge-inbox" style="display:none"></span></button>
     <button class="nav-item" data-tab="tab-stock" onclick="navTo('tab-stock')"><span class="nav-icon">🔔</span><span class="nav-label">تنبيهات التوفر</span></button>
@@ -638,6 +641,30 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
     </div>
   </section>
 
+  <section class="tab" id="tab-seo">
+    <div class="card">
+      <h2>فحص SEO شامل — الأدلة والأخبار 🔍</h2>
+      <p class="hint">يفحص كل الأدلة والأخبار: طول العنوان (30–65 حرفاً) والوصف (120–160 حرفاً)، وجود الصورة والكلمة المفتاحية والعنوان الوصفي والوصف العام. الناقص يظهر بالأحمر، وزر «تعديل» يفتح المقال في تبويبه.</p>
+      <div class="filters">
+        <button class="btn" onclick="loadSeoAudit()">🔄 إعادة الفحص</button>
+        <select id="seo-f-filter" onchange="renderSeoAudit()">
+          <option value="all">الكل</option>
+          <option value="bad">الناقص فقط</option>
+          <option value="noimage">بلا صورة</option>
+          <option value="longtitle">عنوان طويل (&gt;65)</option>
+          <option value="nodesc">بلا وصف</option>
+        </select>
+        <select id="seo-f-kind" onchange="renderSeoAudit()">
+          <option value="all">أدلة + أخبار</option>
+          <option value="guide">أدلة فقط</option>
+          <option value="news">أخبار فقط</option>
+        </select>
+      </div>
+      <p id="seo-summary" class="muted">—</p>
+      <div id="seo-table" class="table-scroll">—</div>
+    </div>
+  </section>
+
   <section class="tab" id="tab-logs">
     <div class="card"><h2>سجل المزامنة</h2><div id="sync-log" class="table-scroll">—</div></div>
     <div class="card"><h2>سجل الأسعار (آخر التغييرات)</h2><div id="price-log" class="table-scroll">—</div></div>
@@ -728,7 +755,7 @@ function activateTab(id){
   closeSidebar();
   if(id==="tab-coupons")loadCoupons(); if(id==="tab-guides")loadGuides(); if(id==="tab-news")loadNews(); if(id==="tab-logs")loadLogs(); if(id==="tab-inbox")loadInbox(); if(id==="tab-setup")renderSetupStatus();
   if(id==="tab-dead")loadDeadModels(); if(id==="tab-stock")loadStockAlerts(); if(id==="tab-backup")loadBackups();
-  if(id==="tab-affiliate")renderAffiliateLockStatus();
+  if(id==="tab-affiliate")renderAffiliateLockStatus(); if(id==="tab-seo")loadSeoAudit();
   if(id==="tab-buylinks")renderBuyLinksStatus();
 }
 function showTab(ev,id){ activateTab(id); } // kept for the password banner + old callers
@@ -2583,6 +2610,87 @@ function renderNews(){
       return "<tr><td>" + esc(r[1]) + "</td><td>" + newsStatusBadge(r) + "</td><td>" + esc(fmtDate(rowVal(r,6))) + "</td><td>" + esc(rowVal(r,15)) + "</td><td>" + link + "</td><td><button class='btn-ghost' onclick='fillNews(" + JSON.stringify(r) + ")'>تعديل</button> <button class='btn-danger' onclick='deleteNews(" + JSON.stringify(r[0]) + ")'>حذف</button>" + pubBtn + "</td></tr>";
     }).join("") + "</table>";
   if(pg) pg.innerHTML = paginationHtml("nw", NW_PAGE, totalPages, rows.length, start+1, Math.min(start+PAGE_SIZE, rows.length));
+}
+/* ---- SEO audit: one table for all guides + news ---- */
+var SEO_AUDIT = []; // {kind, slug, title, titleLen, descLen, hasImage, hasKeyword, hasMetaTitle, hasDesc, fails[]}
+function seoCheckItem(kind, title, metaTitle, metaDesc, image, keyword, desc){
+  var fails = [];
+  if(!title) fails.push("title-missing");
+  else if(title.length > 65) fails.push("title-long");
+  else if(title.length < 30) fails.push("title-short");
+  if(!metaDesc) fails.push("desc-missing");
+  else if(metaDesc.length > 160) fails.push("desc-long");
+  else if(metaDesc.length < 120) fails.push("desc-short");
+  if(!image) fails.push("no-image");
+  if(!keyword) fails.push("no-keyword");
+  if(!metaTitle) fails.push("no-metatitle");
+  if(!desc) fails.push("no-desc");
+  return fails;
+}
+function buildSeoAudit(){
+  SEO_AUDIT = [];
+  GUIDES_DATA.slice(1).forEach(function(r){
+    var title = rowVal(r,1);
+    SEO_AUDIT.push({kind:"guide", slug:rowVal(r,0), title:title, titleLen:title.length,
+      descLen:rowVal(r,13).length, hasImage:!!rowVal(r,9), hasKeyword:!!rowVal(r,11),
+      hasMetaTitle:!!rowVal(r,12), hasDesc:!!rowVal(r,3),
+      fails:seoCheckItem("guide", title, rowVal(r,12), rowVal(r,13), rowVal(r,9), rowVal(r,11), rowVal(r,3))});
+  });
+  NEWS_DATA.slice(1).forEach(function(r){
+    var title = rowVal(r,1);
+    SEO_AUDIT.push({kind:"news", slug:rowVal(r,0), title:title, titleLen:title.length,
+      descLen:rowVal(r,13).length, hasImage:!!rowVal(r,9), hasKeyword:!!rowVal(r,11),
+      hasMetaTitle:!!rowVal(r,12), hasDesc:!!rowVal(r,2),
+      fails:seoCheckItem("news", title, rowVal(r,12), rowVal(r,13), rowVal(r,9), rowVal(r,11), rowVal(r,2))});
+  });
+}
+async function loadSeoAudit(){
+  var el = document.getElementById("seo-table");
+  if(el) el.innerHTML = "جارٍ الفحص…";
+  try{
+    if(!GUIDES_DATA.length){ var d = await api("guides"); GUIDES_DATA = d.rows || []; }
+    if(!NEWS_DATA.length){ var d2 = await api("news"); NEWS_DATA = d2.rows || []; }
+    buildSeoAudit(); renderSeoAudit();
+  }catch(err){ if(el) el.innerHTML = '<span class="error">' + esc(err.message) + "</span>"; }
+}
+function renderSeoAudit(){
+  var fEl = document.getElementById("seo-f-filter"), kEl = document.getElementById("seo-f-kind");
+  var f = fEl ? fEl.value : "all", k = kEl ? kEl.value : "all";
+  var rows = SEO_AUDIT.filter(function(x){
+    if(k !== "all" && x.kind !== k) return false;
+    if(f === "bad" && !x.fails.length) return false;
+    if(f === "noimage" && x.hasImage) return false;
+    if(f === "longtitle" && x.titleLen <= 65) return false;
+    if(f === "nodesc" && x.hasDesc) return false;
+    return true;
+  });
+  var bad = SEO_AUDIT.filter(function(x){ return x.fails.length > 0; }).length;
+  var noimg = SEO_AUDIT.filter(function(x){ return !x.hasImage; }).length;
+  var longt = SEO_AUDIT.filter(function(x){ return x.titleLen > 65; }).length;
+  var nodesc = SEO_AUDIT.filter(function(x){ return !x.hasDesc; }).length;
+  var sm = document.getElementById("seo-summary");
+  if(sm) sm.innerHTML = "الإجمالي: <b>" + SEO_AUDIT.length + "</b> — سليم: <b class='seo-ok'>" + (SEO_AUDIT.length - bad) + "</b> — ناقص: <b class='seo-bad'>" + bad + "</b> — بلا صورة: " + noimg + " — عنوان طويل: " + longt + " — بلا وصف: " + nodesc;
+  var el = document.getElementById("seo-table");
+  if(!el) return;
+  if(!rows.length){ el.innerHTML = "لا توجد عناصر مطابقة للفلتر."; return; }
+  el.innerHTML = "<table><tr><th>النوع</th><th>العنوان</th><th>العنوان (حرف)</th><th>الوصف (حرف)</th><th>الصورة</th><th>الكلمة</th><th>النتيجة</th><th></th></tr>" +
+    rows.map(function(x){
+      var tcell = x.titleLen > 65 ? "<span class='seo-bad'>" + x.titleLen + " — طويل</span>" : (x.titleLen > 0 && x.titleLen < 30 ? "<span class='seo-bad'>" + x.titleLen + " — قصير</span>" : (x.titleLen || "<span class='seo-bad'>مفقود</span>"));
+      var dcell = !x.descLen ? "<span class='seo-bad'>مفقود</span>" : (x.descLen > 160 ? "<span class='seo-bad'>" + x.descLen + " — طويل</span>" : (x.descLen < 120 ? "<span class='seo-bad'>" + x.descLen + " — قصير</span>" : x.descLen));
+      var imgc = x.hasImage ? "✓" : "<span class='seo-bad'>✗</span>";
+      var kwc = x.hasKeyword ? "✓" : "<span class='seo-bad'>✗</span>";
+      var res = !x.fails.length ? "<span class='seo-ok'>سليم ✓</span>" : "<span class='seo-bad'>ناقص (" + x.fails.length + ")</span>";
+      var edit = x.kind === "guide" ? "editSeoGuide" : "editSeoNews";
+      return "<tr><td>" + (x.kind === "guide" ? "دليل" : "خبر") + "</td><td>" + esc(x.title) + "</td><td>" + tcell + "</td><td>" + dcell + "</td><td>" + imgc + "</td><td>" + kwc + "</td><td>" + res + "</td><td><button class='btn-ghost' onclick='" + edit + "(" + JSON.stringify(x.slug) + ")'>تعديل</button></td></tr>";
+    }).join("") + "</table>";
+}
+function editSeoGuide(slug){
+  var row = GUIDES_DATA.slice(1).find(function(r){ return String(r[0]) === String(slug); });
+  if(!row) return; navTo("tab-guides"); fillGuide(row);
+}
+function editSeoNews(slug){
+  var row = NEWS_DATA.slice(1).find(function(r){ return String(r[0]) === String(slug); });
+  if(!row) return; navTo("tab-news"); fillNews(row);
 }
 async function loadNews(){
   try{
