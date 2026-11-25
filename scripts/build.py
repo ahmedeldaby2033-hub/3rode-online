@@ -718,7 +718,7 @@ def head_html(title, desc, canonical, og_image=None, noindex=False,
 <link rel="apple-touch-icon" href="/assets/icon-192.png">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0b5ed7">
-<link rel="stylesheet" href="/assets/style.css?v=10">
+<link rel="stylesheet" href="/assets/style.css?v=11">
 {verif}{ga}{extra}"""
 
 
@@ -729,7 +729,7 @@ def header_html():
 <nav class="main-nav" id="main-nav">
 <a href="/">الرئيسية</a><a href="/deals/">أفضل العروض</a><a href="/prices/">الأسعار اليومية</a><a href="/coupons/">الكوبونات</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/brands/">الماركات</a><a href="/about/">من نحن</a>
 </nav>
-<button id="theme-toggle" class="theme-toggle" type="button">{icon("sun")} الوضع النهاري</button>
+<button id="theme-toggle" class="theme-toggle icon-only" type="button" aria-label="التبديل إلى الوضع النهاري">{icon("sun")}</button>
 <button id="pwa-install" class="theme-toggle" type="button" style="display:none">{icon("download")} ثبّت التطبيق</button>
 </div></header>"""
 
@@ -750,7 +750,7 @@ def footer_html():
 <button id="to-top" type="button" aria-label="العودة للأعلى">↑</button>
 <div class="toast" id="toast" role="status"></div>
 <script>window.SITE_CONFIG = {json.dumps({"adminApiUrl": ADMIN_API_URL, "onesignalAppId": ONESIGNAL_APP_ID, "contactEmail": EMAIL}, ensure_ascii=False)};</script>
-<script src="/assets/app.js?v=5" defer></script>"""
+<script src="/assets/app.js?v=6" defer></script>"""
 
 
 def page_shell(title, desc, canonical, body, noindex=False, json_ld=None,
@@ -1631,6 +1631,15 @@ def _daily_stale_note(t):
             ". راجع المصدر قبل اتخاذ قرار شراء.</p></section>")
 
 
+_DAILY_PRICE_IMAGES = {
+    # (src, alt, width, height) — CC0 / public-domain photos from Wikimedia Commons.
+    # Hotlinked (1280px thumbs): the repo push tool accepts text files only,
+    # so binary images cannot be pushed; Wikimedia thumbs are stable embeds.
+    "gold": ("https://thumb.wikimedia.org/wikipedia/commons/thumb/a/af/Gold_bullion_bars.jpg/1280px-Gold_bullion_bars.jpg", "سبائك ذهب", 1280, 960),
+    "usd": ("https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Folding_money_%2820_dollar_US_banknotes%29.jpg/1280px-Folding_money_%2820_dollar_US_banknotes%29.jpg", "أوراق نقدية أمريكية من فئة 20 دولاراً", 1280, 1222),
+}
+
+
 def build_daily_price_page(topic):
     """Fixed-URL daily price page: /prices/gold/ and /prices/usd/.
 
@@ -1709,7 +1718,10 @@ def build_daily_price_page(topic):
         note = ("<p>سعر السوق (متوسط) — أسعار الشراء والبيع في البنوك تتبع البنك "
                 "المركزي المصري وتختلف قروشاً قليلة بين بنك وآخر. البنك المركزي "
                 "يحجب الطلبات الآلية، لذلك نعرض سعر السوق حتى يتاح جدول البنوك.</p>")
-    body = ("<h1>" + title + "</h1>" + _daily_stale_note(t) + table +
+    img_src, img_alt, img_w, img_h = _DAILY_PRICE_IMAGES[topic]
+    hero = ("<figure class=\"price-hero\"><img src=\"" + img_src + "\" alt=\"" + esc(img_alt) +
+            "\" width=\"" + str(img_w) + "\" height=\"" + str(img_h) + "\"></figure>")
+    body = ("<h1>" + title + "</h1>" + hero + _daily_stale_note(t) + table +
             delta_html + note + _daily_source_line(t) +
             "<p><a href=\"/prices/\">كل الأسعار اليومية</a> • <a href=\"/prices/" +
             other + "/\">" + other_label + "</a></p>")
@@ -1718,7 +1730,8 @@ def build_daily_price_page(topic):
     if t.get("date"):
         ld["dateModified"] = t["date"]
     return page_shell(title + " | عروض أونلاين", desc,
-                      BASE_URL + "/prices/" + topic + "/", body, json_ld=[ld])
+                      BASE_URL + "/prices/" + topic + "/", body, json_ld=[ld],
+                      og_image=img_src)
 
 
 def build_prices_index():
@@ -1729,8 +1742,12 @@ def build_prices_index():
                          ("usd", "سعر الدولار اليوم")):
         t = topics.get(topic, {}) or {}
         upd = t.get("date", "")
+        img_src, img_alt, img_w, img_h = _DAILY_PRICE_IMAGES[topic]
         cards += ("<section class=\"card\"><h2><a href=\"/prices/" + topic +
                   "/\">" + label + "</a></h2>" +
+                  "<a href=\"/prices/" + topic + "/\"><img class=\"price-card-img\" src=\"" + img_src +
+                  "\" alt=\"" + esc(img_alt) + "\" loading=\"lazy\" width=\"" + str(img_w) +
+                  "\" height=\"" + str(img_h) + "\"></a>" +
                   ("<p class=\"muted\">آخر تحديث: " + esc(upd) + "</p>"
                    if upd else "<p class=\"muted\">قريباً — تُجلب الأسعار يومياً.</p>") +
                   "</section>")
@@ -2656,7 +2673,7 @@ def write_manifest():
                    "purpose": "any maskable"}],
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     (SITE / "sw.js").write_text(
-        "const CACHE='r3de-v12';const CORE=['/','/assets/style.css','/assets/app.js',"
+        "const CACHE='r3de-v13';const CORE=['/','/assets/style.css','/assets/app.js',"
         "'/assets/logo.png','/assets/icon-192.png','/assets/icon-512.png'];\n"
         "self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});\n"
         "self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});\n"
