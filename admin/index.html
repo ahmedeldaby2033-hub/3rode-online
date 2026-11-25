@@ -119,6 +119,16 @@ button{border-radius:3px}
 body.wp-collapsed .menu-badge{display:none}
 /* ---- footer ---- */
 .wp-footer{max-width:1400px;margin:0 auto;padding:14px 20px 30px;color:var(--muted);font-size:13px}
+/* ---- advanced filters + pagination (guides/news) ---- */
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.filters input[type=text]{flex:1;min-width:180px}
+.filters select{width:auto;min-width:130px}
+.pagination{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.page-btn{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:6px;font-weight:600;min-height:34px}
+.page-btn:hover{border-color:var(--accent)}
+.page-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.page-btn:disabled{opacity:.45;cursor:default}
+.page-info{color:var(--muted);font-size:13px;margin-inline-start:4px}
 /* ---- WP dark admin menu (desktop) ---- */
 #sidebar-collapse{display:none}
 @media(min-width:769px){
@@ -488,8 +498,16 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
   <section class="tab" id="tab-guides">
     <div class="card"><h2>أدلة الشراء</h2>
       <p class="hint">النصوص المولَّدة جاهزة للنشر بعد مراجعتك البصرية فقط — المراجعة البشرية تُكتب تلقائياً بأسلوب احترافي. لا يُنشر دليل قبل مراجعتك (سياسة المحتوى الموسَّع في Google).</p>
-      <p><input type="text" id="guides-filter" placeholder="بحث بالعنوان…" oninput="renderGuides()"></p>
+      <div class="filters">
+        <input type="text" id="guides-filter" placeholder="بحث بالعنوان…" oninput="gdFilterChanged()">
+        <select id="gd-f-status" onchange="gdFilterChanged()"><option value="">كل الحالات</option><option value="published">منشور</option><option value="draft">مسودة</option><option value="scheduled">مجدول</option></select>
+        <select id="gd-f-criterion" onchange="gdFilterChanged()"><option value="">كل المعايير</option></select>
+        <select id="gd-f-review" onchange="gdFilterChanged()"><option value="">المراجعة: الكل</option><option value="yes">بمراجعة بشرية</option><option value="no">بلا مراجعة</option></select>
+        <select id="gd-f-image" onchange="gdFilterChanged()"><option value="">الصورة: الكل</option><option value="yes">بصورة</option><option value="no">بلا صورة</option></select>
+        <select id="gd-f-sort" onchange="gdFilterChanged()"><option value="new">الأحدث أولاً</option><option value="old">الأقدم أولاً</option><option value="title">العنوان أ–ي</option></select>
+      </div>
       <div id="guides-table" class="table-scroll">—</div>
+      <div id="guides-pagination"></div>
       <h3>إضافة / تعديل دليل</h3>
       <div class="row">
         <div><label for="gd-slug">الرابط المختصر (slug)</label><input type="text" id="gd-slug" dir="ltr">
@@ -551,8 +569,15 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
   <section class="tab" id="tab-news">
     <div class="card"><h2>الأخبار</h2>
       <p class="hint">قسم /news/ منفصل عن صفحات المنتجات (صفحات المنتجات لا تدخل Google News أبداً). كل خبر يحتاج مراجعة بشرية وصورة 1200px على الأقل.</p>
-      <p><input type="text" id="news-filter" placeholder="بحث بالعنوان…" oninput="renderNews()"></p>
+      <div class="filters">
+        <input type="text" id="news-filter" placeholder="بحث بالعنوان…" oninput="nwFilterChanged()">
+        <select id="nw-f-status" onchange="nwFilterChanged()"><option value="">كل الحالات</option><option value="published">منشور</option><option value="draft">مسودة</option><option value="scheduled">مجدول</option><option value="example">مثال</option></select>
+        <select id="nw-f-category" onchange="nwFilterChanged()"><option value="">كل التصنيفات</option></select>
+        <select id="nw-f-image" onchange="nwFilterChanged()"><option value="">الصورة: الكل</option><option value="yes">بصورة</option><option value="no">بلا صورة</option></select>
+        <select id="nw-f-sort" onchange="nwFilterChanged()"><option value="new">الأحدث أولاً</option><option value="old">الأقدم أولاً</option><option value="title">العنوان أ–ي</option></select>
+      </div>
       <div id="news-table" class="table-scroll">—</div>
+      <div id="news-pagination"></div>
       <h3>إضافة / تعديل خبر</h3>
       <div class="row">
         <div><label for="nw-slug">الرابط المختصر (slug)</label><input type="text" id="nw-slug" dir="ltr">
@@ -2360,21 +2385,91 @@ function guideStatusBadge(r){
   if(rowVal(r,8)) return "<span class='badge amber'>مجدول " + esc(fmtDate(rowVal(r,8))) + "</span>";
   return "<span class='badge amber'>مسودة</span>";
 }
+/* ---- pagination + advanced filters (guides/news): 20 per page ---- */
+var PAGE_SIZE = 20;
+var GD_PAGE = 1, NW_PAGE = 1;
+function gdFilterChanged(){ GD_PAGE = 1; renderGuides(); }
+function nwFilterChanged(){ NW_PAGE = 1; renderNews(); }
+function pageNums(page, total){
+  if(total <= 7){ var a=[]; for(var i=1;i<=total;i++) a.push(i); return a; }
+  var s = [1, 2];
+  if(page > 3) s.push("…");
+  for(var i=Math.max(3,page-1); i<=Math.min(total-2,page+1); i++) s.push(i);
+  if(page < total-2) s.push("…");
+  s.push(total-1, total);
+  var out=[]; s.forEach(function(n){ if(out.indexOf(n)===-1) out.push(n); });
+  return out;
+}
+function paginationHtml(prefix, page, totalPages, total, start, end){
+  if(!total) return "";
+  var h = "<div class='pagination'>";
+  h += "<button class='page-btn' " + (page <= 1 ? "disabled" : "") + " onclick=\"setPage('" + prefix + "'," + (page-1) + ")\">‹ السابق</button>";
+  pageNums(page, totalPages).forEach(function(n){
+    if(n === "…") h += "<span class='page-info'>…</span>";
+    else h += "<button class='page-btn" + (n === page ? " active" : "") + "' onclick=\"setPage('" + prefix + "'," + n + ")\">" + n + "</button>";
+  });
+  h += "<button class='page-btn' " + (page >= totalPages ? "disabled" : "") + " onclick=\"setPage('" + prefix + "'," + (page+1) + ")\">التالي ›</button>";
+  h += "<span class='page-info'>عرض " + start + "–" + end + " من " + total + "</span></div>";
+  return h;
+}
+function setPage(prefix, n){
+  if(prefix === "gd"){ GD_PAGE = n; renderGuides(); }
+  else { NW_PAGE = n; renderNews(); }
+  var t = prefix === "gd" ? "guides-table" : "news-table";
+  var el = document.getElementById(t); if(el) el.scrollIntoView({block:"nearest"});
+}
+function sortRows(rows, sort, dateIdx, titleIdx){
+  var s = rows.slice();
+  if(sort === "title") s.sort(function(a,b){ return String(a[titleIdx]||"").localeCompare(String(b[titleIdx]||""), "ar"); });
+  else if(sort === "old") s.sort(function(a,b){ return String(a[dateIdx]||"").localeCompare(String(b[dateIdx]||"")); });
+  else s.sort(function(a,b){ return String(b[dateIdx]||"").localeCompare(String(a[dateIdx]||"")); });
+  return s;
+}
+function fillSelectOptions(selId, values, current, allLabel){
+  var sel = document.getElementById(selId); if(!sel) return;
+  var opts = values.slice().sort(function(a,b){ return String(a).localeCompare(String(b), "ar"); });
+  sel.innerHTML = "<option value=''>" + allLabel + "</option>" + opts.map(function(v){ return "<option value='" + esc(v) + "'" + (v === current ? " selected" : "") + ">" + esc(v) + "</option>"; }).join("");
+}
+function guideMatches(r, q, st, crit, rev, img){
+  if(q && String(r[1] || "").toLowerCase().indexOf(q) === -1) return false;
+  var status = rowVal(r,5) || "draft";
+  if(st === "published" && status !== "published") return false;
+  if(st === "draft" && (status === "published" || rowVal(r,8))) return false;
+  if(st === "scheduled" && !(status !== "published" && rowVal(r,8))) return false;
+  if(crit && rowVal(r,2) !== crit) return false;
+  if(rev === "yes" && !rowVal(r,4)) return false;
+  if(rev === "no" && rowVal(r,4)) return false;
+  if(img === "yes" && !rowVal(r,9)) return false;
+  if(img === "no" && rowVal(r,9)) return false;
+  return true;
+}
 function renderGuides(){
   var el = document.getElementById("guides-table");
   if(!el) return;
-  if(!GUIDES_DATA.length){ el.innerHTML = "لا توجد أدلة."; return; }
+  var pg = document.getElementById("guides-pagination");
+  if(!GUIDES_DATA.length){ el.innerHTML = "لا توجد أدلة."; if(pg) pg.innerHTML=""; return; }
   var q = (document.getElementById("guides-filter").value || "").toLowerCase();
-  var rows = GUIDES_DATA.slice(1).filter(function(r){
-    return !q || String(r[1] || "").toLowerCase().indexOf(q) !== -1;
-  });
-  if(!rows.length){ el.innerHTML = "لا توجد أدلة مطابقة للبحث."; return; }
-  el.innerHTML = "<table><tr><th>العنوان</th><th>المعيار</th><th>الحالة</th><th>تاريخ النشر</th><th>مراجعة بشرية</th><th></th></tr>" +
-    rows.map(function(r){
-      var st = rowVal(r,5) || "draft";
-      var pubBtn = st === "published" ? "" : " <button class='btn-green' onclick='publishNow(\"guide\"," + JSON.stringify(r[0]) + ")'>نشر الآن</button>";
-      return "<tr><td>" + esc(r[1]) + "</td><td>" + esc(r[2]) + "</td><td>" + guideStatusBadge(r) + "</td><td>" + esc(fmtDate(rowVal(r,7))) + "</td><td>" + (rowVal(r,4) ? "نعم" : "لا") + "</td><td><button class='btn-ghost' onclick='fillGuide(" + JSON.stringify(r) + ")'>تعديل</button> <button class='btn-danger' onclick='deleteGuide(" + JSON.stringify(r[0]) + ")'>حذف</button>" + pubBtn + "</td></tr>";
+  var st = document.getElementById("gd-f-status").value;
+  var crit = document.getElementById("gd-f-criterion").value;
+  var rev = document.getElementById("gd-f-review").value;
+  var img = document.getElementById("gd-f-image").value;
+  var sort = document.getElementById("gd-f-sort").value;
+  var crits = []; GUIDES_DATA.slice(1).forEach(function(r){ var c=rowVal(r,2); if(c && crits.indexOf(c)===-1) crits.push(c); });
+  fillSelectOptions("gd-f-criterion", crits, crit, "كل المعايير");
+  var rows = sortRows(GUIDES_DATA.slice(1).filter(function(r){ return guideMatches(r, q, st, crit, rev, img); }), sort, 7, 1);
+  if(!rows.length){ el.innerHTML = "لا توجد أدلة مطابقة للفلاتر."; if(pg) pg.innerHTML=""; return; }
+  var totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  if(GD_PAGE > totalPages) GD_PAGE = totalPages;
+  if(GD_PAGE < 1) GD_PAGE = 1;
+  var start = (GD_PAGE-1)*PAGE_SIZE, pageRows = rows.slice(start, start+PAGE_SIZE);
+  el.innerHTML = "<table><tr><th>العنوان</th><th>المعيار</th><th>الحالة</th><th>تاريخ النشر</th><th>مراجعة بشرية</th><th>الرابط</th><th></th></tr>" +
+    pageRows.map(function(r){
+      var stt = rowVal(r,5) || "draft";
+      var pubBtn = stt === "published" ? "" : " <button class='btn-green' onclick='publishNow(\"guide\"," + JSON.stringify(r[0]) + ")'>نشر الآن</button>";
+      var link = stt === "published" ? "<a href='https://3rde.online/guides/" + esc(r[0]) + "/' target='_blank' rel='noopener'>فتح المقال ↗</a>" : "—";
+      return "<tr><td>" + esc(r[1]) + "</td><td>" + esc(r[2]) + "</td><td>" + guideStatusBadge(r) + "</td><td>" + esc(fmtDate(rowVal(r,7))) + "</td><td>" + (rowVal(r,4) ? "نعم" : "لا") + "</td><td>" + link + "</td><td><button class='btn-ghost' onclick='fillGuide(" + JSON.stringify(r) + ")'>تعديل</button> <button class='btn-danger' onclick='deleteGuide(" + JSON.stringify(r[0]) + ")'>حذف</button>" + pubBtn + "</td></tr>";
     }).join("") + "</table>";
+  if(pg) pg.innerHTML = paginationHtml("gd", GD_PAGE, totalPages, rows.length, start+1, Math.min(start+PAGE_SIZE, rows.length));
 }
 async function loadGuides(){
   try{
@@ -2450,21 +2545,44 @@ function newsStatusBadge(r){
   if(rowVal(r,6)) return "<span class='badge green'>منشور " + esc(fmtDate(rowVal(r,6))) + "</span>";
   return "<span class='badge amber'>مسودة</span>";
 }
+function newsMatches(r, q, st, cat, img){
+  if(q && String(r[1] || "").toLowerCase().indexOf(q) === -1) return false;
+  var ex = newsIsExample(r);
+  if(st === "published" && (ex || !rowVal(r,6) || rowVal(r,8))) return false;
+  if(st === "draft" && (ex || rowVal(r,6) || rowVal(r,8))) return false;
+  if(st === "scheduled" && !rowVal(r,8)) return false;
+  if(st === "example" && !ex) return false;
+  if(cat && rowVal(r,15) !== cat) return false;
+  if(img === "yes" && !rowVal(r,9)) return false;
+  if(img === "no" && rowVal(r,9)) return false;
+  return true;
+}
 function renderNews(){
   var el = document.getElementById("news-table");
   if(!el) return;
-  if(!NEWS_DATA.length){ el.innerHTML = "لا توجد أخبار."; return; }
+  var pg = document.getElementById("news-pagination");
+  if(!NEWS_DATA.length){ el.innerHTML = "لا توجد أخبار."; if(pg) pg.innerHTML=""; return; }
   var q = (document.getElementById("news-filter").value || "").toLowerCase();
-  var rows = NEWS_DATA.slice(1).filter(function(r){
-    return !q || String(r[1] || "").toLowerCase().indexOf(q) !== -1;
-  });
-  if(!rows.length){ el.innerHTML = "لا توجد أخبار مطابقة للبحث."; return; }
-  el.innerHTML = "<table><tr><th>العنوان</th><th>الحالة</th><th>تاريخ النشر</th><th>التصنيف</th><th></th></tr>" +
-    rows.map(function(r){
+  var st = document.getElementById("nw-f-status").value;
+  var cat = document.getElementById("nw-f-category").value;
+  var img = document.getElementById("nw-f-image").value;
+  var sort = document.getElementById("nw-f-sort").value;
+  var cats = []; NEWS_DATA.slice(1).forEach(function(r){ var c=rowVal(r,15); if(c && cats.indexOf(c)===-1) cats.push(c); });
+  fillSelectOptions("nw-f-category", cats, cat, "كل التصنيفات");
+  var rows = sortRows(NEWS_DATA.slice(1).filter(function(r){ return newsMatches(r, q, st, cat, img); }), sort, 6, 1);
+  if(!rows.length){ el.innerHTML = "لا توجد أخبار مطابقة للفلاتر."; if(pg) pg.innerHTML=""; return; }
+  var totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  if(NW_PAGE > totalPages) NW_PAGE = totalPages;
+  if(NW_PAGE < 1) NW_PAGE = 1;
+  var start = (NW_PAGE-1)*PAGE_SIZE, pageRows = rows.slice(start, start+PAGE_SIZE);
+  el.innerHTML = "<table><tr><th>العنوان</th><th>الحالة</th><th>تاريخ النشر</th><th>التصنيف</th><th>الرابط</th><th></th></tr>" +
+    pageRows.map(function(r){
       var published = !newsIsExample(r) && !!rowVal(r,6) && !rowVal(r,8);
       var pubBtn = published ? "" : " <button class='btn-green' onclick='publishNow(\"news\"," + JSON.stringify(r[0]) + ")'>نشر الآن</button>";
-      return "<tr><td>" + esc(r[1]) + "</td><td>" + newsStatusBadge(r) + "</td><td>" + esc(fmtDate(rowVal(r,6))) + "</td><td>" + esc(rowVal(r,15)) + "</td><td><button class='btn-ghost' onclick='fillNews(" + JSON.stringify(r) + ")'>تعديل</button> <button class='btn-danger' onclick='deleteNews(" + JSON.stringify(r[0]) + ")'>حذف</button>" + pubBtn + "</td></tr>";
+      var link = published ? "<a href='https://3rde.online/news/" + esc(r[0]) + "/' target='_blank' rel='noopener'>فتح المقال ↗</a>" : "—";
+      return "<tr><td>" + esc(r[1]) + "</td><td>" + newsStatusBadge(r) + "</td><td>" + esc(fmtDate(rowVal(r,6))) + "</td><td>" + esc(rowVal(r,15)) + "</td><td>" + link + "</td><td><button class='btn-ghost' onclick='fillNews(" + JSON.stringify(r) + ")'>تعديل</button> <button class='btn-danger' onclick='deleteNews(" + JSON.stringify(r[0]) + ")'>حذف</button>" + pubBtn + "</td></tr>";
     }).join("") + "</table>";
+  if(pg) pg.innerHTML = paginationHtml("nw", NW_PAGE, totalPages, rows.length, start+1, Math.min(start+PAGE_SIZE, rows.length));
 }
 async function loadNews(){
   try{
