@@ -1,0 +1,32 @@
+# Daily prices (gold + USD) — unattended data update.
+#
+# Runs every day at 07:30 Cairo (05:30 UTC): fetches live prices via
+# scripts/daily-prices.py and commits data/daily-prices.json +
+# data/daily-prices-history.json when they change. The pages themselves
+# are rebuilt on the next «مزامنة الآن» (or any sync) — this workflow
+# never deploys the site on its own. A failed fetch changes nothing:
+# the fetcher never writes a stale price under a new date.
+name: daily-prices
+
+on:
+  schedule:
+    - cron: "30 5 * * *"
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Fetch daily prices
+        run: python3 scripts/daily-prices.py
+      - name: Commit if changed
+        run: |
+          git config user.name "3rde-bot"
+          git config user.email "3rdeonline@gmail.com"
+          git add data/daily-prices.json data/daily-prices-history.json
+          git diff --cached --quiet || git commit -m "daily prices: $(date -u +%F)"
+          git push origin main
