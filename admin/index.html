@@ -19,6 +19,10 @@ header h1{font-size:20px;margin:0}
 header a{color:#fff}
 main{max-width:1100px;margin:0 auto;padding:20px}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:16px}
+/* Edit-form wrappers: scroll-margin keeps the form below the sticky admin bar,
+   and .flash outlines the form briefly after clicking تعديل so the eye lands on it. */
+#guide-form-card,#news-form-card{scroll-margin-top:60px}
+#guide-form-card.flash,#news-form-card.flash{outline:2px solid var(--accent,#2563eb);outline-offset:4px;border-radius:12px}
 .card h2{margin:0 0 12px;font-size:18px}
 label{display:block;font-weight:600;margin:10px 0 4px}
 input[type=text],input[type=password],input[type=url],input[type=number],input[type=date],input[type=datetime-local],select,textarea{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font:inherit}
@@ -576,6 +580,7 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
       </div>
       <div id="guides-table" class="table-scroll">—</div>
       <div id="guides-pagination"></div>
+      <div id="guide-form-card">
       <h3>إضافة / تعديل دليل</h3>
       <div class="row">
         <div><label for="gd-slug">الرابط المختصر (slug)</label><input type="text" id="gd-slug" dir="ltr">
@@ -608,6 +613,7 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
         <select id="gd-status"><option value="draft">مسودة</option><option value="published">منشور</option></select></div>
         <div><label for="gd-publish-at">تاريخ ووقت النشر المجدول (اختياري — اتركه فارغاً للنشر الفوري)</label>
         <input type="datetime-local" id="gd-publish-at" dir="ltr"></div>
+      </div>
       </div>
       <div class="card" style="background:var(--bg,#f4f6fb);margin-top:14px"><h3>فحص الجودة وSEO — مباشر</h3>
         <div id="gd-seo-score"></div><div id="gd-seo-list"></div><div id="gd-seo-improve"></div></div>
@@ -651,6 +657,7 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
       </div>
       <div id="news-table" class="table-scroll">—</div>
       <div id="news-pagination"></div>
+      <div id="news-form-card">
       <h3>إضافة / تعديل خبر</h3>
       <div class="row">
         <div><label for="nw-slug">الرابط المختصر (slug)</label><input type="text" id="nw-slug" dir="ltr">
@@ -684,6 +691,7 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
       <p><label style="display:inline;font-weight:400"><input type="checkbox" id="nw-img-rights" onchange="updateSeo('nw')"> أؤكد أن الصورة ملك للموقع أو مرخّصة للاستخدام</label></p>
       <label for="nw-publish-at">تاريخ ووقت النشر المجدول (اختياري — اتركه فارغاً للنشر الفوري)</label>
       <input type="datetime-local" id="nw-publish-at" dir="ltr">
+      </div>
       <div class="card" style="background:var(--bg,#f4f6fb);margin-top:14px"><h3>فحص الجودة وSEO — مباشر</h3>
         <div id="nw-seo-score"></div><div id="nw-seo-list"></div><div id="nw-seo-improve"></div></div>
       <p><button type="button" class="btn-ghost" onclick="spellCheck('nw')">تدقيق إملائي</button>
@@ -981,12 +989,15 @@ function getAppsScriptUrl(){
 async function api(action, body, params){
   var base = getAppsScriptUrl();
   if(!base || base.indexOf("PASTE_YOUR")===0){throw new Error("لم يتم ربط Apps Script بعد — افتح تبويب «الإعداد والربط» والصق رابط تطبيق الويب (ينتهي بـ /exec) ثم اضغط «حفظ واختبار الاتصال»")}
-  var url = base + "?action=" + encodeURIComponent(action) + "&token=" + encodeURIComponent(token);
+  /* cache-buster + no-store: ردود /exec من نوع GET قد تُحفظ في كاش المتصفح،
+     فقراءة الجدول بعد الحفظ كانت ترجع الصفوف القديمة ويبدو التعديل كأنه لم يُحفظ.
+     الطابع الزمني يجعل كل قراءة جديدة. */
+  var url = base + "?action=" + encodeURIComponent(action) + "&token=" + encodeURIComponent(token) + "&_=" + Date.now();
   if(params){
     var qs = new URLSearchParams(params).toString();
     if(qs) url += "&" + qs;
   }
-  var opts = {method: body ? "POST" : "GET", redirect: "follow"};
+  var opts = {method: body ? "POST" : "GET", redirect: "follow", cache: "no-store"};
   if(body){opts.headers = {"Content-Type":"text/plain;charset=utf-8"}; opts.body = JSON.stringify(body);}
   var res = await fetch(url, opts);
   var data = await res.json();
@@ -3129,6 +3140,20 @@ async function saveGuide(){
   try{ await api("saveGuide", {guide: g}); toast("تم حفظ الدليل"); loadGuides(); }
   catch(err){ toast(err.message); }
 }
+/* Scroll the edit form into view and flash it, so a click on تعديل always
+   gives visible feedback. The old window.scrollTo(0, offsetTop) could land the
+   form under the sticky admin bar, so the click looked like nothing happened. */
+function scrollToForm(cardId){
+  var card = document.getElementById(cardId);
+  if(card && card.scrollIntoView){
+    card.scrollIntoView({behavior: "smooth", block: "start"});
+    card.classList.add("flash");
+    setTimeout(function(){ card.classList.remove("flash"); }, 1600);
+    return;
+  }
+  var el = document.getElementById(cardId === "guide-form-card" ? "gd-slug" : "nw-slug");
+  if(el) window.scrollTo(0, el.offsetTop);
+}
 function fillGuide(r){
   var g = guideObjFromRow(r);
   document.getElementById("gd-slug").value = g.slug;
@@ -3147,7 +3172,8 @@ function fillGuide(r){
   document.getElementById("gd-tags").value = g.tags;
   renderImagePreview("gd");
   updateSeo("gd");
-  window.scrollTo(0, document.getElementById("gd-slug").offsetTop);
+  scrollToForm("guide-form-card");
+  toast("تم تحميل «" + g.title + "» في نموذج التعديل — عدّل ثم اضغط «حفظ الدليل»");
 }
 async function deleteGuide(slug){
   if(!confirm("حذف هذا الدليل؟"))return;
@@ -3359,11 +3385,13 @@ function renderSeoAudit(){
 }
 function editSeoGuide(slug){
   var row = GUIDES_DATA.slice(1).find(function(r){ return String(r[0]) === String(slug); });
-  if(!row) return; navTo("tab-guides"); fillGuide(row);
+  if(!row){ toast("لم أجد هذا الدليل في البيانات — حدّث الجدول من تبويب «الأدلة» أولاً"); return; }
+  navTo("tab-guides"); fillGuide(row);
 }
 function editSeoNews(slug){
   var row = NEWS_DATA.slice(1).find(function(r){ return String(r[0]) === String(slug); });
-  if(!row) return; navTo("tab-news"); fillNews(row);
+  if(!row){ toast("لم أجد هذا الخبر في البيانات — حدّث الجدول من تبويب «الأخبار» أولاً"); return; }
+  navTo("tab-news"); fillNews(row);
 }
 async function loadNews(){
   try{
@@ -3396,7 +3424,8 @@ function fillNews(r){
   document.getElementById("nw-category").value = n.category;
   renderImagePreview("nw");
   updateSeo("nw");
-  window.scrollTo(0, document.getElementById("nw-slug").offsetTop);
+  scrollToForm("news-form-card");
+  toast("تم تحميل «" + n.title + "» في نموذج التعديل — عدّل ثم اضغط «حفظ الخبر»");
 }
 async function deleteNews(slug){
   if(!confirm("حذف هذا الخبر؟"))return;
