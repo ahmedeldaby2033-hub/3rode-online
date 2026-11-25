@@ -10,6 +10,14 @@ Flow:
   -> POSTs the Coolify deploy webhook of the main site
   -> panel polls GET /sync-status?job=<id> for progress
 
+  panel -> POST /fetch-price {token, url}   (price refresh, one product page)
+  -> real headless Chromium (Playwright) loads the store page and reads
+     the current price / old price / stock from JSON-LD + page selectors
+  -> panel writes the result back to the Sheet via Apps Script updatePrice
+     (price + old price + discount + last-update date + price history)
+  NOTE: direct HTTP fetching is blocked by Cloudflare (403) on Jumia, so
+  only a real browser gets through — that's why this needs Playwright.
+
 Env vars (set in Coolify):
   SYNC_TOKEN              shared secret the admin panel sends
   REPO_URL                git URL of the site repo (SSH form for push)
@@ -61,6 +69,134 @@ LAYOUTS = ("classic", "rows", "deals", "store", "compact", "luxury",
            "fullrows", "quick")
 
 JOBS = {}
+
+# ------------------------------------------------------------------ price fetch
+# One Chromium browser for the whole process, one fetch at a time, with a
+# small gap between fetches so the store never sees a burst.
+_PW_LOCK = threading.Lock()
+_PW_BROWSER = None
+_PW_LAST_FETCH = 0.0
+_PW_MIN_GAP = 1.5
+FETCH_HOSTS = ("jumia.com.eg", "noon.com", "amazon.eg", "amazon.com")
+FETCH_TIMEOUT_MS = 30000
+
+_EXTRACT_JS = r"""
+() => {
+  const num = (s) => {
+    if (s === null || s === undefined) return null;
+    const m = String(s).replace(/[\s\u00a0]/g, '').match(/[\d,]+(\.\d+)?/);
+    if (!m) return null;
+    const v = parseFloat(m[0].replace(/,/g, ''));
+    return (v >= 100 && v <= 500000) ? v : null;
+  };
+  // 1) JSON-LD Product -> offers.price (most reliable, all three stores)
+  let price = null, oldPrice = null, avail = null;
+  const walk = (o) => {
+    if (!o) return;
+    if (Array.isArray(o)) { o.forEach(walk); return; }
+    if (typeof o !== 'object') return;
+    if (o['@type'] === 'Product' || (Array.isArray(o['@type']) && o['@type'].includes('Product'))) {
+      const off = o.offers;
+      const list = Array.isArray(off) ? off : (off ? [off] : []);
+      list.forEach((f) => {
+        if (price === null) price = num(f.price);
+        if (avail === null && f.availability) avail = String(f.availability);
+      });
+      return;
+    }
+    Object.values(o).forEach(walk);
+  };
+  document.querySelectorAll('script[type="application/ld+json"]').forEach((s) => {
+    try { walk(JSON.parse(s.textContent)); } catch (e) {}
+  });
+  // 2) visible price selectors (Jumia / Noon / Amazon)
+  const pick = (sels) => {
+    for (const s of sels) {
+      const el = document.querySelector(s);
+      if (el) { const v = num(el.textContent); if (v !== null) return v; }
+    }
+    return null;
+  };
+  if (price === null) price = pick([
+    '[data-testid="pdp-price"]', '.pdp-price', '.-fs-20',
+    '[data-qa="product-price"]', '#priceblock_ourprice',
+    '.a-price .a-offscreen', '#corePriceDisplay_desktop_feature_div .a-offscreen'
+  ]);
+  if (oldPrice === null) oldPrice = pick([
+    '[data-testid="pdp-old-price"]', '.pdp-old-price', '.-old-price',
+    '.a-text-price .a-offscreen', '#corePriceDisplay_desktop_feature_div s'
+  ]);
+  // 3) last resort: "price":12345 inside embedded page JSON
+  if (price === null) {
+    const m = document.documentElement.innerHTML.match(/"price"\s*:\s*"?([\d,]+\.?\d*)"?/);
+    if (m) price = num(m[1]);
+  }
+  let inStock = null;
+  if (avail) {
+    if (/InStock/i.test(avail)) inStock = true;
+    else if (/OutOfStock|SoldOut/i.test(avail)) inStock = false;
+  }
+  if (inStock === null) {
+    const t = document.body.innerText.toLowerCase();
+    if (t.includes('out of stock') || t.includes('غير متوفر') || t.includes('sold out')) inStock = false;
+    else if (price !== null) inStock = true;
+  }
+  let stockText = '';
+  const st = document.querySelector('[data-testid="pdp-stock"], .pdp-stock, .stock-info');
+  if (st) stockText = st.textContent.trim().slice(0, 80);
+  return { price, old_price: oldPrice, in_stock: inStock,
+           stock_text: stockText, title: document.title.slice(0, 160) };
+}
+"""
+
+
+def _pw_browser():
+    global _PW_BROWSER
+    if _PW_BROWSER is None:
+        from playwright.sync_api import sync_playwright
+        _pw = sync_playwright().start()
+        _PW_BROWSER = _pw.chromium.launch(
+            headless=True,
+            args=["--no-sandbox", "--disable-blink-features=AutomationControlled"])
+        _PW_BROWSER._pw = _pw  # keep the driver alive with the browser
+    return _PW_BROWSER
+
+
+def fetch_price(url):
+    """Load a store product page in real Chromium and read its price.
+    Returns dict(price, old_price, in_stock, stock_text, title) or raises."""
+    global _PW_LAST_FETCH
+    with _PW_LOCK:
+        gap = _PW_MIN_GAP - (time.time() - _PW_LAST_FETCH)
+        if gap > 0:
+            time.sleep(gap)
+        try:
+            browser = _pw_browser()
+        except ImportError as e:
+            raise RuntimeError(
+                "Playwright is not installed in the sync app image — "
+                "redeploy the sync app after this update") from e
+        ctx = browser.new_context(
+            user_agent=("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                        "AppleWebKit/537.36 (KHTML, like Gecko) "
+                        "Chrome/126.0.0.0 Safari/537.36"),
+            locale="ar-EG")
+        page = ctx.new_page()
+        try:
+            resp = page.goto(url, wait_until="domcontentloaded",
+                             timeout=FETCH_TIMEOUT_MS)
+            if resp is not None and resp.status >= 400:
+                raise RuntimeError(f"store page returned HTTP {resp.status}")
+            page.wait_for_timeout(3500)  # let the price render / challenges pass
+            data = page.evaluate(_EXTRACT_JS)
+            _PW_LAST_FETCH = time.time()
+            if not data or not data.get("price"):
+                raise RuntimeError("no price found on the page "
+                                   "(blocked, changed layout, or removed)")
+            return data
+        finally:
+            page.close()
+            ctx.close()
 
 
 def log(job, step):
@@ -304,6 +440,26 @@ class Handler(BaseHTTPRequestHandler):
         return self._json(404, {"ok": False, "error": "not found"})
 
     def do_POST(self):
+        if self.path == "/fetch-price":
+            payload = self._read_json()
+            token = payload.get("token", "")
+            if not SYNC_TOKEN or not hmac.compare_digest(
+                    token, SYNC_TOKEN):
+                return self._json(401, {"ok": False, "error": "unauthorized"})
+            url = str(payload.get("url") or "").strip()
+            try:
+                host = url.split("://", 1)[-1].split("/", 1)[0].lower()
+                host = host[4:] if host.startswith("www.") else host
+            except Exception:  # noqa: BLE001
+                host = ""
+            if not url.startswith("http") or host not in FETCH_HOSTS:
+                return self._json(400, {"ok": False,
+                                        "error": "unsupported store url"})
+            try:
+                data = fetch_price(url)
+            except Exception as e:  # noqa: BLE001 - report to the panel
+                return self._json(200, {"ok": False, "error": str(e)})
+            return self._json(200, {"ok": True, **data})
         if self.path != "/sync":
             return self._json(404, {"ok": False, "error": "not found"})
         payload = self._read_json()

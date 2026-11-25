@@ -875,6 +875,16 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
       <p id="buylinks-progress"></p>
       <div id="buylinks-results" class="table-scroll">—</div>
     </div>
+    <div class="card"><h2>تحديث الأسعار من صفحات المتاجر 💰</h2>
+      <p class="hint">يزور صفحة كل منتج في المتجر (جوميا / نون / أمازون) بمتصفح حقيقي، يقرأ السعر الحالي، ويحدّث السعر والسعر القديم ونسبة الخصم وتاريخ التحديث في الشيت — وبعدها «مزامنة الآن» تنشر الأسعار الجديدة على الموقع. جلب الأسعار يتم عبر خدمة المزامنة (نفس رابط ورمز «الإعداد والربط»)، منتجاً منتجاً، وكل نتيجة تظهر في الجدول فوراً. التحديث الكامل للأرخص لكل موديل (312 منتجاً) يستغرق نحو 40 دقيقة — اتركه يعمل في الخلفية.</p>
+      <p><label>النطاق: </label><select id="pu-scope" onchange="document.getElementById('pu-model').style.display = this.value==='one' ? '' : 'none'"><option value="cheapest">الأرخص لكل موديل (312 منتج)</option><option value="all">كل العروض (1709)</option><option value="one">موديل واحد</option></select>
+      <input id="pu-model" placeholder="اسم الموديل (لخيار «موديل واحد»)" style="display:none"></p>
+      <p><button class="btn" id="btn-run-priceupdate" onclick="runPriceUpdate()">بدء تحديث الأسعار</button>
+      <button class="btn-danger" id="btn-stop-priceupdate" onclick="stopPriceUpdate()" style="display:none">إيقاف</button></p>
+      <p id="pu-status"></p>
+      <p id="pu-progress"></p>
+      <div id="pu-results" class="table-scroll">—</div>
+    </div>
   </section>
 
   <section class="tab" id="tab-affiliate">
@@ -3548,6 +3558,82 @@ function renderBuyLinksResults(){
 function renderBuyLinksStatus(){
   var el = document.getElementById("buylinks-status");
   if(el && !el.textContent) el.textContent = "—";
+}
+
+/* ---------------- price refresh (fetch-price + updatePrice) ----------------
+   Visits each store product page in a real browser (sync-app /fetch-price,
+   because direct HTTP fetching is blocked by Cloudflare 403 on Jumia),
+   reads the current price, and writes it back to the Sheet via updatePrice
+   (price + old price + discount + last-update date + price history). */
+var PRICE_UPDATE = {running: false, stop: false, done: 0, total: 0, changed: 0, failed: 0};
+function puSay(t){ var el = document.getElementById("pu-status"); if(el) el.innerHTML = t; }
+async function runPriceUpdate(){
+  var wh = getWebhook();
+  if(!wh.url || !wh.token){ puSay('<span class="error">اربط خدمة المزامنة أولاً من تبويب «الإعداد والربط» (رابط الخدمة + SYNC_TOKEN) — جلب الأسعار يتم عبرها.</span>'); return; }
+  if(PRICE_UPDATE.running) return;
+  var scope = document.getElementById("pu-scope").value;
+  puSay("جارٍ تحميل قائمة المنتجات من الشيت…");
+  var d;
+  try{
+    d = await api("products", null, {full: "1"});
+  }catch(e){ puSay('<span class="error">' + esc(e.message) + '</span>'); return; }
+  var rows = (d.rows || []).filter(function(r){ return r[0] && r[4] && String(r[4]).indexOf("http") === 0; });
+  if(scope === "cheapest"){
+    var byKey = {};
+    rows.forEach(function(r){
+      var k = modelKeyFromRow(r);
+      var p = parseFloat(String(r[7] || "").replace(/[^0-9.]/g, "")) || 0;
+      if(!byKey[k] || (p && p < byKey[k].price)) byKey[k] = {row: r, price: p};
+    });
+    rows = Object.keys(byKey).map(function(k){ return byKey[k].row; });
+  }else if(scope === "one"){
+    var q = (document.getElementById("pu-model").value || "").trim().toLowerCase();
+    if(!q){ puSay('<span class="error">اكتب اسم الموديل أولاً.</span>'); return; }
+    rows = rows.filter(function(r){ return ((r[2] || "") + " " + (r[3] || "")).toLowerCase().indexOf(q) !== -1; });
+    if(!rows.length){ puSay('<span class="error">لم أجد موديلاً بهذا الاسم.</span>'); return; }
+  }
+  PRICE_UPDATE = {running: true, stop: false, done: 0, total: rows.length, changed: 0, failed: 0};
+  document.getElementById("btn-run-priceupdate").style.display = "none";
+  document.getElementById("btn-stop-priceupdate").style.display = "";
+  document.getElementById("pu-results").innerHTML = "<table><tr><th>المنتج</th><th>المتجر</th><th>السعر القديم</th><th>السعر الجديد</th><th>النتيجة</th></tr></table>";
+  for(var i = 0; i < rows.length; i++){
+    if(PRICE_UPDATE.stop) break;
+    var r = rows[i];
+    var oldPrice = parseFloat(String(r[7] || "").replace(/[^0-9.]/g, "")) || 0;
+    var res = await puFetchOne(wh, r);
+    PRICE_UPDATE.done++;
+    if(res.ok){
+      if(res.changed) PRICE_UPDATE.changed++;
+      puAddRow(r, oldPrice, res.price, res.changed ? "تغيّر ✓" : "كما هو");
+    }else{
+      PRICE_UPDATE.failed++;
+      puAddRow(r, oldPrice, null, "فشل: " + res.error);
+    }
+    document.getElementById("pu-progress").innerHTML = "تم " + PRICE_UPDATE.done + " / " + PRICE_UPDATE.total + " — تغيّر: " + PRICE_UPDATE.changed + " — فشل: " + PRICE_UPDATE.failed;
+  }
+  PRICE_UPDATE.running = false;
+  document.getElementById("btn-run-priceupdate").style.display = "";
+  document.getElementById("btn-stop-priceupdate").style.display = "none";
+  puSay("انتهى التحديث — فُحص " + PRICE_UPDATE.done + " منتج، تغيّر " + PRICE_UPDATE.changed + "، فشل " + PRICE_UPDATE.failed + ". اضغط «مزامنة الآن» من الأعلى لنشر الأسعار الجديدة على الموقع.");
+  toast("انتهى تحديث الأسعار");
+}
+function stopPriceUpdate(){ PRICE_UPDATE.stop = true; puSay("جارٍ الإيقاف بعد المنتج الحالي…"); }
+async function puFetchOne(wh, r){
+  try{
+    var f = await fetch(wh.url + "/fetch-price", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({token: wh.token, url: r[4]})});
+    var j = await f.json();
+    if(!j.ok) return {ok: false, error: j.error || "تعذّر قراءة السعر"};
+    var upd = await api("updatePrice", {url: r[4], price: j.price, old_price: j.old_price || "", in_stock: j.in_stock, stock_text: j.stock_text || ""});
+    if(!upd.ok) return {ok: false, error: (upd.error || "تعذّر الحفظ في الشيت") + " — تأكد من نشر Code.gs V9 من محرر Apps Script"};
+    return {ok: true, price: j.price, changed: !!upd.changed};
+  }catch(e){ return {ok: false, error: e.message}; }
+}
+function puAddRow(r, oldPrice, newPrice, status){
+  var tbl = document.querySelector("#pu-results table");
+  if(!tbl) return;
+  var tr = document.createElement("tr");
+  tr.innerHTML = "<td>" + esc(r[0] || "") + "</td><td>" + esc(r[5] || "") + "</td><td>" + (oldPrice ? oldPrice.toLocaleString("en-US") : "—") + "</td><td>" + (newPrice ? newPrice.toLocaleString("en-US") : "—") + "</td><td>" + esc(status) + "</td>";
+  tbl.appendChild(tr);
 }
 async function setupDailyBuyLinksCheck(){
   var el = document.getElementById("buylinks-status");

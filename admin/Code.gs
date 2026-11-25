@@ -975,6 +975,36 @@ function doPost(e) {
         s.appendRow(row);
         return jsonOut({ ok: true, added: s.getLastRow() });
       }
+      if (action === 'updatePrice') {
+        // Price refresh (panel «تحديث الأسعار» + sync-app /fetch-price):
+        // body: {url, price, old_price?, in_stock?, stock_text?}
+        // Writes ONLY the price fields + last-update date; everything else
+        // in the row is untouched. The discount % is recomputed from the
+        // old price, and a real change is appended to «سجل الأسعار».
+        s = ss().getSheetByName(SHEET_PRODUCTS);
+        var prow = findProductRow(body.url || '');
+        if (prow <= 0) return jsonOut({ ok: false, error: 'product not found' });
+        var newPrice = Number(body.price) || 0;
+        if (!newPrice) return jsonOut({ ok: false, error: 'no price given' });
+        var prowVals = s.getRange(prow, 1, 1, 47).getValues()[0];
+        var prevPrice = Number(prowVals[6]) || 0;
+        var newOld = Number(body.old_price) || Number(prowVals[7]) || 0;
+        var disc = 0;
+        if (newOld > newPrice) disc = -Math.round((1 - newPrice / newOld) * 100);
+        s.getRange(prow, 7).setValue(newPrice);            // G السعر الحالي
+        s.getRange(prow, 8).setValue(newOld || '');         // H السعر قبل الخصم
+        s.getRange(prow, 9).setValue(disc);                 // I نسبة الخصم
+        if (body.stock_text) s.getRange(prow, 10).setValue(body.stock_text);
+        else if (body.in_stock === false) s.getRange(prow, 10).setValue('Out of stock');
+        var now = new Date();
+        var dd = ('0' + now.getDate()).slice(-2);
+        var mm = ('0' + (now.getMonth() + 1)).slice(-2);
+        s.getRange(prow, 26).setValue(dd + '-' + mm + '-' + now.getFullYear()); // Z تاريخ آخر تحديث
+        prowVals[6] = newPrice;
+        appendPriceHistory(prowVals, prevPrice, newPrice);
+        return jsonOut({ ok: true, row: prow, changed: prevPrice !== newPrice,
+                         prevPrice: prevPrice, price: newPrice });
+      }
       if (action === 'deleteProduct') {
         s = ss().getSheetByName(SHEET_PRODUCTS);
         var delRow = findProductRow(body.productUrl || '');
