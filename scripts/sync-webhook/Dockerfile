@@ -8,12 +8,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends git openssh-cli
     && rm -rf /var/lib/apt/lists/*
 # Explicit install: the base image already bundles playwright, but if the
 # build ever runs against a base without it, this line (not a silent runtime
-# error) is what saves the deploy.
-RUN python3 -m pip install --no-cache-dir pillow playwright==1.49.0
+# error) is what saves the deploy. playwright-stealth patches the
+# automation fingerprints (webdriver flag, plugins, languages...) so the
+# store's bot detection sees a normal desktop browser.
+RUN python3 -m pip install --no-cache-dir pillow playwright==1.49.0 playwright-stealth
 # Build-time smoke test: fail the image build LOUDLY if Playwright cannot be
 # imported, instead of deploying an app that answers every price request with
 # "Playwright is not installed" (what happened on 2026-11-25).
-RUN python3 -c "from playwright.sync_api import sync_playwright; print('playwright import ok')"
+RUN python3 -c "from playwright.sync_api import sync_playwright; import playwright_stealth; print('playwright + stealth import ok')"
 WORKDIR /app
 COPY server.py /app/server.py
 RUN mkdir -p /data/repo

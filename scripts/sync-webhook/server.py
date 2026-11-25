@@ -40,6 +40,16 @@ import threading
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
+
+# Stealth patches (webdriver flag, plugins, languages...) applied to every
+# page so the store's bot detection sees a normal desktop browser instead
+# of headless automation. Optional at runtime (the Dockerfile installs it
+# and its smoke test verifies the import) — without it the fetch still
+# runs, just easier to fingerprint.
+try:
+    from playwright_stealth import stealth_sync as _stealth_sync
+except ImportError:  # pragma: no cover - missing package
+    _stealth_sync = None
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib import request as urlrequest
 from urllib.error import URLError
@@ -182,9 +192,22 @@ def _pw_browser():
         _pw = sync_playwright().start()
         _PW_BROWSER = _pw.chromium.launch(
             headless=True,
-            args=["--no-sandbox", "--disable-blink-features=AutomationControlled"])
+            args=["--no-sandbox",
+                  "--disable-dev-shm-usage",  # /dev/shm is tiny in containers
+                  "--disable-blink-features=AutomationControlled"])
         _PW_BROWSER._pw = _pw  # keep the driver alive with the browser
     return _PW_BROWSER
+
+
+def _new_context(browser):
+    """A context that looks like a normal desktop browser in Cairo."""
+    return browser.new_context(
+        user_agent=("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/126.0.0.0 Safari/537.36"),
+        locale="ar-EG",
+        timezone_id="Africa/Cairo",
+        viewport={"width": 1366, "height": 768})
 
 
 def fetch_price(url):
@@ -209,11 +232,7 @@ def _fetch_price_once(url):
             "Playwright is not installed in the sync app image — "
             "redeploy the sync app after this update") from e
     try:
-        ctx = browser.new_context(
-            user_agent=("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                        "AppleWebKit/537.36 (KHTML, like Gecko) "
-                        "Chrome/126.0.0.0 Safari/537.36"),
-            locale="ar-EG")
+        ctx = _new_context(browser)
     except Exception:
         # The shared browser died (Chromium crash / driver gone): close it
         # best-effort (avoid leaking a Chromium process per retry), drop
@@ -229,19 +248,12 @@ def _fetch_price_once(url):
             pass
         _PW_BROWSER = None
         browser = _pw_browser()
-        ctx = browser.new_context(
-            user_agent=("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                        "AppleWebKit/537.36 (KHTML, like Gecko) "
-                        "Chrome/126.0.0.0 Safari/537.36"),
-            locale="ar-EG")
+        ctx = _new_context(browser)
     page = ctx.new_page()
+    if _stealth_sync is not None:
+        _stealth_sync(page)
     try:
-        resp = page.goto(url, wait_until="domcontentloaded",
-                         timeout=FETCH_TIMEOUT_MS)
-        if resp is not None and resp.status >= 400:
-            raise RuntimeError(f"store page returned HTTP {resp.status}")
-        page.wait_for_timeout(3500)  # let the price render / challenges pass
-        data = page.evaluate(_EXTRACT_JS)
+        data = _load_and_extract(page, url)
         _PW_LAST_FETCH = time.time()
         if not data or not data.get("price"):
             raise RuntimeError("no price found on the page "
@@ -250,6 +262,40 @@ def _fetch_price_once(url):
     finally:
         page.close()
         ctx.close()
+
+
+def _load_and_extract(page, url):
+    """Load the page and extract the price, surviving a bot-check 403.
+
+    The store's protection often answers the first load with HTTP 403 and
+    a challenge page that resolves itself once its JS runs (cookie set +
+    reload). Failing immediately on the first 403 (the old behaviour) made
+    every product fail even when the challenge would have cleared. So on a
+    403: wait for the challenge to resolve and try the extraction; if there
+    is still no price, reload once and try again; only then give up — with
+    the page title in the error so the next diagnosis knows what was served.
+    """
+    resp = page.goto(url, wait_until="domcontentloaded",
+                     timeout=FETCH_TIMEOUT_MS)
+    if resp is not None and resp.status >= 400:
+        page.wait_for_timeout(8000)  # let a challenge page resolve itself
+        data = page.evaluate(_EXTRACT_JS)
+        if data and data.get("price"):
+            return data
+        resp = page.goto(url, wait_until="domcontentloaded",
+                         timeout=FETCH_TIMEOUT_MS)
+        if resp is not None and resp.status >= 400:
+            title = ""
+            try:
+                title = (page.title() or "").strip()
+            except Exception:
+                pass
+            raise RuntimeError(
+                f"store page returned HTTP {resp.status}"
+                + (f" ({title[:60]})" if title else ""))
+    else:
+        page.wait_for_timeout(3500)  # let the price render / challenges pass
+    return page.evaluate(_EXTRACT_JS)
 
 
 def log(job, step):
