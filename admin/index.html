@@ -544,6 +544,16 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
   <section class="tab" id="tab-logs">
     <div class="card"><h2>سجل المزامنة</h2><div id="sync-log" class="table-scroll">—</div></div>
     <div class="card"><h2>سجل الأسعار (آخر التغييرات)</h2><div id="price-log" class="table-scroll">—</div></div>
+    <div class="card"><h2>رادار الانخفاضات 📉</h2>
+      <p class="hint">أكبر انخفاضات الأسعار المسجلة في «سجل الأسعار» (انخفاض ≥ 5%) — انشر أي انخفاض كخبر بضغطة واحدة. يُنشأ الخبر كمسودة (بلا سعر في العنوان، ووصفه يبدأ بـ«انخفاض سعر») لتراجعه في تبويب الأخبار قبل النشر.</p>
+      <p>
+        <button class="btn" onclick="loadPriceDrops(7,'pct')">آخر 7 أيام — أكبر نسبة</button>
+        <button class="btn" onclick="loadPriceDrops(30,'pct')">آخر 30 يوم — أكبر نسبة</button>
+        <button class="btn" onclick="loadPriceDrops(30,'egp')">آخر 30 يوم — أكبر توفير بالجنيه</button>
+        <button class="btn-ghost" onclick="loadPriceDrops(0,'pct')">كل الانخفاضات</button>
+      </p>
+      <div id="price-drops" class="table-scroll">اضغط أحد الأزرار لعرض الرادار.</div>
+    </div>
     <div class="card"><h2>نقرات أزرار الشراء</h2><div id="clicks-stats" class="table-scroll">—</div></div>
   </section>
 
@@ -2563,6 +2573,48 @@ async function loadLogs(){
     document.getElementById("clicks-stats").innerHTML = "إجمالي النقرات: <b>"+cl.total+"</b><br>"+
       Object.keys(cl.byStore||{}).map(function(s){return esc(s)+": "+cl.byStore[s]}).join(" · ");
   }catch(err){document.getElementById("sync-log").innerHTML='<span class="error">'+err.message+"</span>"}
+}
+
+/* ---------------- price-drop radar ---------------- */
+function fmtEGP(n){ return Number(n).toLocaleString("en-US"); }
+function radarSlug(s){
+  var t = String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  return t || "price-drop";
+}
+async function loadPriceDrops(days, sort){
+  var el = document.getElementById("price-drops");
+  el.innerHTML = "جارٍ تحميل الرادار…";
+  try{
+    var d = await api("priceDrops", null, {days: days, sort: sort});
+    window._DROPS = d.drops || [];
+    if(!window._DROPS.length){ el.innerHTML = "لا توجد انخفاضات ≥ 5% في هذه الفترة."; return; }
+    el.innerHTML = "<p class='hint'>" + d.total + " موديل بانخفاض ≥ 5%.</p>" +
+      "<table><tr><th>الموديل</th><th>المتجر</th><th>السعر القديم</th><th>السعر الجديد</th><th>الانخفاض</th><th>التاريخ</th><th></th></tr>" +
+      window._DROPS.map(function(x, i){
+        return "<tr><td>" + esc(x.name) + "</td><td>" + esc(x.store) + "</td><td>" + fmtEGP(x.old) + "</td><td>" + fmtEGP(x.new) + "</td><td><b>−" + fmtEGP(x.diff) + " جنيه (" + esc(x.pct) + "%)</b></td><td>" + esc(x.date) + "</td><td><button class='btn-green' onclick='publishDropAsNews(" + i + ")'>انشر كخبر</button></td></tr>";
+      }).join("") + "</table>";
+  }catch(err){ el.innerHTML = '<span class="error">' + esc(err.message) + "</span>"; }
+}
+async function publishDropAsNews(i){
+  var x = (window._DROPS || [])[i];
+  if(!x){ toast("أعد تحميل الرادار أولاً"); return; }
+  var modelName = String(x.name || x.model || "").trim();
+  var base = x.slug || radarSlug(modelName);
+  var today = new Date().toISOString().slice(0,10);
+  var n = {
+    slug: base + "-price-drop-" + today,
+    title: "خصم قوي على " + modelName + " لفترة محدودة",
+    description: "انخفاض سعر " + modelName + " إلى " + fmtEGP(x.new) + " جنيه في " + x.store + "، بتراجع " + fmtEGP(x.diff) + " جنيه (" + x.pct + "%) عن سعره السابق " + fmtEGP(x.old) + " جنيه.",
+    body: "انخفض سعر " + modelName + " في " + x.store + " إلى " + fmtEGP(x.new) + " جنيه، بعد أن كان " + fmtEGP(x.old) + " جنيه، بتراجع قدره " + fmtEGP(x.diff) + " جنيه، أي بنسبة " + x.pct + "%، وذلك وفق آخر تحديث موثّق للأسعار بتاريخ " + (x.date || today) + ".",
+    model_slug: x.slug || "", author: "فريق عروض أونلاين",
+    date_published: today, is_example: false, publish_at: "",
+    image: x.image || "", image_alt: modelName,
+    keyword: modelName, meta_title: "انخفاض سعر " + modelName + " | عروض أونلاين",
+    meta_desc: "انخفاض سعر " + modelName + " إلى " + fmtEGP(x.new) + " جنيه في " + x.store + " — قارن الأسعار بين جوميا وأمازون ونون.",
+    tags: "انخفاضات الأسعار, " + modelName, category: "انخفاضات الأسعار"
+  };
+  try{ await api("saveNews", {news: n}); toast("تم إنشاء الخبر كمسودة — راجعه في تبويب الأخبار"); loadNews(); }
+  catch(err){ toast(err.message); }
 }
 
 /* ===== templates/admin-search-buttons.html — JS (settings read at click time) =====

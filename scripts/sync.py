@@ -492,6 +492,63 @@ def download_images(limit_per_run=20):
     log("download-images", f"{done} new, {len(LOG['image_failures'])} failed")
 
 
+def append_history_to_sheet(changes):
+    """Append new price changes to the Sheet «سجل الأسعار» tab so the
+    admin price-drop radar's 7/30-day windows fill over time.
+    Best-effort only: needs hatch_gws_cli (absent on the VPS sync app —
+    then it silently skips) and never raises into the sync. Only moves
+    of >= 1% are appended, to keep noise (e.g. 0.04% rounding moves)
+    out of the tab. Rows match the tab's 12 columns: date, name, model,
+    storage, ram, store, seller, url, old, new, diff, pct (diff/pct
+    signed: negative = drop)."""
+    if not changes:
+        return
+    try:
+        cli = pathlib.Path("/opt/hatch/bin/hatch_gws_cli")
+        sheet_id = SETTINGS.get("sheet_id") or ""
+        if not cli.exists() or not sheet_id:
+            return
+        rows = json.loads((RAW / "sheet1.json").read_text(encoding="utf-8"))["values"]
+        header = [str(h).strip() for h in rows[0]]
+        col = {name: i for i, name in enumerate(header)}
+        by_url = {}
+        for r in rows[1:]:
+            if not any(str(c).strip() for c in r):
+                continue
+            by_url[r[col["رابط المنتج"]]] = r
+        values = []
+        for c in changes:
+            diff, pct = SH.price_change(c["old"], c["new"])
+            if abs(pct) < 1:
+                continue
+            r = by_url.get(c["url"])
+            if not r:
+                continue
+            values.append([
+                c["date"],
+                r[col["اسم الموبايل"]], r[col["الموديل"]],
+                r[col["التخزين"]], r[col["الرام"]],
+                r[col["المتجر (جوميا / أمازون)"]], r[col["البائع"]],
+                c["url"], c["old"], c["new"], diff, pct,
+            ])
+        if not values:
+            return
+        out = subprocess.run(
+            [str(cli), "sheets", "spreadsheets", "values", "append",
+             "--params", json.dumps(
+                 {"spreadsheetId": sheet_id, "range": "سجل الأسعار",
+                  "valueInputOption": "USER_ENTERED",
+                  "insertDataOption": "INSERT_ROWS"}),
+             "--json", json.dumps({"values": values})],
+            capture_output=True, text=True, timeout=60)
+        if out.returncode == 0:
+            log("history-append", f"{len(values)} change(s) appended to سجل الأسعار")
+        else:
+            log("history-append", f"skipped (CLI error): {out.stderr[-300:]}")
+    except Exception as e:  # noqa: BLE001 - best-effort, never break the sync
+        log("history-append", f"skipped: {e}")
+
+
 def main():
     sys.path.insert(0, str(SCRIPTS))
     try:
@@ -509,6 +566,7 @@ def main():
             hist.extend(changes)
             hist_file.write_text(json.dumps(hist, ensure_ascii=False, indent=1),
                                  encoding="utf-8")
+        append_history_to_sheet(changes)
         download_images()
         r = subprocess.run([sys.executable, str(SCRIPTS / "build.py")],
                            capture_output=True, text=True, timeout=600)

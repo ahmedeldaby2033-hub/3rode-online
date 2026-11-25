@@ -517,6 +517,61 @@ function doGet(e) {
       var hist = sheet(SHEET_HISTORY).getDataRange().getValues().slice(1).slice(-200).reverse();
       return jsonOut({ ok: true, rows: hist });
     }
+    if (action === 'priceDrops') {
+      // رادار الانخفاضات: أكبر انخفاضات الأسعار المسجلة في «سجل الأسعار».
+      // ?days=7|30|0 (0 = الكل) يصفّي حسب تاريخ الانخفاض؛ ?sort=pct|egp.
+      // يُدمج كل عروض الموديل الواحد (أكبر نسبة انخفاض) ويربط الموديل
+      // بسلاج الموقع وصورته من تبويب المنتجات عبر رابط المنتج.
+      // ملاحظة: تبويب السجل يحمل لقطة 19 نوفمبر 2026 + ما يُضاف من تعديلات
+      // الأسعار اليدوية في اللوحة ومن المزامنة؛ النوافذ الزمنية تتمايز
+      // كلما تراكمت صفوف بتواريخ أحدث.
+      var days = parseInt((e.parameter.days || '30'), 10) || 0;
+      var sortBy = (e.parameter.sort || 'pct') === 'egp' ? 'egp' : 'pct';
+      var histRows = sheet(SHEET_HISTORY).getDataRange().getValues().slice(1);
+      var cutoff = days > 0 ? new Date().getTime() - days * 86400000 : 0;
+      var pv2 = ss().getSheetByName(SHEET_PRODUCTS).getDataRange().getValues();
+      var byUrl = {};
+      for (var pi = 1; pi < pv2.length; pi++) {
+        var pu = String(pv2[pi][4] || '').trim();
+        if (pu && !byUrl[pu]) byUrl[pu] = pv2[pi];
+      }
+      function parseHistDate(v) {
+        if (v instanceof Date) return v.getTime();
+        if (typeof v === 'number' && v > 30000 && v < 60000) return Math.round((v - 25569) * 86400000);
+        var m = String(v || '').match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+        if (m) return new Date(+m[3], +m[2] - 1, +m[1]).getTime();
+        m = String(v || '').match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+        if (m) return new Date(+m[1], +m[2] - 1, +m[3]).getTime();
+        return 0;
+      }
+      function fmtHistDate(v) {
+        var t = parseHistDate(v);
+        if (!t) return '';
+        var d = new Date(t);
+        return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+      }
+      var best = {};
+      histRows.forEach(function (r) {
+        var oldP = Number(r[8]), newP = Number(r[9]);
+        if (!oldP || !newP || newP >= oldP) return;
+        var t = parseHistDate(r[0]);
+        if (cutoff && t && t < cutoff) return;
+        var pct = Math.round((oldP - newP) / oldP * 1000) / 10;
+        if (pct < 5) return; // نفس عتبة توليد الأخبار: تجاهل الانخفاضات الصغيرة
+        var prod = byUrl[String(r[7] || '').trim()];
+        var slug = '', img = '';
+        if (prod) {
+          slug = slugifyModel(prod[2], prod[3], prod[13], prod[14]);
+          img = String(prod[30] || '');
+        }
+        var key = slug || (String(r[1]) + '|' + String(r[2]) + '|' + String(r[3]) + '|' + String(r[4]));
+        var cand = { name: r[1], model: r[2], storage: r[3], ram: r[4], store: r[5], seller: r[6], url: r[7], old: oldP, new: newP, diff: oldP - newP, pct: pct, date: fmtHistDate(r[0]), slug: slug, image: img };
+        if (!best[key] || cand.pct > best[key].pct) best[key] = cand;
+      });
+      var out = Object.keys(best).map(function (k) { return best[k]; });
+      out.sort(function (a, b) { return sortBy === 'egp' ? b.diff - a.diff : b.pct - a.pct; });
+      return jsonOut({ ok: true, drops: out.slice(0, 50), total: out.length, window_days: days });
+    }
     if (action === 'clicks') {
       var clicks = sheet(SHEET_CLICKS).getDataRange().getValues().slice(1);
       var byStore = {}, byModel = {};
