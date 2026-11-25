@@ -726,7 +726,7 @@ def header_html():
 <a class="brand" href="/"><img src="/assets/logo.png" alt="{esc(SITE_NAME)} {DOMAIN}" width="162" height="56"></a>
 <button id="nav-toggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav">{icon("menu")} القائمة</button>
 <nav class="main-nav" id="main-nav">
-<a href="/">الرئيسية</a><a href="/deals/">أفضل العروض</a><a href="/coupons/">الكوبونات</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/brands/">الماركات</a><a href="/about/">من نحن</a>
+<a href="/">الرئيسية</a><a href="/deals/">أفضل العروض</a><a href="/prices/">الأسعار اليومية</a><a href="/coupons/">الكوبونات</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/brands/">الماركات</a><a href="/about/">من نحن</a>
 </nav>
 <button id="theme-toggle" class="theme-toggle" type="button">{icon("sun")} الوضع النهاري</button>
 <button id="pwa-install" class="theme-toggle" type="button" style="display:none">{icon("download")} ثبّت التطبيق</button>
