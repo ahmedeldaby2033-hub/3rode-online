@@ -354,6 +354,222 @@ function fetchOgImage(url) {
   return img;
 }
 
+/* ---- Auto-fill missing specs from Mobizil (mirror of scripts/complete-specs.py) ----
+   Fills ONLY empty cells (screen 15, cpu 16, rear cam 17, front cam 18, battery 19,
+   charging 20, OS 22, 5G 31, SIM 32, year 33, mobizil URL 38, specs 39, pros 40,
+   cons 41, extra images 42). Never overwrites a written value. Year is never
+   guessed: if Mobizil has no announce year, the cell stays empty. */
+var MOBIZIL_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
+var VARIANT_WORDS_GS = ['pro', 'max', 'ultra', 'plus', 'lite', 'fe', 'mini', 'x'];
+function mobizilFetch(url) {
+  var resp = UrlFetchApp.fetch(url, { muteHttpExceptions: true, followRedirects: true,
+    validateHttpsCertificates: false, headers: { 'User-Agent': MOBIZIL_UA } });
+  if (resp.getResponseCode() !== 200) return '';
+  return resp.getContentText();
+}
+function stripTagsGs(s) {
+  s = String(s || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ')
+    .replace(/&#8211;/g, '-').replace(/&amp;/g, '&');
+  return s.replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
+}
+function normTokensGs(s) {
+  return String(s || '').toLowerCase().replace(/[^a-z0-9\u0600-\u06ff]+/g, ' ')
+    .split(' ').filter(function(t){ return !!t; });
+}
+function pickMobizilUrl(brand, model, candidates) {
+  var want = normTokensGs(brand).concat(normTokensGs(model));
+  var best = null, bestScore = -Infinity;
+  candidates.forEach(function(url){
+    var slug = url.replace(/^https:\/\/mobizil\.com\/|\-specs\/$/g, '');
+    var toks = normTokensGs(slug.replace(/-/g, ' '));
+    if (!want.every(function(t){ return toks.indexOf(t) !== -1; })) return;
+    var extra = toks.filter(function(t){ return want.indexOf(t) === -1 && VARIANT_WORDS_GS.indexOf(t) !== -1; });
+    if (extra.length) return;
+    var score = -toks.length;
+    if (score > bestScore) { bestScore = score; best = url; }
+  });
+  return best;
+}
+function parseMobizil(html) {
+  var out = { features: {}, groups: {}, specs: {}, year: null, pros: [], cons: [], images: [], page_model: '' };
+  var m = html.match(/aps-features-list">(.*?)<\/ul>/s);
+  if (m) {
+    var re = /<strong>(.*?)<\/strong>:\s*<span>(.*?)<\/span>/gs, mm;
+    while ((mm = re.exec(m[1])) !== null) out.features[stripTagsGs(mm[1])] = stripTagsGs(mm[2]);
+  }
+  var gre = /<div class="aps-group">\s*<h3[^>]*>([^<]+).*?<ul class="aps-specs-list">(.*?)<\/ul>/gs, gm;
+  while ((gm = gre.exec(html)) !== null) {
+    var gname = stripTagsGs(gm[1]), rows = {};
+    var rre = /<strong class="aps-term[^"]*">(.*?)<\/strong>.*?<span class="aps-1co">(.*?)<\/span>/gs, rm;
+    while ((rm = rre.exec(gm[2])) !== null) {
+      var k = stripTagsGs(rm[1]), v = rm[2];
+      var val = (v.indexOf('aps-icon-check') !== -1) ? 'YES'
+        : (v.indexOf('aps-icon-cancel') !== -1 || v.indexOf('aps-icon-cross') !== -1) ? 'NO' : stripTagsGs(v);
+      if (k && val) rows[k] = val;
+    }
+    if (Object.keys(rows).length) out.groups[gname] = rows;
+  }
+  for (var g in out.groups) for (var kk in out.groups[g]) out.specs[kk] = out.groups[g][kk];
+  var ann = (out.groups['معلومات عامة'] || {})['أعلن عنه'] || '';
+  var ym = ann.match(/(20\d\d)/);
+  out.year = ym ? parseInt(ym[1], 10) : null;
+  [['مميزات', 'pros'], ['عيوب', 'cons']].forEach(function(pair){
+    var pm = html.match(new RegExp('<h4[^>]*>[^<]*' + pair[0] + '[^<]*</h4>\\s*<ul[^>]*>(.*?)</ul>', 's'));
+    if (pm) {
+      var lire = /<li>(.*?)<\/li>/gs, lm;
+      while ((lm = lire.exec(pm[1])) !== null) { var t = stripTagsGs(lm[1]); if (t) out[pair[1]].push(t); }
+    }
+  });
+  var imgs = html.match(/https:\/\/cdn\.shortpixel\.ai\/spai\/[^"' ]+\.jpg/g) || [];
+  imgs = imgs.concat(html.match(/https:\/\/mobizil\.com\/wp-content\/uploads\/[^"' ]+\.jpg/g) || []);
+  var seen = {};
+  imgs.forEach(function(u){ if (!seen[u]) { seen[u] = 1; out.images.push(u); } });
+  out.images = out.images.slice(0, 5);
+  out.page_model = (out.groups['معلومات عامة'] || {})['موديل الموبايل'] || '';
+  return out;
+}
+function normCpuGs(v) {
+  v = String(v || '').replace(/^\s+|\s+$/g, '');
+  if (!v) return '';
+  v = v.replace(/^(?:ثماني|عشاري|سداسي|رباعي)\s+(?:النواة|الانوية)\s+/, '');
+  v = v.replace(/\s*بتكنولوجيا\s+(\d+)\s*نانو/, ' ($1 نانو)');
+  if (/Snapdragon/i.test(v) && !/Qualcomm|كوالكوم/i.test(v)) v = 'Qualcomm ' + v;
+  else if (/Dimensity/i.test(v) && !/MediaTek|ميدياتك/i.test(v)) v = 'MediaTek ' + v;
+  else if (/Exynos/i.test(v) && !/Samsung|سامسونج/i.test(v)) v = 'Samsung ' + v;
+  else if (/Tensor/i.test(v) && !/Google|جوجل/i.test(v)) v = 'Google ' + v;
+  return v;
+}
+function normBatteryGs(v) {
+  v = String(v || '').replace(/^\s+|\s+$/g, '');
+  var m = v.match(/(\d[\d,]*)\s*(?:مللي أمبير|mAh|مللي امبير)/i);
+  return m ? m[1].replace(/,/g, '') + ' mAh' : v;
+}
+function normScreenGs(groups, feats) {
+  var scr = groups['الشاشة'] || {};
+  var stype = scr['نوع الشاشة'] || scr['النوع'] || '';
+  var size = scr['المقاس'] || scr['الحجم'] || '';
+  var res = scr['الدقة'] || '';
+  var refresh = scr['خصائص أخري'] || scr['معدل التحديث'] || '';
+  if (size || res) {
+    var parts = [];
+    if (stype) parts.push(stype);
+    if (size) parts.push(size.indexOf('بوصة') !== -1 ? size : size + ' بوصة');
+    if (res) parts.push(res.replace(/x/g, '×').replace(/ بكسل/g, ''));
+    var txt = parts.join(' ');
+    if (refresh && (refresh.indexOf('Hz') !== -1 || refresh.indexOf('هرتز') !== -1)) txt += '، ' + refresh;
+    return txt;
+  }
+  return feats['الشاشة'] || '';
+}
+function parseWattsGs(v) {
+  v = String(v || '').replace(/^\s+|\s+$/g, '');
+  if (!v || /لا يدعم|غير مدعوم|No/i.test(v)) return null;
+  var m = v.match(/(\d+)\s*واط/) || v.match(/(\d+)\s*W\b/i);
+  return m ? parseInt(m[1], 10) : null;
+}
+function normOsGs(v) {
+  return String(v || '').replace(/^\s+|\s+$/g, '').replace(/[اأإآ]ندرويد/g, 'Android');
+}
+function splitCameraGs(feats) {
+  var v = feats['الكاميرا'] || '';
+  if (v.indexOf('/') !== -1) {
+    var p = v.split('/');
+    return [p[0].replace(/^\s+|\s+$/g, ''), p.slice(1).join('/').replace(/^\s+|\s+$/g, '')];
+  }
+  return [v, ''];
+}
+function buildFillsGs(row, parsed, mobUrl) {
+  var groups = parsed.groups, feats = parsed.features;
+  var hw = groups['هارد وير'] || {}, cam = groups['الكاميرا'] || {},
+      bat = groups['البطارية'] || {}, sw = groups['سوفت وير'] || {}, net = groups['الشبكة'] || {};
+  function empty(i){ return i >= row.length || !String(row[i] || '').replace(/^\s+|\s+$/g, ''); }
+  var fills = {};
+  var screen = normScreenGs(groups, feats);
+  var cpu = normCpuGs(hw['المعالج'] || feats['المعالج'] || '');
+  var rear = cam['الكاميرا الخلفية'] || cam['الكاميرا الرئيسية'] || '';
+  var front = cam['الكاميرا الأمامية'] || cam['كاميرا السيلفي'] || '';
+  if (!rear || !front) {
+    var sp = splitCameraGs(feats);
+    rear = rear || sp[0]; front = front || sp[1];
+  }
+  var batt = normBatteryGs(bat['السعة'] || feats['البطارية'] || '');
+  var watts = parseWattsGs(bat['قوة الشاحن'] || bat['الشحن'] || bat['سرعة الشحن'] || '');
+  var osV = normOsGs(sw['نظام التشغيل'] || feats['نظام التشغيل'] || '');
+  var g5 = net['شبكة 5G'] || '';
+  var g5v = g5 === 'YES' ? 'نعم' : (g5 === 'NO' ? 'لا' : '');
+  var sim = net['ثنائي الشريحة'] || '';
+  var simv = sim === 'YES' ? 2 : (sim === 'NO' ? 1 : null);
+  var cands = { 15: screen, 16: cpu, 17: rear, 18: front, 19: batt, 20: watts,
+    22: osV, 31: g5v, 32: simv, 33: parsed.year, 38: mobUrl };
+  for (var i in cands) {
+    var v = cands[i];
+    if (v === null || v === '' || v === undefined) continue;
+    if (empty(+i)) fills[i] = v;
+  }
+  if (empty(39)) {
+    var parts = [];
+    if (cpu) parts.push('المعالج ' + cpu);
+    var stor = row.length > 13 ? String(row[13] || '') : '', ram = row.length > 14 ? String(row[14] || '') : '';
+    if (stor || ram) parts.push('التخزين/الرام ' + stor + ' مع ' + ram + ' رام');
+    if (rear) parts.push('الكاميرا الخلفية ' + rear + (front ? ' والأمامية ' + front : ''));
+    if (screen) parts.push('الشاشة ' + screen);
+    if (osV) parts.push('نظام التشغيل ' + osV);
+    if (batt) parts.push('البطارية ' + batt + (watts ? ' مع شحن سريع ' + watts + ' واط' : ''));
+    if (parts.length) fills[39] = parts.join('؛ ') + '.';
+  }
+  if (empty(40) && parsed.pros.length) fills[40] = parsed.pros.slice(0, 5).join('؛ ');
+  if (empty(41) && parsed.cons.length) fills[41] = parsed.cons.slice(0, 5).join('؛ ');
+  if (empty(42) && parsed.images.length) fills[42] = parsed.images.join('؛ ');
+  return fills;
+}
+function modelMatchesGs(pageModel, brand, model) {
+  var pm = normTokensGs(pageModel);
+  var want = normTokensGs(brand).concat(normTokensGs(model));
+  if (!pm.length || !want.length) return false;
+  var hit = want.filter(function(t){ return pm.indexOf(t) !== -1; }).length;
+  return hit / want.length >= 0.8;
+}
+function autoFillSpecs(productUrl) {
+  var s = ss().getSheetByName(SHEET_PRODUCTS);
+  var vals = s.getDataRange().getValues();
+  var rowIdx = -1;
+  for (var i = 1; i < vals.length; i++) {
+    if (String(vals[i][4] || '').trim() === productUrl) { rowIdx = i; break; }
+  }
+  if (rowIdx < 0) throw new Error('المنتج غير موجود في الشيت');
+  var row = vals[rowIdx];
+  var brand = String(row[2] || ''), model = String(row[3] || '');
+  var mobUrl = String(row[38] || '').trim();
+  if (!mobUrl) {
+    var q = encodeURIComponent((brand + ' ' + model).trim());
+    var searchHtml = mobizilFetch('https://mobizil.com/?s=' + q);
+    if (!searchHtml) throw new Error('تعذّر الوصول إلى موبيزل — جرّب لاحقاً');
+    var links = [], seen = {};
+    var lm = searchHtml.match(/href="(https:\/\/mobizil\.com\/[^"]+-specs\/)"/g) || [];
+    lm.forEach(function(a){
+      var u = a.replace(/^href="/, '').replace(/"$/, '');
+      if (!seen[u]) { seen[u] = 1; links.push(u); }
+    });
+    mobUrl = pickMobizilUrl(brand, model, links);
+    if (!mobUrl) throw new Error('لم أجد صفحة موبيزل مطابقة لهذا الموديل — يُترك فارغاً');
+  }
+  var html = mobizilFetch(mobUrl);
+  if (!html) throw new Error('تعذّر فتح صفحة موبيزل — جرّب لاحقاً');
+  var parsed = parseMobizil(html);
+  if (parsed.page_model && !modelMatchesGs(parsed.page_model, brand, model))
+    throw new Error('صفحة موبيزل لا تطابق هذا الموديل — يُترك فارغاً');
+  var fills = buildFillsGs(row, parsed, mobUrl);
+  if (!Object.keys(fills).length) return { ok: true, filled: {}, mobizilUrl: mobUrl, note: 'لا توجد خلايا فارغة قابلة للملء' };
+  for (var ci in fills) s.getRange(rowIdx + 1, +ci + 1).setValue(fills[ci]);
+  s.getRange(rowIdx + 1, 26).setValue(new Date());
+  var labels = { 15: 'الشاشة', 16: 'المعالج', 17: 'الكاميرا الخلفية', 18: 'الكاميرا الأمامية',
+    19: 'البطارية', 20: 'الشحن', 22: 'نظام التشغيل', 31: '5G', 32: 'الشرائح',
+    33: 'سنة الإصدار', 38: 'رابط موبيزل', 39: 'المواصفات', 40: 'المميزات', 41: 'العيوب', 42: 'صور إضافية' };
+  var filled = {};
+  for (var cj in fills) filled[labels[cj] || cj] = fills[cj];
+  return { ok: true, filled: filled, mobizilUrl: mobUrl };
+}
+
 /* Buy-link check over a slice of products (offset/limit, default 100).
    200/301/302 = OK, 404/410/500 = broken, anything else (e.g. 403 from
    Cloudflare) = uncertain, never «broken». Uses fetchAll in one batch. */
@@ -871,6 +1087,11 @@ function doPost(e) {
         var img = fetchOgImage(purl);
         if (!img) throw new Error('تعذّر العثور على صورة في صفحة المنتج — قد تكون الصفحة محمية (Cloudflare) أو بلا og:image. انسخ رابط الصورة يدوياً من المتجر.');
         return jsonOut({ ok: true, image: img });
+      }
+      if (action === 'autoFillSpecs') {
+        var purl3 = String(body.productUrl || '').trim();
+        if (!purl3) throw new Error('رابط المنتج مطلوب');
+        return jsonOut(autoFillSpecs(purl3));
       }
       if (action === 'publishScheduled') {
         return jsonOut(publishScheduled());

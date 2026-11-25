@@ -204,6 +204,7 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
     <button class="nav-item active" data-tab="tab-overview" onclick="navTo('tab-overview')"><span class="nav-icon">🏠</span><span class="nav-label">نظرة عامة</span></button>
     <div class="nav-group">المتجر</div>
     <button class="nav-item" data-tab="tab-products" onclick="navTo('tab-products')"><span class="nav-icon">📱</span><span class="nav-label">المنتجات</span></button>
+    <button class="nav-item" data-tab="tab-dataquality" onclick="navTo('tab-dataquality')"><span class="nav-icon">🧩</span><span class="nav-label">جودة البيانات</span></button>
     <button class="nav-item" data-tab="tab-coupons" onclick="navTo('tab-coupons')"><span class="nav-icon">🎟️</span><span class="nav-label">الكوبونات</span><span class="menu-badge amber" id="badge-coupons" style="display:none"></span></button>
     <div class="nav-group">المحتوى</div>
     <button class="nav-item" data-tab="tab-guides" onclick="navTo('tab-guides')"><span class="nav-icon">📚</span><span class="nav-label">الأدلة</span></button>
@@ -289,6 +290,10 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
       <div class="card"><h2>📉 رادار الانخفاضات — أهم 5</h2>
         <div id="dash-drops">—</div>
         <p><button class="btn-ghost" onclick="navTo('tab-logs')">عرض الرادار الكامل ←</button></p>
+      </div>
+      <div class="card"><h2>🧩 جودة البيانات</h2>
+        <div id="dq-widget">—</div>
+        <p><button class="btn-ghost" onclick="loadDqWidget()">فحص الآن</button> <button class="btn-ghost" onclick="navTo('tab-dataquality')">فتح التقرير ←</button></p>
       </div>
     </div>
     <div class="card"><h2>كوبونات تنتهي قريباً ⏰</h2>
@@ -443,6 +448,28 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
     <div class="card"><h2>بلاغات أسعار خاطئة</h2>
       <div id="inbox-reports" class="table-scroll">—</div>
       <p><button class="btn-ghost" onclick="loadInbox()">تحديث القائمتين</button></p>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-dataquality">
+    <div class="card">
+      <h2>جودة البيانات 🧩</h2>
+      <p class="hint">المنتجات التي ينقصها صورة أو سنة إصدار أو مواصفات (الشاشة، المعالج، الكاميرا الخلفية/الأمامية، البطارية، الشحن). زر «أكمل» يجلب البيانات الناقصة من موبيزل للخلايا الفارغة فقط — لا يستبدل أي قيمة مكتوبة أبداً، ولا يخمّن السنة.</p>
+      <p id="dq-summary" class="muted">—</p>
+      <div class="filters">
+        <input type="text" id="dq-filter" placeholder="بحث بالاسم أو الموديل…" oninput="dqFilterChanged()">
+        <select id="dq-f-type" onchange="dqFilterChanged()">
+          <option value="all">الكل الناقص</option>
+          <option value="noimage">بلا صورة</option>
+          <option value="noyear">بلا سنة إصدار</option>
+          <option value="nospecs">ناقص مواصفات</option>
+        </select>
+        <button class="btn" id="dq-bulk-btn" onclick="autoFillBulk()">⚡ أكمل تلقائياً (أول 10)</button>
+        <button class="btn-ghost" onclick="loadDataQuality()">🔄 تحديث</button>
+      </div>
+      <p id="dq-msg" class="hint"></p>
+      <div id="dq-table" class="table-scroll">—</div>
+      <div id="dq-pagination"></div>
     </div>
   </section>
 
@@ -755,7 +782,7 @@ function activateTab(id){
   closeSidebar();
   if(id==="tab-coupons")loadCoupons(); if(id==="tab-guides")loadGuides(); if(id==="tab-news")loadNews(); if(id==="tab-logs")loadLogs(); if(id==="tab-inbox")loadInbox(); if(id==="tab-setup")renderSetupStatus();
   if(id==="tab-dead")loadDeadModels(); if(id==="tab-stock")loadStockAlerts(); if(id==="tab-backup")loadBackups();
-  if(id==="tab-affiliate")renderAffiliateLockStatus(); if(id==="tab-seo")loadSeoAudit();
+  if(id==="tab-affiliate")renderAffiliateLockStatus(); if(id==="tab-seo")loadSeoAudit(); if(id==="tab-dataquality")loadDataQuality();
   if(id==="tab-buylinks")renderBuyLinksStatus();
 }
 function showTab(ev,id){ activateTab(id); } // kept for the password banner + old callers
@@ -1239,6 +1266,103 @@ function exportProductsCSV(){
   a.href = URL.createObjectURL(blob); a.download = "products-3rde.csv"; a.click();
   setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
   toast("تم تنزيل ملف CSV");
+}
+/* ---- Data quality: missing image / year / specs + auto-fill from Mobizil ---- */
+var DQ_ROWS = [];   // all product rows from api("products")
+var DQ_PAGE = 1;
+var DQ_SPEC_COLS = {15:"الشاشة", 16:"المعالج", 17:"الكاميرا الخلفية", 18:"الكاميرا الأمامية", 19:"البطارية", 20:"الشحن"};
+function dqGaps(r){
+  var missing = [];
+  for (var c in DQ_SPEC_COLS) if(!rowVal(r, +c)) missing.push(DQ_SPEC_COLS[c]);
+  return { noImage: !rowVal(r,30), noYear: !rowVal(r,33), missingSpecs: missing };
+}
+function dqFilterChanged(){ DQ_PAGE = 1; renderDataQuality(); }
+async function loadDataQuality(){
+  var el = document.getElementById("dq-table");
+  if(el) el.innerHTML = "جارٍ تحميل المنتجات…";
+  try{
+    var d = await api("products");
+    DQ_ROWS = d.rows || [];
+    renderDataQuality();
+  }catch(err){ if(el) el.innerHTML = '<span class="error">' + esc(err.message) + "</span>"; }
+}
+function renderDataQuality(){
+  var el = document.getElementById("dq-table");
+  if(!el) return;
+  var pg = document.getElementById("dq-pagination");
+  var q = (document.getElementById("dq-filter").value || "").toLowerCase();
+  var type = document.getElementById("dq-f-type").value;
+  var all = DQ_ROWS.filter(function(r){ var g = dqGaps(r); return g.noImage || g.noYear || g.missingSpecs.length; });
+  var noimg = DQ_ROWS.filter(function(r){ return dqGaps(r).noImage; }).length;
+  var noyear = DQ_ROWS.filter(function(r){ return dqGaps(r).noYear; }).length;
+  var nospecs = DQ_ROWS.filter(function(r){ return dqGaps(r).missingSpecs.length; }).length;
+  var sm = document.getElementById("dq-summary");
+  if(sm) sm.innerHTML = "إجمالي المنتجات: <b>" + DQ_ROWS.length + "</b> — ناقص بيانات: <b class='seo-bad'>" + all.length + "</b> — بلا صورة: " + noimg + " — بلا سنة إصدار: " + noyear + " — ناقص مواصفات: " + nospecs;
+  var rows = all.filter(function(r){
+    var g = dqGaps(r);
+    if(type === "noimage" && !g.noImage) return false;
+    if(type === "noyear" && !g.noYear) return false;
+    if(type === "nospecs" && !g.missingSpecs.length) return false;
+    if(q && (String(r[0]||"") + " " + String(r[3]||"")).toLowerCase().indexOf(q) === -1) return false;
+    return true;
+  });
+  if(!rows.length){ el.innerHTML = "لا توجد منتجات مطابقة — كل البيانات مكتملة 🎉"; if(pg) pg.innerHTML=""; return; }
+  var totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  if(DQ_PAGE > totalPages) DQ_PAGE = totalPages;
+  if(DQ_PAGE < 1) DQ_PAGE = 1;
+  var start = (DQ_PAGE-1)*PAGE_SIZE, pageRows = rows.slice(start, start+PAGE_SIZE);
+  el.innerHTML = "<table><tr><th>المنتج</th><th>الماركة</th><th>الصورة</th><th>السنة</th><th>المواصفات الناقصة</th><th></th></tr>" +
+    pageRows.map(function(r){
+      var g = dqGaps(r);
+      return "<tr><td>" + esc(r[0]) + "</td><td>" + esc(r[2]) + "</td><td>" + (g.noImage ? "<span class='seo-bad'>✗ بلا صورة</span>" : "✓") + "</td><td>" + (g.noYear ? "<span class='seo-bad'>✗</span>" : esc(rowVal(r,33))) + "</td><td>" + (g.missingSpecs.length ? "<span class='seo-bad'>" + esc(g.missingSpecs.join("، ")) + "</span>" : "✓") + "</td><td><button class='btn' onclick='autoFillRow(" + JSON.stringify(r[4]) + ", this)'>⚡ أكمل تلقائياً</button></td></tr>";
+    }).join("") + "</table>";
+  if(pg) pg.innerHTML = paginationHtml("dq", DQ_PAGE, totalPages, rows.length, start+1, Math.min(start+PAGE_SIZE, rows.length));
+}
+async function autoFillRow(url, btn){
+  if(btn) btn.disabled = true;
+  var msg = document.getElementById("dq-msg");
+  if(msg) msg.textContent = "جارٍ الجلب من موبيزل…";
+  try{
+    var r = await api("autoFillSpecs", {productUrl: url});
+    var names = Object.keys(r.filled || {});
+    toast(names.length ? ("تم ملء: " + names.join("، ")) : (r.note || "لا توجد خلايا فارغة"));
+    if(msg) msg.textContent = names.length ? ("✓ تم ملء: " + names.join("، ")) : (r.note || "");
+    loadDataQuality();
+  }catch(err){ toast(err.message); if(msg) msg.textContent = "✗ " + err.message; }
+  if(btn) btn.disabled = false;
+}
+async function autoFillBulk(){
+  var btn = document.getElementById("dq-bulk-btn");
+  var msg = document.getElementById("dq-msg");
+  var type = document.getElementById("dq-f-type").value;
+  var rows = DQ_ROWS.filter(function(r){ var g = dqGaps(r); return g.noImage || g.noYear || g.missingSpecs.length; })
+    .filter(function(r){ var g = dqGaps(r);
+      if(type === "noimage") return g.noImage;
+      if(type === "noyear") return g.noYear;
+      if(type === "nospecs") return !!g.missingSpecs.length;
+      return true; }).slice(0, 10);
+  if(!rows.length){ toast("لا توجد منتجات ناقصة"); return; }
+  if(btn) btn.disabled = true;
+  var done = 0, failed = 0;
+  for (var i = 0; i < rows.length; i++){
+    if(msg) msg.textContent = "جارٍ معالجة " + (i+1) + " من " + rows.length + ": " + rows[i][0];
+    try{ await api("autoFillSpecs", {productUrl: rows[i][4]}); done++; }
+    catch(e){ failed++; }
+  }
+  if(msg) msg.textContent = "اكتمل: نجح " + done + " — فشل " + failed + " (المنتجات التي لم تُطابَق صفحات موبيزل تُترك فارغة).";
+  toast("اكتمل التعبئة الجماعية: " + done + " نجح، " + failed + " فشل");
+  if(btn) btn.disabled = false;
+  loadDataQuality();
+}
+async function loadDqWidget(){
+  var w = document.getElementById("dq-widget");
+  if(w) w.textContent = "جارٍ الفحص…";
+  try{
+    if(!DQ_ROWS.length){ var d = await api("products"); DQ_ROWS = d.rows || []; }
+    var noimg = 0, noyear = 0, nospecs = 0;
+    DQ_ROWS.forEach(function(r){ var g = dqGaps(r); if(g.noImage) noimg++; if(g.noYear) noyear++; if(g.missingSpecs.length) nospecs++; });
+    if(w) w.innerHTML = "بلا صورة: <b>" + noimg + "</b> • بلا سنة إصدار: <b>" + noyear + "</b> • ناقص مواصفات: <b>" + nospecs + "</b>";
+  }catch(err){ if(w) w.innerHTML = '<span class="error">' + esc(err.message) + "</span>"; }
 }
 async function loadProducts(){
   try{
@@ -2441,8 +2565,9 @@ function paginationHtml(prefix, page, totalPages, total, start, end){
 }
 function setPage(prefix, n){
   if(prefix === "gd"){ GD_PAGE = n; renderGuides(); }
+  else if(prefix === "dq"){ DQ_PAGE = n; renderDataQuality(); }
   else { NW_PAGE = n; renderNews(); }
-  var t = prefix === "gd" ? "guides-table" : "news-table";
+  var t = prefix === "gd" ? "guides-table" : (prefix === "dq" ? "dq-table" : "news-table");
   var el = document.getElementById(t); if(el) el.scrollIntoView({block:"nearest"});
 }
 function sortRows(rows, sort, dateIdx, titleIdx){
