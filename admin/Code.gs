@@ -27,6 +27,7 @@ var SHEET_PRODUCTS = 'الورقة1';
 var SHEET_HISTORY = 'سجل الأسعار';
 var SHEET_SETTINGS = 'الإعدادات';
 var SHEET_COUPONS = 'الكوبونات';
+var SHEET_REDIRECTS = 'إعادة التوجيه';
 var SHEET_SYNCLOG = 'سجل المزامنة';
 var SHEET_CLICKS = 'النقرات';
 var SHEET_REPORTS = 'البلاغات';
@@ -85,6 +86,7 @@ function setupTabs() {
     if (!keys[kv[0]]) st.appendRow(kv);
   });
   sheet(SHEET_COUPONS, ['id', 'title', 'store', 'code', 'value', 'redirect_url', 'expires_at', 'active', 'description']);
+  sheet(SHEET_REDIRECTS, ['from', 'to', 'code', 'enabled']);
   // Existing coupon sheets created before the description column existed:
   // append the 9th header cell so saveCoupon's 9-column writes line up.
   (function () {
@@ -688,7 +690,7 @@ function doGet(e) {
     if (action === 'export') {  // used by scripts/sync.py (no token needed: read-only data)
       setupTabs();
       var tabs = {};
-      ['الورقة1', 'ملخص', 'سجل الأسعار', 'المكرر فقط', 'الكوبونات', 'الأدلة', 'الأخبار'].forEach(function (name) {
+      ['الورقة1', 'ملخص', 'سجل الأسعار', 'المكرر فقط', 'الكوبونات', 'الأدلة', 'الأخبار', 'إعادة التوجيه'].forEach(function (name) {
         tabs[name] = ss().getSheetByName(name).getDataRange().getValues();
       });
       return jsonOut({ ok: true, tabs: tabs, settings: getSettings() });
@@ -698,6 +700,9 @@ function doGet(e) {
     if (action === 'settings') return jsonOut({ ok: true, settings: getSettings() });
     if (action === 'coupons') {
       return jsonOut({ ok: true, rows: sheet(SHEET_COUPONS).getDataRange().getValues() });
+    }
+    if (action === 'redirects') {
+      return jsonOut({ ok: true, rows: sheet(SHEET_REDIRECTS).getDataRange().getValues() });
     }
     if (action === 'products') {
       var s = ss().getSheetByName(SHEET_PRODUCTS);
@@ -1027,6 +1032,33 @@ function doPost(e) {
           if (cr[i][0] === body.id) { s.deleteRow(i + 1); return jsonOut({ ok: true }); }
         }
         return jsonOut({ ok: false, error: 'coupon not found' });
+      }
+      if (action === 'saveRedirect') {
+        s = sheet(SHEET_REDIRECTS);
+        var rd = body.redirect || {};
+        var from = String(rd.from || '').trim();
+        var to = String(rd.to || '').trim();
+        if (!from || !to) throw new Error('المسار القديم والجديد مطلوبان');
+        if (from[0] !== '/') from = '/' + from;
+        var code = (rd.code === 302 || rd.code === '302') ? 302 : 301;
+        var enabled = rd.enabled !== false && rd.enabled !== 'false';
+        var rr = s.getDataRange().getValues();
+        for (i = 1; i < rr.length; i++) {
+          if (String(rr[i][0]).trim() === from) {
+            s.getRange(i + 1, 1, 1, 4).setValues([[from, to, code, enabled]]);
+            return jsonOut({ ok: true, updated: from });
+          }
+        }
+        s.appendRow([from, to, code, enabled]);
+        return jsonOut({ ok: true, added: true });
+      }
+      if (action === 'deleteRedirect') {
+        s = sheet(SHEET_REDIRECTS);
+        var dr = s.getDataRange().getValues();
+        for (i = 1; i < dr.length; i++) {
+          if (String(dr[i][0]).trim() === String(body.from || '').trim()) { s.deleteRow(i + 1); return jsonOut({ ok: true }); }
+        }
+        return jsonOut({ ok: false, error: 'redirect not found' });
       }
       if (action === 'saveGuide') {
         s = sheet(SHEET_GUIDES);

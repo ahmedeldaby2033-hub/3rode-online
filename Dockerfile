@@ -1,6 +1,7 @@
 # 3rde.online — static site on nginx (Coolify / any Docker host)
 FROM nginx:alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY redirects.conf /etc/nginx/conf.d/redirects.conf
 COPY htpasswd /etc/nginx/htpasswd
 COPY site/ /usr/share/nginx/html/
 COPY admin/index.html /usr/share/nginx/html/adamwnor/index.html

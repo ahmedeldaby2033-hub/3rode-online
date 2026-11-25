@@ -211,6 +211,8 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
     <button class="nav-item" data-tab="tab-news" onclick="navTo('tab-news')"><span class="nav-icon">📰</span><span class="nav-label">الأخبار</span></button>
     <button class="nav-item" data-tab="tab-seo" onclick="navTo('tab-seo')"><span class="nav-icon">🔍</span><span class="nav-label">فحص SEO</span></button>
     <button class="nav-item" data-tab="tab-health" onclick="navTo('tab-health')"><span class="nav-icon">💚</span><span class="nav-label">صحة الموقع</span></button>
+    <button class="nav-item" data-tab="tab-speed" onclick="navTo('tab-speed')"><span class="nav-icon">⚡</span><span class="nav-label">سرعة الصفحات</span></button>
+    <button class="nav-item" data-tab="tab-redirects" onclick="navTo('tab-redirects')"><span class="nav-icon">↪️</span><span class="nav-label">إعادة التوجيه</span></button>
     <div class="nav-group">العملاء</div>
     <button class="nav-item" data-tab="tab-inbox" onclick="navTo('tab-inbox')"><span class="nav-icon">📥</span><span class="nav-label">الطلبات والبلاغات</span><span class="menu-badge" id="badge-inbox" style="display:none"></span></button>
     <button class="nav-item" data-tab="tab-stock" onclick="navTo('tab-stock')"><span class="nav-icon">🔔</span><span class="nav-label">تنبيهات التوفر</span></button>
@@ -616,7 +618,7 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
         <select id="gd-gen-criterion"><option value="under_10000">أفضل هواتف تحت 10,000 جنيه</option><option value="battery">أفضل بطارية</option><option value="camera">أفضل كاميرا</option><option value="gaming">أفضل هواتف للألعاب</option></select>
         <p><button type="button" class="btn" onclick="genGuide()">توليد مسودة الدليل</button></p>
         <p id="gd-gen-msg" class="hint"></p></div>
-      <p><button class="btn-green" onclick="saveGuide()">حفظ الدليل</button></p>
+      <p><button class="btn-green" onclick="saveGuide()">حفظ الدليل</button> <button class="btn" onclick="previewGuide()">👁 معاينة قبل النشر</button></p>
     </div>
     <div class="card"><h2>النشر المجدول ⏰</h2>
       <p class="hint">الأدلة والأخبار التي تحدد لها تاريخ نشر مستقبلي تُنشر تلقائياً عند حلول وقتها (كل ساعة)، بشرط أن تكون حالتها «مسودة». فعّل المشغّل مرة واحدة من هنا.</p>
@@ -688,7 +690,7 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
         </div>
         <p><button type="button" class="btn" onclick="genNews()">توليد مسودة الخبر</button></p>
         <p id="nw-gen-msg" class="hint"></p></div>
-      <p><button class="btn-green" onclick="saveNews()">حفظ الخبر</button></p>
+      <p><button class="btn-green" onclick="saveNews()">حفظ الخبر</button> <button class="btn" onclick="previewNews()">👁 معاينة قبل النشر</button></p>
     </div>
     <div class="card"><h2>النشر المجدول ⏰</h2>
       <p class="hint">الأخبار التي تحدد لها تاريخ نشر مستقبلي تُنشر تلقائياً عند حلول وقتها (كل ساعة). فعّل المشغّل مرة واحدة من هنا (نفس مشغّل الأدلة).</p>
@@ -699,6 +701,20 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
   </section>
 
   <section class="tab" id="tab-seo">
+    <div class="card">
+      <h2>Search Console 🔎</h2>
+      <p class="hint">حالة ظهور الموقع في جوجل — تُفحص حياً من المتصفح. ملاحظة: هذه البطاقة لا تعرض بيانات Search Console نفسها (تحتاج ربط حساب جوجل)؛ هي تتحقق أن كل ما يحتاجه جوجل موجود على الموقع، وتجهّز لك روابط الإرسال.</p>
+      <div class="filters">
+        <button class="btn" onclick="loadSearchConsoleCard()">🔄 إعادة الفحص</button>
+        <a class="btn" href="https://search.google.com/search-console" target="_blank" rel="noopener">فتح Search Console ↗</a>
+      </div>
+      <div id="sc-table" class="table-scroll">—</div>
+      <p class="hint">روابط الإرسال (انسخ والصق في قسم Sitemaps بعد تفعيل الملكية):
+        <button class="btn-ghost" onclick="copyText('https://3rde.online/sitemap.xml')">نسخ خريطة الموقع</button>
+        <button class="btn-ghost" onclick="copyText('https://3rde.online/news-sitemap.xml')">نسخ خريطة الأخبار</button>
+      </p>
+      <p id="sc-hint" class="hint"></p>
+    </div>
     <div class="card">
       <h2>فحص SEO شامل — الأدلة والأخبار 🔍</h2>
       <p class="hint">يفحص كل الأدلة والأخبار: طول العنوان (30–65 حرفاً) والوصف (120–160 حرفاً)، وجود الصورة والكلمة المفتاحية والعنوان الوصفي والوصف العام. الناقص يظهر بالأحمر، وزر «تعديل» يفتح المقال في تبويبه.</p>
@@ -731,6 +747,37 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
       </div>
       <p id="sh-summary" class="muted">—</p>
       <div id="sh-table" class="table-scroll">—</div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-speed">
+    <div class="card">
+      <h2>سرعة الصفحات ⚡</h2>
+      <p class="hint">يقيس من متصفحك مباشرة: زمن أول بايت (TTFB) ووقت التحميل الكامل وحجم الصفحة. القياس يعتمد على اتصالك أنت، فالأرقام تقريبية — للتقرير الكامل (Lighthouse) استخدم رابط PageSpeed Insights تحت الجدول. ملاحظة: قياس روابط خارج الموقع قد يفشل بسبب CORS.</p>
+      <div class="filters">
+        <input id="ps-url" type="text" placeholder="https://3rde.online/" style="flex:1;min-width:220px">
+        <button class="btn" onclick="runPageSpeed()">⚡ قياس الرابط</button>
+        <button class="btn" onclick="runPageSpeedSuite()">📋 فحص الصفحات الرئيسية</button>
+      </div>
+      <div id="ps-table" class="table-scroll">—</div>
+      <p class="hint">التقييم: TTFB حتى 0.3 ثانية = سريع 🟢، حتى 0.8 = مقبول 🟡، أكثر = بطيء 🔴. وحجم HTML أكبر من 300KB يستحق المراجعة.
+        <a id="ps-psi-link" href="https://pagespeed.web.dev/analysis?url=https%3A%2F%2F3rde.online%2F" target="_blank" rel="noopener">تقرير PageSpeed Insights الكامل ↗</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-redirects">
+    <div class="card">
+      <h2>إعادة التوجيه 301 / 302 ↪️</h2>
+      <p class="hint">حوّل الروابط القديمة إلى الجديدة (مثلاً بعد تغيير slug منتج أو حذف صفحة) — جوجل ينقل ترتيب الصفحة القديمة للجديدة مع 301. التوجيهات تُحفظ في تبويب «إعادة التوجيه» في الشيت، وتدخل ملف nginx مع <b>المزامنة التالية + Redeploy الموقع</b> من Coolify (ليست فورية). زر «اختبار» يفحص التوجيه الحي على الموقع.</p>
+      <div class="filters">
+        <input id="rd-from" type="text" placeholder="/mobiles/old-slug/ — المسار القديم" style="flex:1;min-width:180px">
+        <input id="rd-to" type="text" placeholder="/mobiles/new-slug/ أو https://… — المسار الجديد" style="flex:1;min-width:180px">
+        <select id="rd-code"><option value="301">301 — دائم</option><option value="302">302 — مؤقت</option></select>
+        <label><input id="rd-enabled" type="checkbox" checked> مفعّل</label>
+        <button class="btn" onclick="addRedirect()">➕ إضافة توجيه</button>
+      </div>
+      <div id="rd-table" class="table-scroll">—</div>
     </div>
   </section>
 
@@ -849,7 +896,7 @@ function activateTab(id){
   closeSidebar();
   if(id==="tab-coupons")loadCoupons(); if(id==="tab-guides")loadGuides(); if(id==="tab-news")loadNews(); if(id==="tab-logs")loadLogs(); if(id==="tab-inbox")loadInbox(); if(id==="tab-setup")renderSetupStatus();
   if(id==="tab-dead")loadDeadModels(); if(id==="tab-stock")loadStockAlerts(); if(id==="tab-backup")loadBackups();
-  if(id==="tab-affiliate")renderAffiliateLockStatus(); if(id==="tab-seo")loadSeoAudit(); if(id==="tab-dataquality")loadDataQuality(); if(id==="tab-clicks")loadClickAnalytics(); if(id==="tab-health")runSiteHealth();
+  if(id==="tab-affiliate")renderAffiliateLockStatus(); if(id==="tab-seo"){loadSeoAudit(); loadSearchConsoleCard();} if(id==="tab-dataquality")loadDataQuality(); if(id==="tab-clicks")loadClickAnalytics(); if(id==="tab-health")runSiteHealth(); if(id==="tab-speed")runPageSpeedSuite(); if(id==="tab-redirects")loadRedirects();
   if(id==="tab-buylinks")renderBuyLinksStatus();
 }
 function showTab(ev,id){ activateTab(id); } // kept for the password banner + old callers
@@ -2786,8 +2833,17 @@ async function newsBest(qOverride){
   var d = await api("products", null, {q: q});
   var models = cheapestModels(d.rows || []);
   if(!models.length) throw new Error("لم نجد الموديل في بيانات المتجر — تأكد من الاسم.");
-  models.sort(function(a, b){ return a.price - b.price; });
-  var best = models[0];
+  // مطابقة دقيقة أولاً (ماركة+موديل أو موديل وحده) حتى لا نلتقط موديلاً
+  // شبيهاً (مثل A6x بدل A6)؛ وإلا نأخذ أرخص مطابقة.
+  var ql = q.toLowerCase();
+  var exact = models.filter(function(m){
+    var bm = ((m.row[2] || "") + " " + (m.row[3] || "")).trim().toLowerCase();
+    var mo = String(m.row[3] || "").trim().toLowerCase();
+    return bm === ql || mo === ql;
+  });
+  var pool = exact.length ? exact : models;
+  pool.sort(function(a, b){ return a.price - b.price; });
+  var best = pool[0];
   var name = best.row[0] || "";
   var price = best.price;
   var oldRaw = (_genVal("nw-gen-old") || "").replace(/[^0-9.]/g, "");
@@ -3185,6 +3241,62 @@ function buildSeoAudit(){
       fails:seoCheckItem("news", title, rowVal(r,12), rowVal(r,13), rowVal(r,9), rowVal(r,11), rowVal(r,2))});
   });
 }
+function copyText(t){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(function(){ toast("تم نسخ الرابط"); }, function(){ toast("تعذّر النسخ"); });
+  }else{
+    var ta = document.createElement("textarea");
+    ta.value = t; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); toast("تم نسخ الرابط"); }catch(e){ toast("تعذّر النسخ"); }
+    document.body.removeChild(ta);
+  }
+}
+/* ---- Search Console card: live readiness checks (no API — needs his GSC property) ---- */
+async function loadSearchConsoleCard(){
+  var el = document.getElementById("sc-table");
+  if(!el) return;
+  el.innerHTML = "جارٍ فحص جاهزية الموقع لجوجل…";
+  var rows = [];
+  function row(name, status, detail){ rows.push({name: name, status: status, detail: detail}); }
+  var home = await shProbe("https://3rde.online/");
+  if(home.status === 200){
+    var vm = home.text.match(/<meta name="google-site-verification" content="([^"]+)"/);
+    if(vm) row("كود تحقق Search Console", "ok", "موجود في الرئيسية (…" + vm[1].slice(-8) + ")");
+    else row("كود تحقق Search Console", "warn", "غير مضاف — الصق الكود في تبويب «الإعداد والربط» ثم أعد النشر");
+  } else {
+    row("كود تحقق Search Console", "warn", "تعذّر قراءة الرئيسية — أعد الفحص");
+  }
+  var sm = await shProbe("https://3rde.online/sitemap.xml");
+  if(sm.status === 200){
+    var n = (sm.text.match(/<loc>/g) || []).length;
+    row("خريطة الموقع", n > 0 ? "ok" : "warn", n > 0 ? (n + " رابط — جاهزة للإرسال") : "الخريطة فارغة");
+  } else row("خريطة الموقع", "fail", sm.status ? ("HTTP " + sm.status) : "تعذّر الوصول");
+  var ns = await shProbe("https://3rde.online/news-sitemap.xml");
+  if(ns.status === 200){
+    var nn = (ns.text.match(/<loc>/g) || []).length;
+    row("خريطة الأخبار", nn > 0 ? "ok" : "warn", nn > 0 ? (nn + " خبر — جاهزة للإرسال") : "الخريطة فارغة — لا توجد أخبار منشورة بعد");
+  } else row("خريطة الأخبار", "fail", ns.status ? ("HTTP " + ns.status) : "تعذّر الوصول");
+  var rb = await shProbe("https://3rde.online/robots.txt");
+  if(rb.status === 200){
+    var hasSm = rb.text.indexOf("sitemap.xml") !== -1;
+    var hasNews = rb.text.indexOf("news-sitemap") !== -1;
+    row("robots.txt", (hasSm && hasNews) ? "ok" : "warn",
+        hasSm && hasNews ? "يشير للخريطتين" : (hasSm ? "يشير لخريطة الموقع فقط — خريطة الأخبار غير مذكورة" : "لا يشير لأي خريطة"));
+  } else row("robots.txt", "fail", rb.status ? ("HTTP " + rb.status) : "تعذّر الوصول");
+  var icons = {ok: "✅ سليم", warn: "⚠️ تحذير", fail: "❌ خطأ"};
+  var cls = {ok: "seo-ok", warn: "", fail: "seo-bad"};
+  el.innerHTML = "<table><tr><th>البند</th><th>الحالة</th><th>التفاصيل</th></tr>" +
+    rows.map(function(r){
+      return "<tr><td>" + esc(r.name) + "</td><td class='" + cls[r.status] + "'><b>" + icons[r.status] + "</b></td><td>" + esc(r.detail) + "</td></tr>";
+    }).join("") + "</table>";
+  var hint = document.getElementById("sc-hint");
+  if(hint){
+    var verified = rows[0] && rows[0].status === "ok";
+    hint.textContent = verified
+      ? "الكود موجود — فعّل الملكية في Search Console ثم أرسل الخريطتين من قسم Sitemaps."
+      : "الخطوة التالية: انسخ كود التحقق من Search Console (الإعدادات ← إثبات الملكية)، الصقه في تبويب «الإعداد والربط» في اللوحة، ثم اضغط «مزامنة الآن» لإعادة النشر.";
+  }
+}
 async function loadSeoAudit(){
   var el = document.getElementById("seo-table");
   if(el) el.innerHTML = "جارٍ الفحص…";
@@ -3554,6 +3666,135 @@ async function shProbe(url){
     return {status: r.status, text: r.ok ? await r.text() : ""};
   }catch(e){ return {status: 0, text: "", error: String((e && e.message) || e)}; }
 }
+/* ---- PageSpeed: browser-side TTFB + size measurement (no API key needed) ---- */
+var PS_SUITE = [
+  ["الرئيسية", "https://3rde.online/"],
+  ["أفضل العروض", "https://3rde.online/deals/"],
+  ["صفحة منتج", "https://3rde.online/mobiles/samsung-galaxy-a07-64gb-4gb/"],
+  ["أدلة الشراء", "https://3rde.online/guides/"],
+  ["قارن بين الهواتف", "https://3rde.online/compare/"]
+];
+async function psMeasure(url){
+  var t0 = performance.now();
+  try{
+    var r = await fetch(url, {cache: "no-store"});
+    var ttfb = performance.now() - t0;
+    var text = await r.text();
+    var total = performance.now() - t0;
+    var bytes = new Blob([text]).size;
+    return {ok: r.ok, status: r.status, ttfb: ttfb, total: total, kb: bytes / 1024};
+  }catch(e){
+    return {ok: false, status: 0, ttfb: 0, total: 0, kb: 0, error: String((e && e.message) || e)};
+  }
+}
+function psRating(m){
+  if(!m.ok) return {label: "❌ فشل", cls: "seo-bad"};
+  if(m.ttfb <= 300) return {label: "🟢 سريع", cls: "seo-ok"};
+  if(m.ttfb <= 800) return {label: "🟡 مقبول", cls: ""};
+  return {label: "🔴 بطيء", cls: "seo-bad"};
+}
+function psRender(rows){
+  var el = document.getElementById("ps-table");
+  if(!el) return;
+  el.innerHTML = "<table><tr><th>الصفحة</th><th>TTFB</th><th>التحميل الكامل</th><th>حجم HTML</th><th>التقييم</th></tr>" +
+    rows.map(function(x){
+      var m = x.m, rt = psRating(m);
+      var ttfb = m.ok ? (m.ttfb / 1000).toFixed(2) + " ث" : "—";
+      var total = m.ok ? (m.total / 1000).toFixed(2) + " ث" : "—";
+      var size = m.ok ? Math.round(m.kb) + " KB" + (m.kb > 300 ? " ⚠️" : "") : "—";
+      var note = m.ok ? "" : ("تعذّر القياس: " + (m.error || ("HTTP " + m.status)));
+      return "<tr><td><a href='" + esc(x.url) + "' target='_blank' rel='noopener'>" + esc(x.name) + "</a></td><td>" + ttfb + "</td><td>" + total + "</td><td>" + size + "</td><td class='" + rt.cls + "'><b>" + rt.label + "</b>" + (note ? "<br><span class='error'>" + esc(note) + "</span>" : "") + "</td></tr>";
+    }).join("") + "</table>";
+}
+async function runPageSpeed(){
+  var input = document.getElementById("ps-url");
+  var url = (input && input.value.trim()) || "https://3rde.online/";
+  if(url.indexOf("http") !== 0) url = "https://" + url;
+  var el = document.getElementById("ps-table");
+  if(el) el.innerHTML = "جارٍ قياس " + url + "…";
+  var link = document.getElementById("ps-psi-link");
+  if(link) link.href = "https://pagespeed.web.dev/analysis?url=" + encodeURIComponent(url);
+  var m = await psMeasure(url);
+  psRender([{name: url.replace("https://3rde.online", "3rde.online"), url: url, m: m}]);
+}
+async function runPageSpeedSuite(){
+  var el = document.getElementById("ps-table");
+  if(el) el.innerHTML = "جارٍ قياس الصفحات الرئيسية…";
+  var rows = [];
+  for(var i = 0; i < PS_SUITE.length; i++){
+    rows.push({name: PS_SUITE[i][0], url: PS_SUITE[i][1], m: await psMeasure(PS_SUITE[i][1])});
+    psRender(rows);
+  }
+}
+/* ---- Redirects manager (Sheet tab «إعادة التوجيه» -> nginx map via sync) ---- */
+var RD_ROWS = [];
+async function loadRedirects(){
+  var el = document.getElementById("rd-table");
+  if(el) el.innerHTML = "جارٍ تحميل التوجيهات…";
+  try{
+    var d = await api("redirects");
+    RD_ROWS = (d.rows || []).slice(1).filter(function(r){ return r[0]; }).map(function(r){
+      return {from: String(r[0] || "").trim(), to: String(r[1] || "").trim(),
+              code: parseInt(r[2], 10) === 302 ? 302 : 301,
+              enabled: String(r[3]).toLowerCase() !== "false" && r[3] !== false && r[3] !== "0"};
+    });
+    renderRedirects();
+  }catch(e){ if(el) el.innerHTML = "<p class='error'>تعذّر تحميل التوجيهات: " + esc(e.message) + "</p>"; }
+}
+function renderRedirects(){
+  var el = document.getElementById("rd-table");
+  if(!el) return;
+  if(!RD_ROWS.length){
+    el.innerHTML = "<p class='hint'>لا توجد توجيهات بعد — أضف أول توجيه من النموذج أعلاه.</p>";
+    return;
+  }
+  el.innerHTML = "<table><tr><th>من</th><th>إلى</th><th>النوع</th><th>الحالة</th><th>إجراءات</th></tr>" +
+    RD_ROWS.map(function(r, i){
+      return "<tr><td><code>" + esc(r.from) + "</code></td><td><code>" + esc(r.to) + "</code></td>" +
+        "<td>" + r.code + "</td><td>" + (r.enabled ? "✅ مفعّل" : "⏸️ متوقف") + "</td>" +
+        "<td><button class='btn-ghost' onclick=\"testRedirect(" + i + ")\">اختبار</button> " +
+        "<button class='btn-ghost' onclick=\"deleteRedirect(" + i + ")\">حذف</button></td></tr>";
+    }).join("") + "</table>" +
+    "<p class='hint'>التوجيهات المضافة هنا تدخل الموقع مع المزامنة التالية + Redeploy من Coolify.</p>";
+}
+async function addRedirect(){
+  var from = document.getElementById("rd-from").value.trim();
+  var to = document.getElementById("rd-to").value.trim();
+  var code = parseInt(document.getElementById("rd-code").value, 10) || 301;
+  var enabled = document.getElementById("rd-enabled").checked;
+  if(!from || !to){ toast("اكتب المسار القديم والجديد"); return; }
+  if(from === to){ toast("المسار القديم والجديد متطابقان"); return; }
+  try{
+    await api("saveRedirect", {redirect: {from: from, to: to, code: code, enabled: enabled}});
+    document.getElementById("rd-from").value = "";
+    document.getElementById("rd-to").value = "";
+    toast("تم حفظ التوجيه — يفعَّل بعد المزامنة + Redeploy");
+    loadRedirects();
+  }catch(e){ toast(e.message); }
+}
+async function deleteRedirect(i){
+  var r = RD_ROWS[i];
+  if(!r) return;
+  if(!confirm("حذف التوجيه " + r.from + " → " + r.to + "؟")) return;
+  try{ await api("deleteRedirect", {from: r.from}); toast("تم الحذف"); loadRedirects(); }
+  catch(e){ toast(e.message); }
+}
+async function testRedirect(i){
+  var r = RD_ROWS[i];
+  if(!r) return;
+  toast("جارٍ اختبار " + r.from + "…");
+  try{
+    var res = await fetch(r.from, {redirect: "manual"});
+    var loc = res.headers.get("location") || "";
+    if(res.status === 301 || res.status === 302){
+      toast("✅ " + r.from + " يحوّل " + res.status + " إلى " + (loc || r.to));
+    }else if(res.status === 404){
+      toast("⚠️ " + r.from + " يرجع 404 — التوجيه لم يدخل الموقع بعد (مزامنة + Redeploy)");
+    }else{
+      toast("ℹ️ " + r.from + " يرجع HTTP " + res.status + " (بلا توجيه)");
+    }
+  }catch(e){ toast("تعذّر الاختبار: " + e.message); }
+}
 async function runSiteHealth(){
   var el = document.getElementById("sh-table");
   if(el) el.innerHTML = "جارٍ فحص الموقع…";
@@ -3616,6 +3857,85 @@ function renderSiteHealth(rows){
     rows.map(function(r){
       return "<tr><td>" + esc(r.name) + "</td><td class='" + cls[r.status] + "'><b>" + icons[r.status] + "</b></td><td>" + esc(r.detail) + "</td></tr>";
     }).join("") + "</table>";
+}
+/* ---- Pre-publish preview: renders the article the way build.py will ---- */
+function pvPrice(n){ n = Number(n) || 0; return n ? n.toLocaleString("en-US") + " جنيه" : "—"; }
+function pvParas(t){ return String(t || "").split(/\n+/).map(function(s){ return s.trim(); }).filter(Boolean).map(function(s){ return "<p>" + esc(s) + "</p>"; }).join(""); }
+function openPreview(html){
+  document.getElementById("preview-body").innerHTML = html;
+  document.getElementById("preview-modal").style.display = "block";
+}
+function closePreview(){ document.getElementById("preview-modal").style.display = "none"; }
+async function previewGuide(){
+  var g = readGuideForm();
+  if(!g.title){ toast("اكتب عنوان الدليل أولاً"); return; }
+  openPreview("<p class='hint'>جارٍ تجهيز المعاينة…</p>");
+  var table = "";
+  try{
+    if(GD_TITLES[g.criterion]){
+      var top = await guideTop5();
+      table = "<h3>أفضل الهواتف في هذا المعيار</h3><table><tr><th>الهاتف</th><th>أرخص سعر</th><th>التخزين / الرام</th><th>التقييم</th></tr>" +
+        top.top.map(function(m){
+          return "<tr><td>" + esc(m.row[0] || "") + "</td><td><b>" + pvPrice(m.price) + "</b></td><td>" + esc((m.row[13] || "") + " / " + (m.row[14] || "")) + "</td><td>" + esc(String(m.row[11] || "—")) + "</td></tr>";
+        }).join("") + "</table>";
+    }else{
+      var q = g.title.replace(/دليل شراء/g, "").replace(/:\s*السعر والمواصفات/g, "").replace(/2026/g, "").trim();
+      if(q){
+        var d = await api("products", null, {q: q});
+        var ql = q.toLowerCase();
+        var offers = (d.rows || []).filter(function(r){
+          if(!r[0]) return false;
+          var bm = ((r[2] || "") + " " + (r[3] || "")).trim().toLowerCase();
+          var mo = String(r[3] || "").trim().toLowerCase();
+          return bm === ql || mo === ql;
+        });
+        if(offers.length){
+          table = "<h3>أسعار " + esc(q) + " الآن</h3><table><tr><th>المتجر</th><th>السعر</th><th>البائع</th><th>الحالة</th></tr>" +
+            offers.slice(0, 8).map(function(r){
+              return "<tr><td>" + esc(r[5] || "") + "</td><td><b>" + pvPrice(r[7]) + "</b></td><td>" + esc(r[6] || "") + "</td><td>" + esc(r[10] || "") + "</td></tr>";
+            }).join("") + "</table>";
+        }
+      }
+    }
+  }catch(e){ table = "<p class='error'>تعذّر تحميل جدول الأسعار: " + esc(e.message) + "</p>"; }
+  var badge = g.status === "published" ? "<span class='badge green'>منشور</span>" : "<span class='badge amber'>مسودة</span>";
+  var url = "https://3rde.online/guides/" + (g.slug || "…") + "/";
+  openPreview(
+    (g.image ? "<img src='" + esc(g.image) + "' style='max-width:100%;border-radius:8px' alt=''>" : "<p class='error'>⚠️ بلا صورة مميزة</p>") +
+    "<h1 style='margin:12px 0 4px'>" + esc(g.title) + "</h1>" +
+    "<p class='hint'>" + badge + " · المعيار: " + esc(GD_CRIT_LABEL[g.criterion] || g.criterion || "—") + " · الكلمة المفتاحية: " + esc(g.keyword || "—") + "</p>" +
+    "<p class='hint'>العنوان الوصفي (" + (g.meta_title || "").length + " حرف): " + esc(g.meta_title || "—") + "<br>الوصف العام (" + (g.meta_desc || "").length + " حرف): " + esc(g.meta_desc || "—") + "</p>" +
+    pvParas(g.description) + table + pvParas(g.human_review) +
+    (g.human_review ? "" : "<p class='error'>⚠️ بلا مراجعة بشرية — الدليل لن يُنشر كاملاً بدونها.</p>") +
+    (g.tags ? "<p class='hint'>الوسوم: " + esc(g.tags) + "</p>" : "") +
+    "<p class='hint'>الرابط بعد النشر: <a href='" + esc(url) + "' target='_blank' rel='noopener'>" + esc(url) + "</a></p>"
+  );
+}
+async function previewNews(){
+  var n = readNewsForm();
+  if(!n.title){ toast("اكتب عنوان الخبر أولاً"); return; }
+  openPreview("<p class='hint'>جارٍ تجهيز المعاينة…</p>");
+  var priceBox = "";
+  try{
+    var q = n.model_slug || n.title.replace(/دليل شراء/g, "").trim();
+    if(q){
+      var nb = await newsBest(q);
+      var r = nb.best.row;
+      priceBox = "<div class='card' style='background:#f4f6fb'><b>" + esc(r[0] || "") + "</b><br>السعر الآن: <b>" + pvPrice(r[7]) + "</b>" +
+        (nb.diff ? " · كان: " + pvPrice(r[8]) + " · الفرق: " + pvPrice(nb.diff) + " (" + nb.pct + "%)" : "") +
+        "<br><a href='https://3rde.online/mobiles/" + esc(modelSlugFromRow(r)) + "/' target='_blank' rel='noopener'>قارن سعر " + esc(r[0] || "") + " الآن ↗</a></div>";
+    }
+  }catch(e){ /* no model matched — preview without the price box */ }
+  var url = "https://3rde.online/news/" + (n.slug || "…") + "/";
+  openPreview(
+    (n.image ? "<img src='" + esc(n.image) + "' style='max-width:100%;border-radius:8px' alt=''>" : "<p class='error'>⚠️ بلا صورة مميزة</p>") +
+    "<h1 style='margin:12px 0 4px'>" + esc(n.title) + "</h1>" +
+    "<p class='hint'>التصنيف: " + esc(n.category || "—") + " · الكلمة المفتاحية: " + esc(n.keyword || "—") + " · التاريخ: " + esc(n.date_published || "—") + "</p>" +
+    "<p class='hint'>العنوان الوصفي (" + (n.meta_title || "").length + " حرف): " + esc(n.meta_title || "—") + "<br>الوصف العام (" + (n.meta_desc || "").length + " حرف): " + esc(n.meta_desc || "—") + "</p>" +
+    pvParas(n.description) + pvParas(n.body) + priceBox +
+    (n.tags ? "<p class='hint'>الوسوم: " + esc(n.tags) + "</p>" : "") +
+    "<p class='hint'>الرابط بعد النشر: <a href='" + esc(url) + "' target='_blank' rel='noopener'>" + esc(url) + "</a></p>"
+  );
 }
 async function loadLogs(){
   try{
@@ -3720,5 +4040,15 @@ if(sessionStorage.getItem("r3de_admin_session") === "1"){
   });
 }
 </script>
+  <div id="preview-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;overflow:auto;padding:24px 12px" onclick="if(event.target===this)closePreview()">
+    <div style="max-width:820px;margin:0 auto;background:#fff;color:#1a1a1a;border-radius:12px;padding:24px;direction:rtl;text-align:right">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+        <b>👁 معاينة قبل النشر</b>
+        <button class="btn-ghost" onclick="closePreview()">✕ إغلاق</button>
+      </div>
+      <p class="hint" style="color:#666">معاينة المحتوى كما سيظهر في صفحة الموقع — نفس الحقول والترتيب والجدول. التنسيق النهائي من قالب الموقع، والرابط يفعَّل بعد النشر والمزامنة.</p>
+      <div id="preview-body"></div>
+    </div>
+  </div>
 </body>
 </html>

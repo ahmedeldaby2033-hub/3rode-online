@@ -72,7 +72,7 @@ def refresh_from_sheet():
     cli = pathlib.Path("/opt/hatch/bin/hatch_gws_cli")
     tabs = {"sheet1.json": "الورقة1", "summary.json": "ملخص",
             "price_history.json": "سجل الأسعار", "duplicates.json": "المكرر فقط",
-            "coupons.json": "الكوبونات"}
+            "coupons.json": "الكوبونات", "redirects.json": "إعادة التوجيه"}
     if cli.exists() and sheet_id:
         for fname, tab in tabs.items():
             try:
@@ -390,6 +390,63 @@ def sync_coupons_from_raw():
     log("coupons", f"synced {len(coupons)} coupons from {src.name}")
 
 
+def sync_redirects_from_raw():
+    """Convert the Sheet's «إعادة التوجيه» tab export into data/redirects.json
+    (the file build.py reads to generate nginx redirects.conf).
+    Raw source: data/raw/redirects.json (CLI path) or data/raw/إعادة التوجيه
+    (Apps Script export path, which files exports by tab name).
+    Columns: from, to, code (301/302), enabled. Only enabled rows are kept;
+    duplicates keep the last occurrence; from == to rows are dropped."""
+    src = None
+    for cand in (RAW / "redirects.json", RAW / "إعادة التوجيه"):
+        if cand.exists():
+            src = cand
+            break
+    if src is None:
+        return
+    try:
+        raw = json.loads(src.read_text(encoding="utf-8"))
+    except Exception as e:  # noqa: BLE001
+        LOG["errors"].append(f"redirects raw parse: {e}")
+        return
+    values = raw.get("values", []) if isinstance(raw, dict) else raw
+    if not isinstance(values, list) or len(values) < 2:
+        return
+    header = [str(h).strip() for h in values[0]]
+
+    def col(row, name, default=""):
+        try:
+            i = header.index(name)
+        except ValueError:
+            return default
+        return row[i] if i < len(row) else default
+
+    by_from = {}
+    for row in values[1:]:
+        frm = str(col(row, "from", "")).strip()
+        to = str(col(row, "to", "")).strip()
+        if not frm or not to or frm == to:
+            continue
+        if not frm.startswith("/"):
+            frm = "/" + frm
+        try:
+            code = int(str(col(row, "code", 301)).strip() or 301)
+        except ValueError:
+            code = 301
+        code = 302 if code == 302 else 301
+        act = col(row, "enabled", True)
+        enabled = act not in (False, "false", "FALSE", "0", "no", "No", "NO")
+        if not enabled:
+            continue
+        by_from[frm] = {"from": frm, "to": to, "code": code}
+    redirects = [by_from[k] for k in sorted(by_from)]
+    (DATA / "redirects.json").write_text(
+        json.dumps({"redirects": redirects,
+                    "note": "إعادة توجيه تُدار من لوحة التحكم (تبويب إعادة التوجيه في الشيت)."},
+                   ensure_ascii=False, indent=1), encoding="utf-8")
+    log("redirects", f"synced {len(redirects)} redirects from {src.name}")
+
+
 def _num(v, default=None):
     """Parse a number, tolerating Arabic-Indic digits and Arabic separators
     (same logic as build.py num(); sync-helpers has no number parser)."""
@@ -554,6 +611,7 @@ def main():
     try:
         refresh_from_sheet()
         sync_coupons_from_raw()
+        sync_redirects_from_raw()
         sync_guides_from_raw()
         sync_news_from_raw()
         changes = diff_prices()

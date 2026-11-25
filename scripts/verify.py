@@ -239,6 +239,31 @@ def main():
         t = f.read_text(encoding="utf-8")
         check("3rdeonline@gmail.com" in t, "contact email missing from policy page")
 
+    # 7b. redirects (data/redirects.json -> redirects.conf)
+    rd_file = BASE / "data" / "redirects.json"
+    rd_conf = BASE / "redirects.conf"
+    if rd_file.exists():
+        try:
+            rd = json.loads(rd_file.read_text(encoding="utf-8")).get("redirects", [])
+            seen_from = set()
+            for r in rd:
+                frm, to, code = str(r.get("from", "")), str(r.get("to", "")), r.get("code", 301)
+                check(frm.startswith("/"), f"redirect from must start with /: {frm}")
+                check(frm not in seen_from, f"duplicate redirect from: {frm}")
+                seen_from.add(frm)
+                check(frm != to, f"redirect loop (from == to): {frm}")
+                check(to.startswith("/") or to.startswith("http://") or to.startswith("https://"),
+                      f"redirect to must be a path or absolute URL: {to}")
+                check(code in (301, 302), f"redirect code must be 301/302: {frm} -> {code}")
+            check(rd_conf.exists(), "redirects.conf missing (build.py generates it)")
+            if rd_conf.exists():
+                conf_text = rd_conf.read_text(encoding="utf-8")
+                for r in rd:
+                    check(f"    {r['from']} {r['to']};" in conf_text,
+                          f"redirects.conf missing entry: {r['from']} -> {r['to']}")
+        except ValueError as e:
+            check(False, f"redirects.json invalid: {e}")
+
     # required files
     for rel in ["robots.txt", "sitemap.xml", "news-sitemap.xml", "manifest.json",
                 "sw.js", "assets/style.css", "assets/app.js", "assets/logo.png",
