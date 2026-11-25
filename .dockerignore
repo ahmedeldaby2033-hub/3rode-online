@@ -5,3 +5,6 @@ __pycache__/
 *.pyc
 *.log
 data/sync-cron.log
+# Audit 2026-11-25: site/images/originals/ (18MB) is never referenced by any
+# page — it is only a local cache for watermarking. Keep it out of the image.
+site/images/originals

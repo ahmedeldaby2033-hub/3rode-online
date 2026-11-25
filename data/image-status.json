@@ -1460,10 +1460,9 @@
   "note": "downloaded + watermarked A"
  },
  "apple-iphone-13-pro-max-256gb-6gb": {
-  "local": false,
-  "working_url": "https://cdn.shortpixel.ai/spai/q_glossy+ret_img+to_webp/mobizil.com/wp-content/uploads/2021/09/iPhone-13-Pro-Max-1.jpg",
-  "tried_at": "2026-11-20",
-  "note": "both w_800 and original URLs failed (404?) — placeholder used"
+  "local": true,
+  "working_url": "copied from apple-iphone-13-pro-max-128gb-6gb (same device + same photo; the Sheet Mobizil URL 404s)",
+  "note": "fixed 2026-11-25: same-device image reused, watermarked A"
  },
  "apple-iphone-17e-256gb-8gb": {
   "local": true,
