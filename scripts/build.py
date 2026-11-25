@@ -1771,6 +1771,62 @@ def guide_is_published(g):
     return g.get("status") == "published" and bool(norm(g.get("human_review", "")))
 
 
+def model_specs(model):
+    """(label, value) spec pairs for one model, from its cheapest offer.
+    Only pairs with a real value — never an empty cell (same rule as faqs_for)."""
+    cheapest = model.offers[0] if model.offers else None
+    charging = norm(c(cheapest, "قدرة الشحن (واط)")) if cheapest else ""
+    rows = [
+        ("الماركة", model.brand), ("الموديل", model.model),
+        ("التخزين", model.storage), ("الرام", model.ram),
+        ("الشاشة", norm(c(cheapest, "حجم الشاشة")) if cheapest else ""),
+        ("المعالج", norm(c(cheapest, "المعالج")) if cheapest else ""),
+        ("الكاميرا الخلفية", norm(c(cheapest, "الكاميرا الخلفية")) if cheapest else ""),
+        ("الكاميرا الأمامية", norm(c(cheapest, "الكاميرا الأمامية")) if cheapest else ""),
+        ("البطارية", norm(c(cheapest, "البطارية")) if cheapest else ""),
+        ("قدرة الشحن", f"{charging} واط" if charging else ""),
+        ("اللون", norm(c(cheapest, "اللون")) if cheapest else ""),
+        ("نظام التشغيل", norm(c(cheapest, "نظام التشغيل")) if cheapest else ""),
+        ("دعم 5G", "نعم" if model.g5 else "لا"),
+        ("عدد الشرائح", norm(c(cheapest, "عدد الشرائح")) if cheapest else ""),
+        ("سنة الإصدار", str(model.year) if model.year else ""),
+        ("الضمان", norm(c(cheapest, "الضمان")) if cheapest else ""),
+    ]
+    return [(k, v) for k, v in rows if v]
+
+
+def guide_specs_table(cands):
+    """Comparison specs table for a guide's top phones (spec rows x phone columns).
+    A spec row appears only if at least one phone has a value; missing = '—'."""
+    if not cands:
+        return ""
+    spec_defs = [
+        ("الشاشة", lambda m: norm(c(m.offers[0], "حجم الشاشة"))),
+        ("المعالج", lambda m: norm(c(m.offers[0], "المعالج"))),
+        ("البطارية", lambda m: norm(c(m.offers[0], "البطارية"))),
+        ("الكاميرا الخلفية", lambda m: norm(c(m.offers[0], "الكاميرا الخلفية"))),
+        ("الكاميرا الأمامية", lambda m: norm(c(m.offers[0], "الكاميرا الأمامية"))),
+        ("التخزين / الرام", lambda m: f"{m.storage} / {m.ram}"),
+        ("يدعم 5G", lambda m: "نعم" if m.g5 else "لا"),
+    ]
+    head = "".join(f"<th><a href='/mobiles/{m.slug}/'>{esc(m.name_ar)}</a></th>" for m in cands)
+    img_row = ("<tr><td><strong>الصورة</strong></td>" + "".join(
+        f"<td>{f'<a href=\"/mobiles/{m.slug}/\"><img src=\"{esc(m.image)}\" alt=\"{esc(m.name_ar)}\" loading=\"lazy\" style=\"max-width:90px;height:auto;display:block;margin:0 auto\"></a>' if m.image else '—'}</td>"
+        for m in cands) + "</tr>")
+    price_row = ("<tr><td><strong>أرخص سعر</strong></td>" + "".join(
+        f"<td><strong>{fmt_price(m.cheapest_price)} جنيه</strong></td>" for m in cands) + "</tr>")
+    rows_html = ""
+    for label, fn in spec_defs:
+        vals = [fn(m) for m in cands]
+        if not any(vals):
+            continue
+        rows_html += ("<tr><td><strong>" + esc(label) + "</strong></td>" + "".join(
+            f"<td>{esc(v) if v else '—'}</td>" for v in vals) + "</tr>")
+    return (f"<section class='card'><h2>جدول المواصفات — قارن بين الهواتف</h2>"
+            f"<div style='overflow-x:auto'><table class='data'><thead><tr><th>المواصفة</th>{head}</tr></thead>"
+            f"<tbody>{img_row}{price_row}{rows_html}</tbody></table></div></section>")
+
+
 def build_guide(g, guides=None):
     cands = guide_candidates(g.get("criterion", ""))
     rows = ""
@@ -1782,6 +1838,7 @@ def build_guide(g, guides=None):
     table = (f"<table class='data'><thead><tr><th>الهاتف</th><th>أرخص سعر</th>"
              f"<th>التخزين / الرام</th><th>التقييم</th></tr></thead><tbody>{rows}</tbody></table>"
              if rows else "<p>لا توجد هواتف مطابقة حالياً.</p>")
+    specs_table = guide_specs_table(cands)
     review_note = ""
     if g.get("human_review"):
         review_note = f"<section class='card'><h2>رأي فريق {SITE_NAME}</h2><p>{esc(g['human_review'])}</p></section>"
@@ -1854,6 +1911,7 @@ def build_guide(g, guides=None):
 {tag_chips(tags)}
 <p>{esc(g.get('description', ''))}</p>
 {table}
+{specs_table}
 {tips_html}
 {review_note}
 {related_html}
@@ -1932,11 +1990,23 @@ def build_news_post(p, model=None):
                  if chips else f'<div class="tag-chips">{cat_chip}</div>')
     paras = [seg for seg in (p.get("body", "") or "").split("\n") if norm(seg)]
     body_html = "".join(f"<p>{esc(seg.strip())}</p>" for seg in paras) or "<p></p>"
+    specs_html = ""
+    if model:
+        pairs = [(k, v) for k, v in model_specs(model)
+                 if k not in ("الماركة", "الموديل")]
+        pairs.append(("أرخص سعر حالياً", f"{fmt_price(model.cheapest_price)} جنيه"))
+        if pairs:
+            specs_html = (f"<section class='card'><h2>مواصفات {esc(model.name_ar)}</h2>"
+                          f"<table class='data'><tbody>"
+                          + "".join(f"<tr><td><strong>{esc(k)}</strong></td><td>{esc(v)}</td></tr>"
+                                    for k, v in pairs)
+                          + "</tbody></table></section>")
     body = f"""{hero}
 <h1>{esc(p['title'])}{example}</h1>
 <p class="news-meta">بقلم: {esc(p.get('author', 'فريق ' + SITE_NAME))} • نُشر في: {esc(p.get('date_published', TODAY)[:10])}</p>
 {chips}
 {body_html}
+{specs_html}
 {f'<p><a class="btn" href="/mobiles/{model.slug}/">قارن سعر {esc(model.name_ar)} الآن</a></p>' if model else ''}
 <p><a href="/news/">← كل الأخبار</a></p>"""
     return page_shell((p.get("meta_title", "") or p["title"]) + " | " + SITE_NAME,
