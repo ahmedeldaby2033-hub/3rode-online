@@ -2035,12 +2035,16 @@ def build_news_index(posts):
         if not img:
             img = "/images/placeholder.jpg?v=2"
         tags = news_tags(p, model)
+        # No backslash inside an f-string expression: the VPS Python is
+        # older than 3.12 and rejects it (same fix as the specs-table img row).
+        example_tag = (' <span class="example-tag">مثال</span>'
+                       if p.get('is_example') else '')
         items += (f"<article class='article-card'>"
                   f"<a href='/news/{p['slug']}/'><img src='{esc(img)}' "
                   f"alt='{esc(p['title'])}' loading='lazy'></a>"
                   f"<div class='article-card-body'>"
                   f"<h3><a href='/news/{p['slug']}/'>{esc(p['title'])}</a>"
-                  f"{' <span class=\"example-tag\">مثال</span>' if p.get('is_example') else ''}</h3>"
+                  f"{example_tag}</h3>"
                   f"<p class='excerpt'>{esc(p.get('description', ''))}</p>"
                   f"<p class='meta'>{esc(p.get('date_published', TODAY)[:10])} • "
                   f"{esc(p.get('author', ''))}</p>"
