@@ -2758,7 +2758,7 @@ async function guideTop5(){
   var crit = _guideCriterion();
   if(!GD_TITLES[crit]) throw new Error("اختر المعيار أولاً من قائمة التوليد بالأسفل (أو اكتبه في حقل المعيار).");
   if(_guideTopCache && _guideTopCache.crit === crit) return _guideTopCache;
-  var d = await api("products");
+  var d = await api("products", null, {full: "1"});
   var models = cheapestModels(d.rows || []);
   var top = [];
   if(crit === "under_10000"){
@@ -2817,6 +2817,33 @@ async function genField(prefix, field){
         var gA = await guideTop5();
         var at = _genVal("gd-title") || gA.title;
         _genSet("gd", "gd-image-alt", at);
+      }else if(field === "image"){
+        // صورة أفضل هاتف حسب المعيار؛ وإذا كان المعيار ليس من معايير top-5
+        // (مثل دليل موديل واحد model-review) نبحث عن الموديل من عنوان الدليل.
+        var img = null;
+        try{
+          var gg = await guideTop5();
+          img = gg.top[0] && gg.top[0].row && gg.top[0].row[30];
+        }catch(_){}
+        if(!img){
+          var q = _genVal("gd-title").replace(/دليل شراء/g, "").replace(/:\s*السعر والمواصفات/g, "").replace(/2026/g, "").trim();
+          if(q){
+            // مطابقة دقيقة على (الماركة + الموديل) أولاً حتى لا نلتقط موديلاً شبيهاً
+            // (مثل A6x بدل A6)؛ وإلا نأخذ أرخص مطابقة.
+            var dd = await api("products", null, {q: q});
+            var cands = cheapestModels(dd.rows || []);
+            var exact = cands.filter(function(m){
+              var bm = ((m.row[2] || "") + " " + (m.row[3] || "")).trim().toLowerCase();
+              var mo = String(m.row[3] || "").trim().toLowerCase();
+              return bm === q.toLowerCase() || mo === q.toLowerCase();
+            });
+            var pool = exact.length ? exact : cands;
+            pool.sort(function(a, b){ return a.price - b.price; });
+            if(pool[0]) img = pool[0].row && pool[0].row[30];
+          }
+        }
+        if(!img || String(img).indexOf("http") !== 0) throw new Error("لا توجد صورة لأفضل هاتف في بيانات المتجر — أضف رابط صورة يدوياً.");
+        _genSet("gd", "gd-image", sizedImageUrl(String(img), 800));
       }else{
         var g = await guideTop5();
         if(field === "title"){ _genSet("gd", "gd-title", g.title); }
@@ -2827,11 +2854,6 @@ async function genField(prefix, field){
           g.top.forEach(function(m){ var b = (m.row && m.row[2]) || ""; if(b && brands.indexOf(b) === -1) brands.push(b); });
           var tags = ["دليل شراء", GD_CRIT_LABEL[g.crit] || ""].concat(brands.slice(0, 3)).filter(Boolean).slice(0, 5);
           _genSet("gd", "gd-tags", tags.join("، "));
-        }
-        else if(field === "image"){
-          var img = g.top[0] && g.top[0].row && g.top[0].row[30];
-          if(!img || String(img).indexOf("http") !== 0) throw new Error("لا توجد صورة لأفضل هاتف في بيانات المتجر — أضف رابط صورة يدوياً.");
-          _genSet("gd", "gd-image", sizedImageUrl(String(img), 800));
         }
       }
     }else{

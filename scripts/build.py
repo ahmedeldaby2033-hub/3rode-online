@@ -1618,6 +1618,33 @@ def guide_candidates(criterion):
     if criterion == "under_10000":
         pool = [m for m in MODELS if m.cheapest_price < 10000]
         return sorted(pool, key=lambda m: (-(m.rating or 0), m.cheapest_price))[:5]
+    if criterion == "under_5000":
+        pool = [m for m in MODELS if m.cheapest_price < 5000]
+        return sorted(pool, key=lambda m: (-(m.rating or 0), m.cheapest_price))[:5]
+    if criterion == "under_7000":
+        pool = [m for m in MODELS if m.cheapest_price < 7000]
+        return sorted(pool, key=lambda m: (-(m.rating or 0), m.cheapest_price))[:5]
+    if criterion == "under_12000":
+        pool = [m for m in MODELS if m.cheapest_price < 12000]
+        return sorted(pool, key=lambda m: (-(m.rating or 0), m.cheapest_price))[:5]
+    if criterion == "under_15000":
+        pool = [m for m in MODELS if m.cheapest_price < 15000]
+        return sorted(pool, key=lambda m: (-(m.rating or 0), m.cheapest_price))[:5]
+    if criterion == "under_20000":
+        pool = [m for m in MODELS if m.cheapest_price < 20000]
+        return sorted(pool, key=lambda m: (-(m.rating or 0), m.cheapest_price))[:5]
+    if criterion == "under_25000":
+        pool = [m for m in MODELS if m.cheapest_price < 25000]
+        return sorted(pool, key=lambda m: (-(m.rating or 0), m.cheapest_price))[:5]
+    if criterion == "under_30000":
+        pool = [m for m in MODELS if m.cheapest_price < 30000]
+        return sorted(pool, key=lambda m: (-(m.rating or 0), m.cheapest_price))[:5]
+    if criterion == "under_40000":
+        pool = [m for m in MODELS if m.cheapest_price < 40000]
+        return sorted(pool, key=lambda m: (-(m.rating or 0), m.cheapest_price))[:5]
+    if criterion == "under_50000":
+        pool = [m for m in MODELS if m.cheapest_price < 50000]
+        return sorted(pool, key=lambda m: (-(m.rating or 0), m.cheapest_price))[:5]
     if criterion == "battery":
         def mah(m):
             v = num(re.sub(r"[^\d.]", "", norm(c(m.offers[0], "البطارية"))), 0) or 0
@@ -1646,6 +1673,15 @@ def guide_candidates(criterion):
 
 GUIDE_TAGS = {
     "under_10000": ["أقل من 10,000 جنيه", "هواتف اقتصادية", "دليل شراء"],
+    "under_5000": ["أقل من 5,000 جنيه", "هواتف اقتصادية", "دليل شراء"],
+    "under_7000": ["أقل من 7,000 جنيه", "هواتف اقتصادية", "دليل شراء"],
+    "under_12000": ["أقل من 12,000 جنيه", "هواتف اقتصادية", "دليل شراء"],
+    "under_15000": ["أقل من 15,000 جنيه", "هواتف متوسطة", "دليل شراء"],
+    "under_20000": ["أقل من 20,000 جنيه", "هواتف متوسطة", "دليل شراء"],
+    "under_25000": ["أقل من 25,000 جنيه", "هواتف متوسطة", "دليل شراء"],
+    "under_30000": ["أقل من 30,000 جنيه", "هواتف متوسطة", "دليل شراء"],
+    "under_40000": ["أقل من 40,000 جنيه", "هواتف رائدة", "دليل شراء"],
+    "under_50000": ["أقل من 50,000 جنيه", "هواتف رائدة", "دليل شراء"],
     "battery": ["بطارية كبيرة", "عمر البطارية", "دليل شراء"],
     "camera": ["كاميرا", "تصوير", "دليل شراء"],
     "gaming": ["ألعاب", "أداء قوي", "دليل شراء"],
@@ -1713,7 +1749,7 @@ def guide_is_published(g):
     return g.get("status") == "published" and bool(norm(g.get("human_review", "")))
 
 
-def build_guide(g):
+def build_guide(g, guides=None):
     cands = guide_candidates(g.get("criterion", ""))
     rows = ""
     for m in cands:
@@ -1767,6 +1803,29 @@ def build_guide(g):
         banner = f"""<div class="draft-banner">{icon("alert")} مسودة — هذه الصفحة قيد المراجعة البشرية ولم تُنشر بعد لمحركات البحث. الأسعار والجداول مولّدة تلقائياً من بيانات الشيت بتاريخ {esc(g.get('date', TODAY))}.</div>
 """
         status_label = "مسودة"
+    related_html = ""
+    if guides:
+        rel = []
+        g_kw = set(norm(g.get("keyword", "")).split())
+        g_tags = set(t.strip() for t in norm(g.get("tags", "")).split("،") if t.strip())
+        for o in guides:
+            if o.get("slug") == g.get("slug") or not guide_is_published(o):
+                continue
+            score = 0
+            if o.get("criterion") and o.get("criterion") == g.get("criterion"):
+                score += 3
+            shared = set(norm(o.get("keyword", "")).split()) & g_kw
+            shared |= set(t.strip() for t in norm(o.get("tags", "")).split("،") if t.strip()) & g_tags
+            score += min(len(shared), 3)
+            if score:
+                rel.append((score, o))
+        rel.sort(key=lambda t: -t[0])
+        if rel:
+            items = "".join(
+                f"<li><a href='/guides/{o['slug']}/'>{esc(o['title'])}</a></li>"
+                for _, o in rel[:4])
+            related_html = ("<section class='card'><h2>أدلة ذات صلة</h2><ul>"
+                            + items + "</ul></section>")
     body = f"""{hero}
 {banner}<h1>{esc(g['title'])}</h1>
 <p class="muted">بقلم: {esc(g.get('author', 'فريق ' + SITE_NAME))} • التاريخ: {esc(g.get('date', TODAY))} • الحالة: {status_label}</p>
@@ -1775,6 +1834,7 @@ def build_guide(g):
 {table}
 {tips_html}
 {review_note}
+{related_html}
 <p><a href="/guides/">← كل أدلة الشراء</a></p>"""
     return page_shell((g.get("meta_title", "") or g["title"]) + " | " + SITE_NAME,
                       g.get("meta_desc", "") or g.get("description", ""),
@@ -2355,7 +2415,7 @@ def main():
     guides = load_json(DATA / "guides.json")["guides"]
     emit("guides/index.html", build_guides_index(guides))
     for g in guides:
-        emit(f"guides/{g['slug']}/index.html", build_guide(g))
+        emit(f"guides/{g['slug']}/index.html", build_guide(g, guides))
     news = load_json(DATA / "news.json")["posts"]
     emit("news/index.html", build_news_index(news))
     for p in news:

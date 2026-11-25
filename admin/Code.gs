@@ -706,10 +706,11 @@ function doGet(e) {
       var brand = e.parameter.brand || '';
       var rows = values.slice(1).filter(function (r) {
         if (brand && r[2] !== brand) return false;
-        if (q && (String(r[0]) + ' ' + r[3] + ' ' + r[4]).toLowerCase().indexOf(q) === -1) return false;
+        if (q && (String(r[0]) + ' ' + r[2] + ' ' + r[3] + ' ' + r[4]).toLowerCase().indexOf(q) === -1) return false;
         return true;
       });
-      return jsonOut({ ok: true, headers: values[0], rows: rows.slice(0, 200), total: rows.length });
+      var full = e.parameter.full === '1' || e.parameter.full === 'true';
+      return jsonOut({ ok: true, headers: values[0], rows: full ? rows : rows.slice(0, 200), total: rows.length });
     }
     if (action === 'stats') {
       // عدّادات نظرة عامة من الشيت كاملاً (لا من أول 200 صف فقط):
@@ -796,6 +797,29 @@ function doGet(e) {
         byModel[r[2]] = (byModel[r[2]] || 0) + 1;
       });
       return jsonOut({ ok: true, total: clicks.length, byStore: byStore, byModel: byModel });
+    }
+    if (action === 'clickAnalytics') {
+      // تحليل النقرات لكل منتج: ?days=7|30|90|0 (0 = كل الوقت).
+      var days = parseInt((e.parameter.days || '30'), 10);
+      if (isNaN(days) || days < 0) days = 30;
+      var cutoff = days > 0 ? new Date().getTime() - days * 86400000 : 0;
+      var per = {}, total = 0, byStoreAll = {};
+      sheet(SHEET_CLICKS).getDataRange().getValues().slice(1).forEach(function (r) {
+        var t = r[0] ? new Date(r[0]).getTime() : 0;
+        if (t < cutoff) return;
+        var slug = String(r[2] || '').trim();
+        if (!slug) return;
+        total++;
+        var st = String(r[1] || 'غير معروف');
+        byStoreAll[st] = (byStoreAll[st] || 0) + 1;
+        var e2 = per[slug] || (per[slug] = { slug: slug, total: 0, byStore: {}, last: 0 });
+        e2.total++;
+        e2.byStore[st] = (e2.byStore[st] || 0) + 1;
+        if (t > e2.last) e2.last = t;
+      });
+      var rows = Object.keys(per).map(function (k) { return per[k]; });
+      rows.sort(function (a, b) { return b.total - a.total; });
+      return jsonOut({ ok: true, total: total, byStore: byStoreAll, days: days, models: rows });
     }
     if (action === 'reports') {
       return jsonOut({ ok: true, rows: sheet(SHEET_REPORTS).getDataRange().getValues().slice(1).reverse() });
