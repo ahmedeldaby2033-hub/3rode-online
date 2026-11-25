@@ -1688,6 +1688,35 @@ def build_daily_price_page(topic):
                         delta_html = "<p>مقارنة بأمس (" + esc(prev.get("date", "")) + "): عيار 21 مستقر بلا تغيير.</p>"
             except (TypeError, ValueError):
                 pass
+        hist_html = ""
+        try:
+            hist = load_json(DATA / "daily-prices-history.json") or []
+            grows = [r for r in hist if isinstance(r, dict) and r.get("topic") == "gold"
+                     and ((r.get("prices") or {}).get("21") or {}).get("sell")]
+            grows.sort(key=lambda r: r.get("date", ""), reverse=True)
+            grows = grows[:30]
+        except Exception:  # noqa: BLE001
+            grows = []
+        if grows:
+            hrows = ""
+            for i, r in enumerate(grows):
+                p21 = (r.get("prices") or {}).get("21") or {}
+                chg = "—"
+                if i + 1 < len(grows):
+                    nxt = ((grows[i + 1].get("prices") or {}).get("21") or {}).get("sell")
+                    cur = p21.get("sell")
+                    if cur and nxt:
+                        d = int(cur - nxt)
+                        chg = ("+" + fmt_price(d)) if d > 0 else (fmt_price(d) if d < 0 else "0")
+                hrows += ("<tr><td>" + esc(r.get("date", "")) + "</td><td>" +
+                          _price_cell(p21.get("buy")) + "</td><td>" +
+                          _price_cell(p21.get("sell")) + "</td><td>" + chg + "</td></tr>")
+            hist_html = ("<h2>سعر الذهب عيار 21 — آخر 30 يوماً</h2>"
+                         "<p class=\"muted\">يتحدث الجدول يومياً مع كل تحديث للأسعار.</p>"
+                         "<div style=\"overflow-x:auto\"><table class=\"data\">"
+                         "<thead><tr><th>التاريخ</th><th>شراء 21 (جنيه)</th>"
+                         "<th>بيع 21 (جنيه)</th><th>التغير (جنيه)</th></tr></thead><tbody>" +
+                         hrows + "</tbody></table></div>")
         note = ("<p>الأسعار بدون المصنعية والدمغة — تُضاف المصنعية (100–200 جنيه "
                 "للجرام تقريباً) على السعر المعلن، وقد تختلف قليلاً بين المحافظات والمحال.</p>")
     else:
@@ -1715,6 +1744,7 @@ def build_daily_price_page(topic):
                         delta_html = "<p>مقارنة بأمس (" + esc(prev.get("date", "")) + "): الدولار مستقر بلا تغيير.</p>"
             except (TypeError, ValueError):
                 pass
+        hist_html = ""
         note = ("<p>سعر السوق (متوسط) — أسعار الشراء والبيع في البنوك تتبع البنك "
                 "المركزي المصري وتختلف قروشاً قليلة بين بنك وآخر. البنك المركزي "
                 "يحجب الطلبات الآلية، لذلك نعرض سعر السوق حتى يتاح جدول البنوك.</p>")
@@ -1722,7 +1752,7 @@ def build_daily_price_page(topic):
     hero = ("<figure class=\"price-hero\"><img src=\"" + img_src + "\" alt=\"" + esc(img_alt) +
             "\" width=\"" + str(img_w) + "\" height=\"" + str(img_h) + "\"></figure>")
     body = ("<h1>" + title + "</h1>" + hero + _daily_stale_note(t) + table +
-            delta_html + note + _daily_source_line(t) +
+            delta_html + hist_html + note + _daily_source_line(t) +
             "<p><a href=\"/prices/\">كل الأسعار اليومية</a> • <a href=\"/prices/" +
             other + "/\">" + other_label + "</a></p>")
     ld = {"@context": "https://schema.org", "@type": "WebPage",
