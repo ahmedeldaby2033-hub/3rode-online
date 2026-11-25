@@ -1433,6 +1433,7 @@ def build_deals_page():
 </section>"""
     body = f"""<p class="muted"><a href="/">الرئيسية</a> › أفضل العروض</p>
 <h1>أفضل العروض 2026</h1>
+<h2><a href="/deals/white-friday/">عروض الجمعة البيضاء 2026 — 15 منتجاً بخصومات حتى 85%</a></h2>
 <p>أقوى عروض وتخفيضات الهواتف في مصر لعام 2026 — قارن أسعار {len(MODELS)} هاتفاً في جوميا مصر وأمازون مصر ونون مصر، وصفِّ النتائج بالمارة والرام والتخزين والسعر ودعم 5G لتصل إلى أفضل صفقة بأسرع وقت.</p>
 {filters_html}
 <div class="grid" id="models-grid">{cards}</div>
@@ -1449,6 +1450,54 @@ def build_deals_page():
         f"أفضل عروض الهواتف في مصر 2026: قارن أسعار {len(MODELS)} هاتفاً في جوميا مصر وأمازون مصر ونون مصر، وصفِّ النتائج حسب الماركة والرام والتخزين والسعر ودعم 5G.",
         f"{BASE_URL}/deals/", body, json_ld=ld,
         og_image=abs_image(top[0]) if top else None)
+
+
+def build_white_friday_page():
+    """Seasonal /deals/white-friday/ page (White Friday 27 Nov 2026):
+    15 general-store offers from Sheet2, prices verified LIVE on Jumia
+    2026-11-25 10:17 EET — see data/white-friday.json. Jumia-only buy
+    buttons (Sheet2 has no per-product affiliate column); links carry
+    rel="sponsored". Static snapshot: prices/stock may change on the
+    store, so the page states its verification date."""
+    data = load_json(DATA / "white-friday.json")
+    items = sorted(data.get("items", []), key=lambda i: -(i.get("save") or 0))
+    cards = ""
+    ld_items = []
+    for pos, it in enumerate(items, 1):
+        price = it["price"]
+        old = it["old"]
+        disc = it["discount"]
+        save = it.get("save") or (old - price)
+        rating = (f'<span class="rating">★ {it["rating"]} '
+                  f'({it["rcount"]} تقييمات)</span>'
+                  if it.get("rating") else "")
+        stock = esc(it.get("stock") or "")
+        cards += f"""<article class="pcard">
+<a href="{esc(it["url"])}" {SPONSORED}><img src="{esc(it["image"])}" alt="{esc(it["name"])}" loading="lazy" decoding="async" width="500" height="500"></a>
+<div class="pcard-body">
+<h3><a href="{esc(it["url"])}" {SPONSORED}>{esc(it["name"])}</a></h3>
+<div class="brand-line">{esc(it.get("category") or "")} • {stock}</div>
+<div class="price-row"><span class="price">{fmt_price(price)} جنيه</span><span class="old-price">{fmt_price(old)} جنيه</span><span class="disc-badge">خصم {int(disc)}%</span></div>
+<div class="brand-line">وفّر {fmt_price(save)} جنيه • {rating}</div>
+<div class="buy-buttons"><a class="btn-buy btn-jumia" href="{esc(it["url"])}" {SPONSORED} data-store="jumia" data-event="buy-click">اشترِ من جوميا مصر</a>
+<p class="affiliate-note">روابط شراء بالعمولة — <a href="/affiliate-disclosure/">اقرأ الإفصاح</a></p></div>
+</div></article>"""
+        ld_items.append({"@type": "ListItem", "position": pos,
+                         "url": it["url"], "name": it["name"]})
+    total_save = sum(i.get("save") or 0 for i in items)
+    body = f"""<p class="muted"><a href="/">الرئيسية</a> › <a href="/deals/">أفضل العروض</a> › الجمعة البيضاء</p>
+<h1>عروض الجمعة البيضاء 2026</h1>
+<p>أقوى عروض الجمعة البيضاء في مصر — {len(items)} منتجاً من جوميا مصر بخصومات حتى 85% وتوفير إجمالي {fmt_price(total_save)} جنيه. الأسعار تم التحقق منها حياً في 25 نوفمبر 2026 — والكمية محدودة (بعض المنتجات بقي منها قطعة واحدة). <span class="countdown" data-countdown="2026-11-27"></span></p>
+<div class="grid" id="models-grid">{cards}</div>
+<p class="muted">الأسعار من جوميا مصر وتم التحقق منها حياً في 25 نوفمبر 2026 — قد تتغير على المتجر أو تنفد الكمية. آخر تحديث للصفحة: 25 نوفمبر 2026.</p>"""
+    ld = {"@context": "https://schema.org", "@type": "ItemList",
+          "name": f"عروض الجمعة البيضاء 2026 — {SITE_NAME}",
+          "itemListElement": ld_items}
+    return page_shell(
+        f"عروض الجمعة البيضاء 2026 — {SITE_NAME}",
+        f"أقوى عروض الجمعة البيضاء 2026 في مصر: {len(items)} منتجاً من جوميا بخصومات حتى 85% وتوفير {fmt_price(total_save)} جنيه — ثلاجات وديب فريزر وتكييفات وأحذية وإلكترونيات.",
+        f"{BASE_URL}/deals/white-friday/", body, json_ld=ld,
+        og_image=BASE_URL + items[0]["image"] if items else None)
 
 
 # ----------------------------------------------------------------- coupons
@@ -2301,6 +2350,7 @@ def main():
         emit(f"brand/{BRAND_SLUGS[b]}/index.html", build_brand(b))
     emit("brands/index.html", build_brands_index())
     emit("deals/index.html", build_deals_page())
+    emit("deals/white-friday/index.html", build_white_friday_page())
     emit("coupons/index.html", build_coupons())
     guides = load_json(DATA / "guides.json")["guides"]
     emit("guides/index.html", build_guides_index(guides))

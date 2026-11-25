@@ -1,0 +1,18 @@
+[
+ {
+  "url": "https://www.jumia.com.eg/ar/nokia-nokia106-dual-sim-black-4mb-4g-131155293.html",
+  "old": 717.0,
+  "new": 717.3,
+  "diff": 0.2999999999999545,
+  "pct": 0.0,
+  "date": "2026-11-25"
+ },
+ {
+  "url": "https://www.jumia.com.eg/ar/nokia-nokia106-dual-sim-black-4mb-4g-131155293.html",
+  "old": 717.3,
+  "new": 717.0,
+  "diff": -0.2999999999999545,
+  "pct": -0.0,
+  "date": "2026-11-25"
+ }
+]
