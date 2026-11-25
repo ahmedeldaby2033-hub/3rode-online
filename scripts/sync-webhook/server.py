@@ -39,6 +39,7 @@ import subprocess
 import threading
 import time
 import uuid
+from concurrent.futures import ThreadPoolExecutor
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib import request as urlrequest
 from urllib.error import URLError
@@ -73,7 +74,16 @@ JOBS = {}
 # ------------------------------------------------------------------ price fetch
 # One Chromium browser for the whole process, one fetch at a time, with a
 # small gap between fetches so the store never sees a burst.
-_PW_LOCK = threading.Lock()
+# Playwright's sync API is greenlet-based: every object it creates is bound
+# to the thread that created it. ThreadingHTTPServer runs each request on a
+# different thread, so a browser created on request #1's thread cannot be
+# used from request #2's thread — greenlet raises "cannot switch to a
+# different thread (which happens to have exited)". (Hit 2026-11-25 right
+# after the Playwright image redeploy.)
+# So ALL browser work runs on ONE dedicated worker thread via a
+# single-worker executor: the browser is always created AND used there,
+# no matter which request thread asked for the fetch.
+_PW_EXECUTOR = ThreadPoolExecutor(max_workers=1, thread_name_prefix="pw")
 _PW_BROWSER = None
 _PW_LAST_FETCH = 0.0
 _PW_MIN_GAP = 1.5
@@ -179,39 +189,67 @@ def _pw_browser():
 
 def fetch_price(url):
     """Load a store product page in real Chromium and read its price.
-    Returns dict(price, old_price, in_stock, stock_text, title) or raises."""
-    global _PW_LAST_FETCH
-    with _PW_LOCK:
-        gap = _PW_MIN_GAP - (time.time() - _PW_LAST_FETCH)
-        if gap > 0:
-            time.sleep(gap)
-        try:
-            browser = _pw_browser()
-        except ImportError as e:
-            raise RuntimeError(
-                "Playwright is not installed in the sync app image — "
-                "redeploy the sync app after this update") from e
+    Returns dict(price, old_price, in_stock, stock_text, title) or raises.
+
+    Runs on the dedicated Playwright worker thread (see _PW_EXECUTOR):
+    the caller only submits and waits for the result."""
+    return _PW_EXECUTOR.submit(_fetch_price_once, url).result()
+
+
+def _fetch_price_once(url):
+    """The actual fetch — always executes on the Playwright worker thread."""
+    global _PW_LAST_FETCH, _PW_BROWSER
+    gap = _PW_MIN_GAP - (time.time() - _PW_LAST_FETCH)
+    if gap > 0:
+        time.sleep(gap)
+    try:
+        browser = _pw_browser()
+    except ImportError as e:
+        raise RuntimeError(
+            "Playwright is not installed in the sync app image — "
+            "redeploy the sync app after this update") from e
+    try:
         ctx = browser.new_context(
             user_agent=("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                         "AppleWebKit/537.36 (KHTML, like Gecko) "
                         "Chrome/126.0.0.0 Safari/537.36"),
             locale="ar-EG")
-        page = ctx.new_page()
+    except Exception:
+        # The shared browser died (Chromium crash / driver gone): close it
+        # best-effort (avoid leaking a Chromium process per retry), drop
+        # it, and retry once with a fresh browser instead of failing every
+        # remaining product of the run.
         try:
-            resp = page.goto(url, wait_until="domcontentloaded",
-                             timeout=FETCH_TIMEOUT_MS)
-            if resp is not None and resp.status >= 400:
-                raise RuntimeError(f"store page returned HTTP {resp.status}")
-            page.wait_for_timeout(3500)  # let the price render / challenges pass
-            data = page.evaluate(_EXTRACT_JS)
-            _PW_LAST_FETCH = time.time()
-            if not data or not data.get("price"):
-                raise RuntimeError("no price found on the page "
-                                   "(blocked, changed layout, or removed)")
-            return data
-        finally:
-            page.close()
-            ctx.close()
+            browser.close()
+        except Exception:
+            pass
+        try:
+            browser._pw.stop()
+        except Exception:
+            pass
+        _PW_BROWSER = None
+        browser = _pw_browser()
+        ctx = browser.new_context(
+            user_agent=("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                        "AppleWebKit/537.36 (KHTML, like Gecko) "
+                        "Chrome/126.0.0.0 Safari/537.36"),
+            locale="ar-EG")
+    page = ctx.new_page()
+    try:
+        resp = page.goto(url, wait_until="domcontentloaded",
+                         timeout=FETCH_TIMEOUT_MS)
+        if resp is not None and resp.status >= 400:
+            raise RuntimeError(f"store page returned HTTP {resp.status}")
+        page.wait_for_timeout(3500)  # let the price render / challenges pass
+        data = page.evaluate(_EXTRACT_JS)
+        _PW_LAST_FETCH = time.time()
+        if not data or not data.get("price"):
+            raise RuntimeError("no price found on the page "
+                               "(blocked, changed layout, or removed)")
+        return data
+    finally:
+        page.close()
+        ctx.close()
 
 
 def log(job, step):
