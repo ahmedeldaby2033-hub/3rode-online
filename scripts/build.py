@@ -186,6 +186,9 @@ SETTINGS = load_json(BASE / "settings.json")
 SITE_NAME = SETTINGS["site_name"]
 DOMAIN = SETTINGS.get("domain") or SETTINGS.get("site_domain", "3rde.online")
 BASE_URL = (SETTINGS.get("base_url") or f"https://{DOMAIN}").rstrip("/")
+# IndexNow key (settings.json): served at /<key>.txt so Bing/Yandex accept
+# IndexNow submissions from the sync app. The key is public by design.
+INDEXNOW_KEY = str(SETTINGS.get("indexnow_key") or "").strip()
 EMAIL = SETTINGS["contact_email"]
 
 
@@ -714,7 +717,7 @@ def head_html(title, desc, canonical, og_image=None, noindex=False,
 <link rel="apple-touch-icon" href="/assets/icon-192.png">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0b5ed7">
-<link rel="stylesheet" href="/assets/style.css?v=9">
+<link rel="stylesheet" href="/assets/style.css?v=10">
 {verif}{ga}{extra}"""
 
 
@@ -735,7 +738,7 @@ def footer_html():
 <div class="cols">
 <div><h3>{esc(SITE_NAME)}</h3><p>مقارنة أسعار الهواتف في مصر.</p>
 <p class="muted">آخر تحديث للأسعار من الشيت: {SHEET_UPDATED_DATE} — تُحدَّث كل ساعة.</p></div>
-<div><h3>روابط سريعة</h3><a href="/coupons/">الكوبونات</a><a href="/deals/">أفضل العروض</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/budget/">البحث بالميزانية</a><a href="/search/specs/">بحث بالمواصفات</a><a href="/compare/">قارن بين الهواتف</a><a href="/about/">من نحن</a><a href="/contact/">اتصل بنا</a></div>
+<div><h3>روابط سريعة</h3><a href="/coupons/">الكوبونات</a><a href="/deals/">أفضل العروض</a><a href="/prices/">الأسعار اليومية</a><a href="/guides/">أدلة الشراء</a><a href="/news/">الأخبار</a><a href="/budget/">البحث بالميزانية</a><a href="/search/specs/">بحث بالمواصفات</a><a href="/compare/">قارن بين الهواتف</a><a href="/about/">من نحن</a><a href="/contact/">اتصل بنا</a></div>
 <div><h3>سياسات الموقع</h3><a href="/privacy/">سياسة الخصوصية</a><a href="/terms/">شروط الاستخدام</a><a href="/affiliate-disclosure/">إفصاح التسويق بالعمولة</a><a href="/cookies/">سياسة ملفات تعريف الارتباط</a></div>
 <div><h3>تواصل معنا</h3><a href="mailto:{EMAIL}">{EMAIL}</a></div>
 </div>
@@ -746,7 +749,7 @@ def footer_html():
 <button id="to-top" type="button" aria-label="العودة للأعلى">↑</button>
 <div class="toast" id="toast" role="status"></div>
 <script>window.SITE_CONFIG = {json.dumps({"adminApiUrl": ADMIN_API_URL, "onesignalAppId": ONESIGNAL_APP_ID, "contactEmail": EMAIL}, ensure_ascii=False)};</script>
-<script src="/assets/app.js?v=4" defer></script>"""
+<script src="/assets/app.js?v=5" defer></script>"""
 
 
 def page_shell(title, desc, canonical, body, noindex=False, json_ld=None,
@@ -1022,6 +1025,15 @@ def build_index():
                                  "offers": {"@type": "Offer", "price": m.cheapest_price,
                                             "priceCurrency": "EGP"}}}
                        for i, m in enumerate(biggest)]}
+    # White Friday banner (2026-11-25): the homepage had NO link to
+    # /deals/white-friday/ at all — only /deals/ linked it. The countdown
+    # span is driven by assets/app.js; app.js hides the banner once the
+    # date passes, so it expires by itself after 27 Nov 2026.
+    wf_banner = """<section class="wf-banner" aria-label="عروض الجمعة البيضاء">
+<div class="container wide"><strong>🔥 الجمعة البيضاء — خصومات حتى 85% من جوميا</strong>
+<span class="countdown" data-countdown="2026-11-27"></span>
+<a class="btn" href="/deals/white-friday/">شوف كل العروض</a></div></section>"""
+    body = wf_banner + body
     body_cls = f"layout-{HOME_LAYOUT}" + (f" theme-{HOME_THEME}" if HOME_THEME else "")
     return page_shell(
         f"{SITE_NAME} | قارن أسعار الهواتف في مصر — جوميا وأمازون ونون",
@@ -1561,6 +1573,175 @@ def coupon_is_expired(expires_at):
     except ValueError:
         return False
     return d < date.today()
+
+
+def load_daily_prices():
+    """Read data/daily-prices.json (written by scripts/daily-prices.py).
+    Returns {} when the file is missing — the pages then say the prices
+    will appear with the next update instead of showing stale numbers."""
+    try:
+        return load_json(DATA / "daily-prices.json")
+    except Exception:  # noqa: BLE001 - missing file is a normal first-run state
+        return {}
+
+
+def _price_cell(v):
+    return fmt_price(v) if v else "—"
+
+
+def _daily_prev(topic, date):
+    """Previous successful day for a topic, from the history file."""
+    try:
+        hist = load_json(DATA / "daily-prices-history.json")
+    except Exception:  # noqa: BLE001
+        return None
+    if not isinstance(hist, list):
+        return None
+    for row in reversed(hist):
+        if row.get("topic") == topic and row.get("date") != date:
+            return row
+    return None
+
+
+def _daily_source_line(t):
+    if not t.get("source_name"):
+        return ""
+    link = ""
+    if t.get("source_url"):
+        link = (" — <a href=\"" + esc(t["source_url"]) +
+                "\" target=\"_blank\" rel=\"noopener\">رابط المصدر</a>")
+    when = esc(t.get("fetched_at", "") or t.get("date", ""))
+    return ("<p class=\"muted\">المصدر: " + esc(t["source_name"]) + link +
+            " — آخر تحديث: " + when + " بتوقيت القاهرة.</p>")
+
+
+def _daily_stale_note(t):
+    """Warning when the last successful fetch is not today: the page keeps
+    showing the last good price WITH its real date, and says so plainly.
+    A stale price is never presented as today's."""
+    if not t:
+        return ("<section class=\"card\"><h2>الأسعار اليومية قيد الإعداد</h2>"
+                "<p>لم تُجلب أسعار اليوم بعد — ستظهر هنا فور نجاح أول جلب.</p></section>")
+    if t.get("date") == TODAY:
+        return ""
+    return ("<section class=\"card\"><h2>تنبيه</h2>"
+            "<p>تعذّر تحديث أسعار اليوم — نعرض أدناه آخر سعر متاح بتاريخ " +
+            esc(t.get("date", "")) + "، من " + esc(t.get("source_name", "")) +
+            ". راجع المصدر قبل اتخاذ قرار شراء.</p></section>")
+
+
+def build_daily_price_page(topic):
+    """Fixed-URL daily price page: /prices/gold/ and /prices/usd/.
+
+    Titles never contain a price (same rule as news). Every number on
+    the page carries its source name + link and the exact fetch time."""
+    data = load_daily_prices()
+    topics = data.get("topics", {}) if isinstance(data, dict) else {}
+    t = topics.get(topic, {}) or {}
+    prices = t.get("prices", {}) or {}
+    other = "usd" if topic == "gold" else "gold"
+    other_label = "سعر الدولار اليوم" if topic == "gold" else "سعر الذهب اليوم"
+    if topic == "gold":
+        title = "سعر الذهب اليوم في مصر"
+        desc = ("سعر الذهب اليوم في مصر: عيار 24 وعيار 21 وعيار 18 والجنيه "
+                "الذهب — أسعار الشراء والبيع، محدثة يومياً من مصدر ثابت.")
+        rows_html = ""
+        for karat in ("24", "21", "18"):
+            p = prices.get(karat, {}) or {}
+            if not p:
+                continue
+            rows_html += ("<tr><td>عيار " + karat + "</td><td>" +
+                          _price_cell(p.get("buy")) + "</td><td>" +
+                          _price_cell(p.get("sell")) + "</td></tr>")
+        pound = prices.get("pound", {}) or {}
+        if pound:
+            rows_html += ("<tr><td>الجنيه الذهب (8 جرام عيار 21)</td><td>" +
+                          _price_cell(pound.get("buy")) + "</td><td>" +
+                          _price_cell(pound.get("sell")) + "</td></tr>")
+        table = ("<div style=\"overflow-x:auto\"><table class=\"data\">"
+                 "<thead><tr><th>العيار</th><th>شراء (جنيه)</th>"
+                 "<th>بيع (جنيه)</th></tr></thead><tbody>" +
+                 rows_html + "</tbody></table></div>") if rows_html else ""
+        delta_html = ""
+        prev = _daily_prev("gold", t.get("date"))
+        if prev:
+            try:
+                cur = float((prices.get("21") or {}).get("sell") or 0)
+                old = float(((prev.get("prices") or {}).get("21") or {}).get("sell") or 0)
+                if cur and old:
+                    d = int(cur - old)
+                    if d > 0:
+                        delta_html = "<p>مقارنة بأمس (" + esc(prev.get("date", "")) + "): عيار 21 ارتفع " + fmt_price(d) + " جنيهاً.</p>"
+                    elif d < 0:
+                        delta_html = "<p>مقارنة بأمس (" + esc(prev.get("date", "")) + "): عيار 21 انخفض " + fmt_price(-d) + " جنيهاً.</p>"
+                    else:
+                        delta_html = "<p>مقارنة بأمس (" + esc(prev.get("date", "")) + "): عيار 21 مستقر بلا تغيير.</p>"
+            except (TypeError, ValueError):
+                pass
+        note = ("<p>الأسعار بدون المصنعية والدمغة — تُضاف المصنعية (100–200 جنيه "
+                "للجرام تقريباً) على السعر المعلن، وقد تختلف قليلاً بين المحافظات والمحال.</p>")
+    else:
+        title = "سعر الدولار اليوم في مصر"
+        desc = "سعر الدولار اليوم في مصر مقابل الجنيه — محدث يومياً من سعر السوق."
+        rate = prices.get("rate")
+        rate_txt = ("%.2f" % float(rate)) if rate else "—"
+        table = ("<div style=\"overflow-x:auto\"><table class=\"data\">"
+                 "<thead><tr><th>العملة</th><th>السعر (جنيه)</th></tr></thead>"
+                 "<tbody><tr><td>دولار أمريكي (USD)</td><td>" + rate_txt +
+                 "</td></tr></tbody></table></div>") if rate else ""
+        delta_html = ""
+        prev = _daily_prev("usd", t.get("date"))
+        if prev:
+            try:
+                cur = float(rate or 0)
+                old = float((prev.get("prices") or {}).get("rate") or 0)
+                if cur and old:
+                    d = cur - old
+                    if abs(d) >= 0.01:
+                        delta_html = ("<p>مقارنة بأمس (" + esc(prev.get("date", "")) +
+                                      "): الدولار " + ("ارتفع " if d > 0 else "انخفض ") +
+                                      ("%.2f" % abs(d)) + " جنيه.</p>")
+                    else:
+                        delta_html = "<p>مقارنة بأمس (" + esc(prev.get("date", "")) + "): الدولار مستقر بلا تغيير.</p>"
+            except (TypeError, ValueError):
+                pass
+        note = ("<p>سعر السوق (متوسط) — أسعار الشراء والبيع في البنوك تتبع البنك "
+                "المركزي المصري وتختلف قروشاً قليلة بين بنك وآخر. البنك المركزي "
+                "يحجب الطلبات الآلية، لذلك نعرض سعر السوق حتى يتاح جدول البنوك.</p>")
+    body = ("<h1>" + title + "</h1>" + _daily_stale_note(t) + table +
+            delta_html + note + _daily_source_line(t) +
+            "<p><a href=\"/prices/\">كل الأسعار اليومية</a> • <a href=\"/prices/" +
+            other + "/\">" + other_label + "</a></p>")
+    ld = {"@context": "https://schema.org", "@type": "WebPage",
+          "name": title, "url": BASE_URL + "/prices/" + topic + "/"}
+    if t.get("date"):
+        ld["dateModified"] = t["date"]
+    return page_shell(title + " | عروض أونلاين", desc,
+                      BASE_URL + "/prices/" + topic + "/", body, json_ld=[ld])
+
+
+def build_prices_index():
+    data = load_daily_prices()
+    topics = data.get("topics", {}) if isinstance(data, dict) else {}
+    cards = ""
+    for topic, label in (("gold", "سعر الذهب اليوم"),
+                         ("usd", "سعر الدولار اليوم")):
+        t = topics.get(topic, {}) or {}
+        upd = t.get("date", "")
+        cards += ("<section class=\"card\"><h2><a href=\"/prices/" + topic +
+                  "/\">" + label + "</a></h2>" +
+                  ("<p class=\"muted\">آخر تحديث: " + esc(upd) + "</p>"
+                   if upd else "<p class=\"muted\">قريباً — تُجلب الأسعار يومياً.</p>") +
+                  "</section>")
+    body = ("<h1>الأسعار اليومية</h1>"
+            "<p>أسعار الذهب والدولار في مصر، محدثة يومياً من مصادر ثابتة، "
+            "مع تاريخ كل تحديث ومصدره.</p>" + cards)
+    return page_shell("الأسعار اليومية في مصر | عروض أونلاين",
+                      "أسعار الذهب والدولار اليوم في مصر — محدثة يومياً من مصادر ثابتة مع تاريخ التحديث.",
+                      BASE_URL + "/prices/", body,
+                      json_ld=[{"@context": "https://schema.org", "@type": "WebPage",
+                                "name": "الأسعار اليومية في مصر",
+                                "url": BASE_URL + "/prices/"}])
 
 
 def build_coupons():
@@ -2559,6 +2740,9 @@ def main():
         emit(f"budget/under-{_limit}/index.html", build_budget_band(_limit))
     emit("search/index.html", build_search())
     emit("search/specs/index.html", build_specs_search())
+    emit("prices/index.html", build_prices_index())
+    emit("prices/gold/index.html", build_daily_price_page("gold"))
+    emit("prices/usd/index.html", build_daily_price_page("usd"))
 
     # policy pages (already built — copy as-is)
     policy_map = {"privacy": "privacy", "terms": "terms",
@@ -2611,6 +2795,13 @@ def main():
     write_sitemap(sitemap_meta,
                   # Audit 2026-11-25: example posts stay out of both sitemaps.
                   [p for p in news if not p.get("is_example")])
+
+    # IndexNow key file (2026-11-25): the key lives in settings.json and
+    # must be served at https://3rde.online/<key>.txt for Bing/Yandex to
+    # accept IndexNow submissions. main() wipes site/ on every build, so
+    # the file is written here, not committed as a static file.
+    if INDEXNOW_KEY and INDEXNOW_KEY.isalnum():
+        (SITE / (INDEXNOW_KEY + ".txt")).write_text(INDEXNOW_KEY, encoding="utf-8")
 
     print(f"models: {len(MODELS)}  offers: {len(ROWS)}  brands: {len(BRANDS)}")
     print(f"product pages: {len(MODELS)}  brand pages: {len(BRANDS)}  "

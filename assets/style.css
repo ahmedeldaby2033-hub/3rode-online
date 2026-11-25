@@ -528,6 +528,13 @@ html[data-theme="dark"] .coupon-shop-btn.shop-noon { color: #222 !important; }
 }
 html[data-theme="dark"] .coupon-code { color: #ffb347; background: #2a2113; }
 .countdown { font-weight: 800; color: var(--red); }
+/* White Friday homepage banner (2026-11-25) — expires by itself: app.js
+   hides .wf-banner once its countdown passes 27 Nov 2026. */
+.wf-banner { background: linear-gradient(135deg, #ea580c, #dc2626); color: #fff; border-radius: 14px; padding: 14px 18px; margin: 18px 0 4px; }
+.wf-banner .container { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; }
+.wf-banner strong { font-size: 18px; }
+.wf-banner .countdown { color: #fff; background: rgba(0,0,0,.25); padding: 4px 12px; border-radius: 999px; }
+.wf-banner .btn { background: #fff; color: #c2410c; }
 .example-tag {
   display: inline-block; background: #fef3c7; color: #92400e; border: 1px solid #fcd34d;
   font-size: .78rem; font-weight: 800; padding: 2px 9px; border-radius: 999px;

@@ -72,7 +72,16 @@ def refresh_from_sheet():
     cli = pathlib.Path("/opt/hatch/bin/hatch_gws_cli")
     tabs = {"sheet1.json": "الورقة1", "summary.json": "ملخص",
             "price_history.json": "سجل الأسعار", "duplicates.json": "المكرر فقط",
-            "coupons.json": "الكوبونات", "redirects.json": "إعادة التوجيه"}
+            "coupons.json": "الكوبونات", "redirects.json": "إعادة التوجيه",
+            # Guides + news were missing here (2026-11-25): their raw files
+            # only refreshed via the Apps Script fallback, which never runs
+            # when the CLI succeeds — so local syncs built stale guides
+            # (the 3 guides stayed "draft" with empty reviews even though
+            # the Sheet said "published"). The VPS never hit this because
+            # hatch_gws_cli does not exist there, so it always uses the
+            # Apps Script export. Refreshing them here makes local syncs
+            # match the VPS.
+            "guides.json": "الأدلة", "news.json": "الأخبار"}
     if cli.exists() and sheet_id:
         for fname, tab in tabs.items():
             try:
@@ -219,13 +228,14 @@ def sync_guides_from_raw():
         if not slug:
             continue
         prev = existing.get(slug, {})
+        st = str(col(row, "status", "")).strip() or "draft"
         guides.append({
             "slug": slug,
             "title": str(col(row, "title", "")).strip(),
             "criterion": str(col(row, "criterion", "")).strip(),
             "description": str(col(row, "description", "")).strip(),
             "human_review": str(col(row, "human_review", "")).strip(),
-            "status": str(col(row, "status", "")).strip() or "draft",
+            "status": st,
             "author": str(col(row, "author", "")).strip() or "فريق عروض أونلاين",
             "date": str(col(row, "date", "")).strip(),
             "publish_at": str(col(row, "publish_at", "")).strip(),
@@ -235,7 +245,10 @@ def sync_guides_from_raw():
             "meta_title": str(col(row, "meta_title", "")).strip(),
             "meta_desc": str(col(row, "meta_desc", "")).strip(),
             "tags": _tags_list(col(row, "tags", "")),
-            "hidden": bool(prev.get("hidden", False)),
+            # A guide marked published in the Sheet must never stay hidden:
+            # otherwise "نشر" from the panel silently changes nothing on
+            # the site (hit 2026-11-25 with the gaming/camera/battery guides).
+            "hidden": bool(prev.get("hidden", False)) and st != "published",
             "tips": prev.get("tips", []),
             "is_example": bool(prev.get("is_example", False)),
         })
@@ -606,6 +619,25 @@ def append_history_to_sheet(changes):
         log("history-append", f"skipped: {e}")
 
 
+def refresh_daily_prices():
+    """Refresh gold/USD daily prices when today's data is missing.
+
+    Best-effort: scripts/daily-prices.py fetches live prices and writes
+    data/daily-prices.json. On ANY failure the old file stays untouched
+    (the pages show the last successful date — never a stale price under
+    a new date). Never fails the sync."""
+    try:
+        r = subprocess.run([sys.executable, str(SCRIPTS / "daily-prices.py")],
+                           capture_output=True, text=True, timeout=180)
+        out = (r.stdout or "").strip()
+        if out:
+            log("daily-prices", out[-500:])
+        if r.returncode != 0:
+            log("daily-prices", "fetcher failed — keeping last good data")
+    except Exception as e:  # noqa: BLE001 - best-effort by design
+        log("daily-prices", "skipped: " + str(e))
+
+
 def main():
     sys.path.insert(0, str(SCRIPTS))
     try:
@@ -625,6 +657,7 @@ def main():
             hist_file.write_text(json.dumps(hist, ensure_ascii=False, indent=1),
                                  encoding="utf-8")
         append_history_to_sheet(changes)
+        refresh_daily_prices()
         download_images()
         r = subprocess.run([sys.executable, str(SCRIPTS / "build.py")],
                            capture_output=True, text=True, timeout=600)

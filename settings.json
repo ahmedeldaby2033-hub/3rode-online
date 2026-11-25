@@ -1,13 +1,13 @@
 {
   "site_name": "عروض أونلاين",
   "site_domain": "3rde.online",
+  "indexnow_key": "94aea73c8d5d33bd91d5185fd2adda2f",
   "site_slogan": "",
-  "home_layout": "store",
+  "home_layout": "classic",
   "brand_order": [
     "Apple",
     "Samsung",
     "Xiaomi",
-    "XIAOMI",
     "OPPO",
     "realme",
     "vivo",
@@ -19,7 +19,6 @@
     "Nokia",
     "Motorola",
     "itel",
-    "Itel",
     "ZTE",
     "Micromax",
     "Generic",

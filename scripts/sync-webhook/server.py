@@ -477,6 +477,56 @@ def trigger_deploy(job):
     return ok
 
 
+def submit_indexnow(job):
+    """Submit changed page URLs to IndexNow (Bing/Yandex) after a
+    successful deploy. The legacy google.com/ping (404) and
+    bing.com/ping (410) endpoints are dead — IndexNow is the working
+    route (POST to api.indexnow.org returns 202, verified live
+    2026-11-25). Best-effort: never fails the sync. The key file
+    <key>.txt is written by build.py into site/ from settings.json
+    indexnow_key; the first submission after the key is introduced may
+    fail validation until the file is live on the site — harmless."""
+    try:
+        sp = os.path.join(WORKDIR, "settings.json")
+        settings = json.load(open(sp, encoding="utf-8")) if os.path.exists(sp) else {}
+        key = str(settings.get("indexnow_key") or "").strip()
+        if not key or len(key) < 16:
+            return {"submitted": 0, "note": "no indexnow_key in settings.json"}
+        domain = str(settings.get("domain") or
+                     settings.get("site_domain") or "3rde.online").strip()
+        r = run(["git", "show", "--name-only", "--pretty=format:", "HEAD"],
+                cwd=WORKDIR)
+        urls = []
+        for line in (r.stdout or "").splitlines():
+            line = line.strip()
+            if not line.startswith("site/") or not line.endswith(".html"):
+                continue
+            rel = line[5:]
+            if rel == "index.html":
+                urls.append("https://" + domain + "/")
+            elif rel.endswith("/index.html"):
+                urls.append("https://" + domain + "/" + rel[:-len("index.html")])
+            else:
+                urls.append("https://" + domain + "/" + rel)
+        urls = sorted(set(urls))[:10000]
+        if not urls:
+            return {"submitted": 0, "note": "no changed html pages"}
+        body = json.dumps({"host": domain, "key": key,
+                           "keyLocation": "https://" + domain + "/" + key + ".txt",
+                           "urlList": urls}, ensure_ascii=False).encode("utf-8")
+        req = urlrequest.Request("https://api.indexnow.org/indexnow",
+                                 data=body,
+                                 headers={"Content-Type": "application/json"},
+                                 method="POST")
+        with urlrequest.urlopen(req, timeout=15) as resp:
+            status = resp.status
+        log(job, "IndexNow: أُرسلت " + str(len(urls)) + " صفحة (HTTP " + str(status) + ")")
+        return {"submitted": len(urls), "http": status}
+    except Exception as e:  # noqa: BLE001 - best-effort by design
+        log(job, "IndexNow: تخطّي (" + str(e)[:200] + ")")
+        return {"submitted": 0, "error": str(e)[:200]}
+
+
 def do_sync(job, payload):
     try:
         ensure_repo(job)
@@ -485,6 +535,11 @@ def do_sync(job, payload):
         result["pushed"] = push_changes(job)
         result["deployed"] = (trigger_deploy(job)
                               if result["pushed"] else False)
+        # IndexNow (Bing/Yandex): the legacy google.com/ping (404) and
+        # bing.com/ping (410) endpoints are dead — IndexNow is the working
+        # route. Best-effort; never fails the sync.
+        if result["deployed"]:
+            result["indexnow"] = submit_indexnow(job)
         job["status"] = "done"
         job["result"] = result
         log(job, "اكتمل التحديث ✓")
