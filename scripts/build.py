@@ -1073,13 +1073,35 @@ def faqs_for(model):
          f"أرخص سعر حالي هو {fmt_price(model.cheapest_price)} جنيه في {cheapest_store} (البائع: {norm(c(cheapest, 'البائع'))})، وآخر تحديث للسعر في {model.last_update}. السعر النهائي هو سعر المتجر وقت الشراء."),
         (f"هل يدعم {model.name_ar} شبكة 5G؟",
          f"{'نعم، يدعم هذا الهاتف شبكات الجيل الخامس 5G.' if model.g5 else 'لا، هذا الهاتف لا يدعم شبكات الجيل الخامس 5G.'}"),
-        (f"ما سعة بطارية {model.name_ar}؟",
-         f"بطارية بسعة {norm(c(cheapest, 'البطارية'))}، وقدرة شحن {norm(c(cheapest, 'قدرة الشحن (واط)'))} واط."),
-        (f"ما التخزين والرام في {model.name_ar}؟",
-         f"التخزين {model.storage} والرام {model.ram}، وعدد الشرائح {norm(c(cheapest, 'عدد الشرائح'))}."),
-        (f"ما الضمان على {model.name_ar}؟",
-         f"{norm(c(cheapest, 'الضمان')) or 'حسب سياسة المتجر والبائع.'}"),
     ]
+    # Audit 2026-11-25: 68/312 models lack battery and/or charging data and
+    # 40 lack storage/RAM — the old code rendered broken answers like
+    # "بطارية بسعة ، وقدرة شحن  واط." (also into FAQPage JSON-LD).
+    # Only ask questions whose data actually exists.
+    battery = norm(c(cheapest, "البطارية"))
+    charging = norm(c(cheapest, "قدرة الشحن (واط)"))
+    if battery or charging:
+        parts = []
+        if battery:
+            parts.append(f"بطارية بسعة {battery}")
+        if charging:
+            parts.append(f"قدرة شحن {charging} واط")
+        faqs.append((f"ما سعة بطارية {model.name_ar}؟", "، و".join(parts) + "."))
+    storage, ram = model.storage, model.ram
+    sims = norm(c(cheapest, "عدد الشرائح"))
+    if storage or ram:
+        parts = []
+        if storage:
+            parts.append(f"التخزين {storage}")
+        if ram:
+            parts.append(f"الرام {ram}")
+        if sims:
+            parts.append(f"عدد الشرائح {sims}")
+        faqs.append((f"ما التخزين والرام في {model.name_ar}؟", "، و".join(parts) + "."))
+    elif sims:
+        faqs.append((f"كم عدد الشرائح في {model.name_ar}؟", f"عدد الشرائح {sims}."))
+    faqs.append((f"ما الضمان على {model.name_ar}؟",
+                 f"{norm(c(cheapest, 'الضمان')) or 'حسب سياسة المتجر والبائع.'}"))
     return faqs
 
 

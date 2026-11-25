@@ -323,6 +323,16 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
       <div id="products-table" class="table-scroll">—</div>
     </div>
 
+    <div class="card">
+      <h2>أسئلة شائعة تلقائية ❓</h2>
+      <p class="hint">كل صفحة منتج على الموقع فيها قسم «أسئلة شائعة» يُولَّد تلقائياً من بيانات المنتج (السعر، 5G، البطارية، التخزين/الرام، الضمان) مع FAQPage JSON-LD — والأسئلة التي لا توجد بياناتها لا تظهر أصلاً. جرّب المعاينة هنا قبل النشر:</p>
+      <div class="filters">
+        <input id="faq-model" type="text" placeholder="مثال: OPPO A6" style="flex:1;min-width:180px">
+        <button class="btn" onclick="previewProductFaqs()">👁 معاينة الأسئلة</button>
+      </div>
+      <div id="faq-preview"></div>
+    </div>
+
     <div class="card" id="product-form-card" style="display:none">
       <h2 id="product-form-title">إضافة / تعديل منتج</h2>
       <form id="product-form" onsubmit="return saveProduct(event)">
@@ -618,7 +628,8 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
         <select id="gd-gen-criterion"><option value="under_10000">أفضل هواتف تحت 10,000 جنيه</option><option value="battery">أفضل بطارية</option><option value="camera">أفضل كاميرا</option><option value="gaming">أفضل هواتف للألعاب</option></select>
         <p><button type="button" class="btn" onclick="genGuide()">توليد مسودة الدليل</button></p>
         <p id="gd-gen-msg" class="hint"></p></div>
-      <p><button class="btn-green" onclick="saveGuide()">حفظ الدليل</button> <button class="btn" onclick="previewGuide()">👁 معاينة قبل النشر</button></p>
+      <p><button class="btn-green" onclick="saveGuide()">حفظ الدليل</button> <button class="btn" onclick="previewGuide()">👁 معاينة قبل النشر</button> <button class="btn" onclick="humanizeGuide()">✨ Humanize — طبيعي أكثر</button></p>
+      <div id="gd-humanize-report"></div>
     </div>
     <div class="card"><h2>النشر المجدول ⏰</h2>
       <p class="hint">الأدلة والأخبار التي تحدد لها تاريخ نشر مستقبلي تُنشر تلقائياً عند حلول وقتها (كل ساعة)، بشرط أن تكون حالتها «مسودة». فعّل المشغّل مرة واحدة من هنا.</p>
@@ -690,7 +701,8 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
         </div>
         <p><button type="button" class="btn" onclick="genNews()">توليد مسودة الخبر</button></p>
         <p id="nw-gen-msg" class="hint"></p></div>
-      <p><button class="btn-green" onclick="saveNews()">حفظ الخبر</button> <button class="btn" onclick="previewNews()">👁 معاينة قبل النشر</button></p>
+      <p><button class="btn-green" onclick="saveNews()">حفظ الخبر</button> <button class="btn" onclick="previewNews()">👁 معاينة قبل النشر</button> <button class="btn" onclick="humanizeNews()">✨ Humanize — طبيعي أكثر</button></p>
+      <div id="nw-humanize-report"></div>
     </div>
     <div class="card"><h2>النشر المجدول ⏰</h2>
       <p class="hint">الأخبار التي تحدد لها تاريخ نشر مستقبلي تُنشر تلقائياً عند حلول وقتها (كل ساعة). فعّل المشغّل مرة واحدة من هنا (نفس مشغّل الأدلة).</p>
@@ -714,6 +726,14 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
         <button class="btn-ghost" onclick="copyText('https://3rde.online/news-sitemap.xml')">نسخ خريطة الأخبار</button>
       </p>
       <p id="sc-hint" class="hint"></p>
+    </div>
+    <div class="card">
+      <h2>أصالة النصوص — فحص التشابه بين المقالات ✨</h2>
+      <p class="hint">يقارن نصوص كل الأدلة والأخبار ببعضها (تشابه الكلمات المتتابعة) ويعرض الأزواج الأكثر تشابهاً — المقالات المولّدة من قالب واحد تتشابه بطبيعتها، فالهدف كشف النسخ شبه الكامل لا التشابه العادي. <b>تنبيه صادق:</b> لا توجد أداة تضمن «أصالة 100%» — كاشفات الذكاء الاصطناعي غير دقيقة؛ هذا الفحص يقيس تشابه نصوصك ببعضها فقط، وزر Humanize يحوّل الأسلوب الرسمي لطبيعي أكثر.</p>
+      <div class="filters">
+        <button class="btn" onclick="runSimilarityAudit()">🔍 فحص تشابه المقالات</button>
+      </div>
+      <div id="sim-table" class="table-scroll">—</div>
     </div>
     <div class="card">
       <h2>فحص SEO شامل — الأدلة والأخبار 🔍</h2>
@@ -3936,6 +3956,187 @@ async function previewNews(){
     (n.tags ? "<p class='hint'>الوسوم: " + esc(n.tags) + "</p>" : "") +
     "<p class='hint'>الرابط بعد النشر: <a href='" + esc(url) + "' target='_blank' rel='noopener'>" + esc(url) + "</a></p>"
   );
+}
+/* ---- Product FAQs preview (mirrors build.py faqs_for exactly) ---- */
+function productFaqs(r){
+  var name = r[1] || r[0] || "";
+  var price = parseFloat(String(r[7] || "").replace(/[^0-9.]/g, "")) || 0;
+  var faqs = [
+    ["ما سعر " + name + " في مصر؟", "أرخص سعر حالي هو " + pvPrice(price) + " في " + (r[5] || "جوميا") + " (البائع: " + (r[6] || "—") + ")، وآخر تحديث للسعر في " + (r[25] || "—") + ". السعر النهائي هو سعر المتجر وقت الشراء."],
+    ["هل يدعم " + name + " شبكة 5G؟", String(r[31] || "") === "نعم" ? "نعم، يدعم هذا الهاتف شبكات الجيل الخامس 5G." : "لا، هذا الهاتف لا يدعم شبكات الجيل الخامس 5G."]
+  ];
+  var battery = String(r[19] || "").trim(), charging = String(r[20] || "").trim();
+  if(battery || charging){
+    var parts = [];
+    if(battery) parts.push("بطارية بسعة " + battery);
+    if(charging) parts.push("قدرة شحن " + charging + " واط");
+    faqs.push(["ما سعة بطارية " + name + "؟", parts.join("، و") + "."]);
+  }
+  var storage = String(r[13] || "").trim(), ram = String(r[14] || "").trim(), sims = String(r[32] || "").trim();
+  if(storage || ram){
+    var sp = [];
+    if(storage) sp.push("التخزين " + storage);
+    if(ram) sp.push("الرام " + ram);
+    if(sims) sp.push("عدد الشرائح " + sims);
+    faqs.push(["ما التخزين والرام في " + name + "؟", sp.join("، و") + "."]);
+  }else if(sims){
+    faqs.push(["كم عدد الشرائح في " + name + "؟", "عدد الشرائح " + sims + "."]);
+  }
+  faqs.push(["ما الضمان على " + name + "؟", String(r[23] || "").trim() || "حسب سياسة المتجر والبائع."]);
+  return faqs;
+}
+async function previewProductFaqs(){
+  var q = document.getElementById("faq-model").value.trim();
+  var el = document.getElementById("faq-preview");
+  if(!q){ toast("اكتب اسم الموديل"); return; }
+  el.innerHTML = "جارٍ التحميل…";
+  try{
+    var nb = await newsBest(q);
+    var faqs = productFaqs(nb.best.row);
+    el.innerHTML = "<h3>أسئلة شائعة عن " + esc(nb.best.row[1] || nb.best.row[0]) + "</h3>" +
+      faqs.map(function(f){ return "<details class='faq-item'><summary>" + esc(f[0]) + "</summary><p>" + esc(f[1]) + "</p></details>"; }).join("") +
+      "<p class='hint'>هذه نفس الأسئلة التي تظهر في صفحة المنتج على الموقع (مع FAQPage JSON-LD).</p>";
+  }catch(e){ el.innerHTML = "<p class='error'>" + esc(e.message) + "</p>"; }
+}
+/* ---- Humanize + originality check ----
+   Honest scope: no tool can guarantee "100% originality" (AI detectors are
+   unreliable). This does two real things: (1) a rule-based rewrite that
+   turns stiff/formal phrasing into natural Egyptian Arabic, and (2) a
+   shingle-based similarity check of the article against every other
+   guide/news, reported as a percentage. */
+var HUMANIZE_RULES = [
+  ["بالإضافة إلى ذلك", "وكمان"], ["علاوة على ذلك", "وفوق كده"],
+  ["من الجدير بالذكر أن", ""], ["من الجدير بالذكر", ""],
+  ["في الختام", "في النهاية"], ["بشكل عام", "عموماً"],
+  ["من المهم أن", "مهم إن"], ["يجب أن", "لازم"], ["يجب", "لازم"],
+  ["يمكنك", "تقدر"], ["يمكن للمستخدم", "تقدر"],
+  ["يتميز بـ", "بيتميز بـ"], ["يتميز", "بيتميز"],
+  ["يوفر", "بيوفر"], ["يسمح بـ", "بيسمح بـ"],
+  ["كما أن", "وكمان"], ["حيث أن", "لأن"],
+  ["لذلك", "عشان كده"], ["على الرغم من", "رغم إن"],
+  ["عندما", "لما"], ["في الوقت الحالي", "دلوقتي"],
+  ["من أجل", "عشان"], ["بشكل كبير", "جداً"],
+  ["يتيح", "بيتيح"], ["يقدم", "بيقدم"], ["يمنح", "بيدي"],
+  ["يُعد", "يعتبر"], ["يُعتبر", "يعتبر"], ["يعد", "يعتبر"]
+];
+function reEsc(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+function humanizeText(text){
+  var out = String(text || ""), changes = [], total = 0;
+  HUMANIZE_RULES.forEach(function(pair){
+    var from = pair[0], to = pair[1];
+    var re = new RegExp("(^|[\\s،؛:.!?()\"'«»-])" + reEsc(from) + "(?=[\\s،؛:.!?()\"'«»-]|$)", "g");
+    var n = 0;
+    out = out.replace(re, function(m, pre){ n++; return pre + to; });
+    if(n){ changes.push(from + " → " + (to || "حذف") + " (" + n + ")"); total += n; }
+  });
+  // split long clauses at semicolons (human rhythm) and clean doubles
+  var semi = (out.match(/؛/g) || []).length;
+  if(semi){ out = out.replace(/؛\s*/g, ". "); total += semi; changes.push("؛ → . (" + semi + ")"); }
+  out = out.replace(/(\S+) \1\b/g, "$1");
+  out = out.replace(/[ ]{2,}/g, " ").replace(/\s+([،؛:.!?])/g, "$1").trim();
+  return {text: out, changes: changes, total: total};
+}
+function textShingles(t, n){
+  n = n || 5;
+  var words = String(t || "").replace(/[^\u0600-\u06FFa-zA-Z0-9\s]/g, " ").split(/\s+/).filter(function(w){ return w.length > 1; });
+  var s = new Set();
+  for(var i = 0; i + n <= words.length; i++) s.add(words.slice(i, i + n).join(" "));
+  return s;
+}
+function jaccard(a, b){
+  if(!a.size || !b.size) return 0;
+  var inter = 0;
+  a.forEach(function(x){ if(b.has(x)) inter++; });
+  return inter / (a.size + b.size - inter);
+}
+function articleTexts(){
+  var list = [];
+  (GUIDES_DATA || []).slice(1).forEach(function(r){
+    // guides have no review text yet (human_review is empty on all drafts);
+    // the comparable text is the description (+ human review when present).
+    var t = ((r[3] || "") + " " + (r[4] || "")).trim();
+    if(t) list.push({kind: "دليل", slug: r[0], title: r[1], text: t});
+  });
+  (NEWS_DATA || []).slice(1).forEach(function(r){
+    if(r[3]) list.push({kind: "خبر", slug: r[0], title: r[1], text: r[3]});
+  });
+  return list;
+}
+function similarityVsOthers(text, selfSlug){
+  var mine = textShingles(text);
+  if(!mine.size) return [];
+  var out = [];
+  articleTexts().forEach(function(a){
+    if(a.slug === selfSlug) return;
+    var sim = jaccard(mine, textShingles(a.text));
+    if(sim > 0.05) out.push({title: a.title, kind: a.kind, pct: Math.round(sim * 100)});
+  });
+  return out.sort(function(a, b){ return b.pct - a.pct; }).slice(0, 3);
+}
+function humanizeReportHtml(res, before, after){
+  var h = "<div class='card' style='background:#f4f6fb;margin-top:8px'><b>تقرير Humanize</b><br>";
+  h += res.total ? ("تعديلات الأسلوب: " + res.total + " — " + esc(res.changes.slice(0, 8).join("، ")) + (res.changes.length > 8 ? "…" : "")) : "لم يجد النص عبارات رسمية لتعديلها — الأسلوب طبيعي أصلاً.";
+  h += "<br>أقرب مقال مشابه قبل: " + (before.length ? esc(before[0].title) + " (" + before[0].pct + "%)" : "لا يوجد") +
+       " · بعد: " + (after.length ? esc(after[0].title) + " (" + after[0].pct + "%)" : "لا يوجد");
+  h += "<br><span class='hint'>ملاحظة: النسبة تقيس تشابه نصك مع مقالاتك الأخرى فقط — لا تضمن «أصالة 100%» ضد أي كاشف خارجي. راجع النص قبل الحفظ.</span></div>";
+  return h;
+}
+async function ensureArticlesLoaded(){
+  if(!GUIDES_DATA.length){ var d = await api("guides"); GUIDES_DATA = d.rows || []; }
+  if(!NEWS_DATA.length){ var d2 = await api("news"); NEWS_DATA = d2.rows || []; }
+}
+function humanizeGuide(){
+  var dEl = document.getElementById("gd-desc"), rEl = document.getElementById("gd-review");
+  var t = (dEl ? dEl.value : "") + "\n" + (rEl ? rEl.value : "");
+  if(!t.trim()){ toast("اكتب وصف الدليل أو المراجعة أولاً"); return; }
+  var before = similarityVsOthers(t, document.getElementById("gd-slug").value.trim());
+  var total = 0, allChanges = [];
+  [dEl, rEl].forEach(function(el){
+    if(!el || !el.value.trim()) return;
+    var res = humanizeText(el.value);
+    el.value = res.text;
+    total += res.total; allChanges = allChanges.concat(res.changes);
+  });
+  var after = similarityVsOthers((dEl ? dEl.value : "") + "\n" + (rEl ? rEl.value : ""), document.getElementById("gd-slug").value.trim());
+  document.getElementById("gd-humanize-report").innerHTML = humanizeReportHtml({total: total, changes: allChanges}, before, after);
+  toast(total ? ("تم تحسين النص — " + total + " تعديل") : "النص طبيعي أصلاً — لا تعديلات");
+}
+function humanizeNews(){
+  var el = document.getElementById("nw-body");
+  var t = el ? el.value : "";
+  if(!t.trim()){ toast("اكتب نص الخبر أولاً"); return; }
+  var before = similarityVsOthers(t, document.getElementById("nw-slug").value.trim());
+  var res = humanizeText(t);
+  el.value = res.text;
+  var after = similarityVsOthers(res.text, document.getElementById("nw-slug").value.trim());
+  document.getElementById("nw-humanize-report").innerHTML = humanizeReportHtml(res, before, after);
+  toast(res.total ? ("تم تحسين النص — " + res.total + " تعديل") : "النص طبيعي أصلاً — لا تعديلات");
+}
+async function runSimilarityAudit(){
+  var el = document.getElementById("sim-table");
+  el.innerHTML = "جارٍ فحص التشابه بين المقالات…";
+  try{
+    await ensureArticlesLoaded();
+    var arts = articleTexts();
+    var pairs = [];
+    for(var i = 0; i < arts.length; i++){
+      var si = textShingles(arts[i].text);
+      for(var j = i + 1; j < arts.length; j++){
+        var sim = jaccard(si, textShingles(arts[j].text));
+        if(sim >= 0.25) pairs.push({a: arts[i], b: arts[j], pct: Math.round(sim * 100)});
+      }
+    }
+    pairs.sort(function(x, y){ return y.pct - x.pct; });
+    var html = "<p class='hint'>فحص " + arts.length + " مقالاً — أزواج بتشابه ≥25%: <b>" + pairs.length + "</b>. التشابه العادي بين مقالات القالب الواحد متوقع؛ راجع الأزواج فوق 60% أولاً (قد تحتاج إعادة صياغة أو دمج).</p>";
+    if(!pairs.length){ html += "<p>لا توجد أزواج بتشابه 25% أو أكثر.</p>"; }
+    else{
+      html += "<table><tr><th>المقال الأول</th><th>المقال الثاني</th><th>التشابه</th></tr>" +
+        pairs.slice(0, 20).map(function(p){
+          return "<tr><td>" + esc(p.a.title) + " <span class='hint'>(" + p.a.kind + ")</span></td><td>" + esc(p.b.title) + " <span class='hint'>(" + p.b.kind + ")</span></td><td><b>" + p.pct + "%</b></td></tr>";
+        }).join("") + "</table>";
+    }
+    el.innerHTML = html;
+  }catch(e){ el.innerHTML = "<p class='error'>تعذّر الفحص: " + esc(e.message) + "</p>"; }
 }
 async function loadLogs(){
   try{
