@@ -86,12 +86,66 @@ section.tab.active{display:block}
 .stat-label{color:var(--muted);font-size:13px;margin-top:2px}
 .warn-banner{background:#fef0c7;border:1px solid #fdb022;color:#7a3c06;border-radius:10px;padding:12px 14px;margin-bottom:16px}
 .steps li{margin-bottom:8px;line-height:1.7}
+/* ================= WordPress-style admin (RTL) ================= */
+:root{--wp-bar:#1d2327;--wp-menu:#1d2327;--wp-blue:#2271b1;--wp-bg:#f0f0f1;--wp-border:#c3c4c7}
+body{background:var(--wp-bg)}
+main{max-width:1400px}
+/* ---- top admin bar (WP #wpadminbar) ---- */
+header.wp-adminbar{position:sticky;top:0;z-index:70;background:var(--wp-bar);color:#eee;padding:0 10px;min-height:46px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+header.wp-adminbar .wp-logo{font-size:18px;font-weight:800;color:#fff;text-decoration:none;white-space:nowrap}
+header.wp-adminbar .wp-adminbar-title{color:#c3c4c7;font-size:14px}
+header.wp-adminbar .wp-adminbar-spacer{flex:1}
+header.wp-adminbar a{color:#eee;text-decoration:none;font-size:13px}
+header.wp-adminbar a:hover{color:#fff;text-decoration:underline}
+header.wp-adminbar .wp-adminbar-btn{background:var(--wp-blue);color:#fff;border-radius:3px;padding:7px 12px;font-size:13px}
+header.wp-adminbar .wp-adminbar-btn:hover{background:#135e96}
+header.wp-adminbar select#admin-theme{width:auto;padding:5px 8px;border-radius:3px;font-size:13px}
+header.wp-adminbar #logout-btn{background:transparent;border:1px solid #50575e;color:#eee;padding:7px 12px;border-radius:3px;font-size:13px}
+body:not(.logged-in) header.wp-adminbar .requires-login{display:none}
+/* ---- WP postbox cards ---- */
+.card{border:1px solid var(--wp-border);border-radius:3px;box-shadow:0 1px 1px rgba(0,0,0,.04)}
+.card h2{font-size:15px;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px}
+.card h3{font-size:14px}
+button{border-radius:3px}
+/* ---- WP notice ---- */
+.warn-banner{background:#fff;border:1px solid var(--wp-border);border-inline-start:4px solid #dba617;box-shadow:0 1px 1px rgba(0,0,0,.04);border-radius:3px}
+/* ---- dashboard widgets grid ---- */
+.wp-widgets{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.wp-widgets .card{margin-bottom:0}
+@media(max-width:768px){.wp-widgets{grid-template-columns:1fr}}
+/* ---- WP menu count badges ---- */
+.menu-badge{display:inline-block;min-width:18px;padding:1px 6px;border-radius:9px;background:#d63638;color:#fff;font-size:11px;font-weight:700;text-align:center;margin-inline-start:6px;vertical-align:middle}
+.menu-badge.amber{background:#dba617;color:#1d2327}
+body.wp-collapsed .menu-badge{display:none}
+/* ---- footer ---- */
+.wp-footer{max-width:1400px;margin:0 auto;padding:14px 20px 30px;color:var(--muted);font-size:13px}
+/* ---- WP dark admin menu (desktop) ---- */
+#sidebar-collapse{display:none}
+@media(min-width:769px){
+  #sidebar{background:var(--wp-menu);border:0;border-radius:0;position:sticky;top:58px;max-height:calc(100vh - 58px);padding:10px 0}
+  #sidebar .nav-group{color:#eee;font-size:12px;padding:0 14px;margin:16px 0 4px}
+  .nav-item{color:#eee;border-radius:0;padding:9px 14px;font-size:14px;font-weight:400;display:flex;align-items:center;gap:8px}
+  .nav-item:hover{background:#2c3338;color:#fff}
+  .nav-item.active{background:var(--wp-blue);color:#fff;box-shadow:inset -4px 0 0 #72aee6}
+  #sidebar-collapse{display:block}
+  body.wp-collapsed #sidebar{width:56px;flex-basis:56px}
+  body.wp-collapsed .nav-item{justify-content:center;padding:10px 0}
+  body.wp-collapsed .nav-item .nav-label,body.wp-collapsed #sidebar .nav-group{display:none}
+}
 </style>
 </head>
 <body>
-<header>
-  <h1><button id="hamburger" onclick="toggleSidebar()" aria-label="القائمة" style="background:none;border:0;color:#fff;font-size:22px;padding:4px 8px">☰</button> لوحة تحكم — عروض أونلاين <span style="font-weight:400">3rde.online</span></h1>
-  <span><a href="https://3rde.online/" target="_blank" rel="noopener">عرض الموقع ↗</a> &nbsp;·&nbsp; <a href="https://docs.google.com/spreadsheets/d/1VeOXP8ly-W0dwT0QQK9kqf9z_834zok9ekIqGjfPNdE" target="_blank" rel="noopener">فتح الشيت ↗</a> &nbsp;·&nbsp; <label for="admin-theme" style="font-weight:700">المظهر:</label> <select id="admin-theme" onchange="setAdminTheme(this.value)"><option value="">فاتح</option><option value="admin-dark">داكن</option><option value="admin-blue">أزرق</option><option value="admin-green">أخضر</option></select> &nbsp;·&nbsp; <button class="btn-ghost" id="logout-btn" style="display:none" onclick="logout()">تسجيل الخروج</button></span>
+<header class="wp-adminbar">
+  <button id="hamburger" onclick="toggleSidebar()" aria-label="القائمة" style="background:none;border:0;color:#fff;font-size:22px;padding:4px 8px">☰</button>
+  <a class="wp-logo" href="https://3rde.online/" target="_blank" rel="noopener">عروض أونلاين</a>
+  <span class="wp-adminbar-title">لوحة التحكم</span>
+  <span class="wp-adminbar-spacer"></span>
+  <button class="wp-adminbar-btn requires-login" onclick="syncNow()">⟳ مزامنة الآن</button>
+  <a href="https://3rde.online/" target="_blank" rel="noopener">عرض الموقع ↗</a>
+  <a href="https://docs.google.com/spreadsheets/d/1VeOXP8ly-W0dwT0QQK9kqf9z_834zok9ekIqGjfPNdE" target="_blank" rel="noopener">فتح الشيت ↗</a>
+  <label for="admin-theme" style="font-weight:700;color:#eee">المظهر:</label>
+  <select id="admin-theme" onchange="setAdminTheme(this.value)"><option value="">فاتح</option><option value="admin-dark">داكن</option><option value="admin-blue">أزرق</option><option value="admin-green">أخضر</option></select>
+  <button class="btn-ghost" id="logout-btn" style="display:none" onclick="logout()">تسجيل الخروج</button>
 </header>
 <main>
 
@@ -135,26 +189,30 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
   <div class="shell">
   <nav id="sidebar" aria-label="القائمة الرئيسية">
     <div class="nav-group">الرئيسية</div>
-    <button class="nav-item active" data-tab="tab-overview" onclick="navTo('tab-overview')">🏠 نظرة عامة</button>
+    <button class="nav-item active" data-tab="tab-overview" onclick="navTo('tab-overview')"><span class="nav-icon">🏠</span><span class="nav-label">نظرة عامة</span></button>
     <div class="nav-group">المتجر</div>
-    <button class="nav-item" data-tab="tab-products" onclick="navTo('tab-products')">📱 المنتجات</button>
-    <button class="nav-item" data-tab="tab-coupons" onclick="navTo('tab-coupons')">🎟️ الكوبونات</button>
+    <button class="nav-item" data-tab="tab-products" onclick="navTo('tab-products')"><span class="nav-icon">📱</span><span class="nav-label">المنتجات</span></button>
+    <button class="nav-item" data-tab="tab-coupons" onclick="navTo('tab-coupons')"><span class="nav-icon">🎟️</span><span class="nav-label">الكوبونات</span><span class="menu-badge amber" id="badge-coupons" style="display:none"></span></button>
     <div class="nav-group">المحتوى</div>
-    <button class="nav-item" data-tab="tab-guides" onclick="navTo('tab-guides')">📚 الأدلة</button>
-    <button class="nav-item" data-tab="tab-news" onclick="navTo('tab-news')">📰 الأخبار</button>
+    <button class="nav-item" data-tab="tab-guides" onclick="navTo('tab-guides')"><span class="nav-icon">📚</span><span class="nav-label">الأدلة</span></button>
+    <button class="nav-item" data-tab="tab-news" onclick="navTo('tab-news')"><span class="nav-icon">📰</span><span class="nav-label">الأخبار</span></button>
     <div class="nav-group">العملاء</div>
-    <button class="nav-item" data-tab="tab-inbox" onclick="navTo('tab-inbox')">📥 الطلبات والبلاغات</button>
-    <button class="nav-item" data-tab="tab-stock" onclick="navTo('tab-stock')">🔔 تنبيهات التوفر</button>
+    <button class="nav-item" data-tab="tab-inbox" onclick="navTo('tab-inbox')"><span class="nav-icon">📥</span><span class="nav-label">الطلبات والبلاغات</span><span class="menu-badge" id="badge-inbox" style="display:none"></span></button>
+    <button class="nav-item" data-tab="tab-stock" onclick="navTo('tab-stock')"><span class="nav-icon">🔔</span><span class="nav-label">تنبيهات التوفر</span></button>
     <div class="nav-group">التحليلات</div>
-    <button class="nav-item" data-tab="tab-logs" onclick="navTo('tab-logs')">📊 النقرات والسجلات</button>
-    <button class="nav-item" data-tab="tab-dead" onclick="navTo('tab-dead')">💀 منتجات بلا نقرات</button>
+    <button class="nav-item" data-tab="tab-logs" onclick="navTo('tab-logs')"><span class="nav-icon">📊</span><span class="nav-label">النقرات والسجلات</span></button>
+    <button class="nav-item" data-tab="tab-dead" onclick="navTo('tab-dead')"><span class="nav-icon">💀</span><span class="nav-label">منتجات بلا نقرات</span></button>
     <div class="nav-group">الأدوات</div>
-    <button class="nav-item" data-tab="tab-buylinks" onclick="navTo('tab-buylinks')">🔗 فحص روابط الشراء</button>
-    <button class="nav-item" data-tab="tab-affiliate" onclick="navTo('tab-affiliate')">🛡️ فحص الأفلييت</button>
-    <button class="nav-item" data-tab="tab-backup" onclick="navTo('tab-backup')">💾 النسخ الاحتياطي</button>
+    <button class="nav-item" data-tab="tab-buylinks" onclick="navTo('tab-buylinks')"><span class="nav-icon">🔗</span><span class="nav-label">فحص روابط الشراء</span></button>
+    <button class="nav-item" data-tab="tab-affiliate" onclick="navTo('tab-affiliate')"><span class="nav-icon">🛡️</span><span class="nav-label">فحص الأفلييت</span></button>
+    <button class="nav-item" data-tab="tab-backup" onclick="navTo('tab-backup')"><span class="nav-icon">💾</span><span class="nav-label">النسخ الاحتياطي</span></button>
     <div class="nav-group">الإعداد والربط</div>
-    <button class="nav-item" data-tab="tab-setup" onclick="navTo('tab-setup')">🔌 الإعداد والربط</button>
-    <button class="nav-item" data-tab="tab-settings" onclick="navTo('tab-settings')">⚙️ الإعدادات والإعلانات</button>
+    <button class="nav-item" data-tab="tab-setup" onclick="navTo('tab-setup')"><span class="nav-icon">🔌</span><span class="nav-label">الإعداد والربط</span></button>
+    <button class="nav-item" data-tab="tab-settings" onclick="navTo('tab-settings')"><span class="nav-icon">⚙️</span><span class="nav-label">الإعدادات والإعلانات</span></button>
+    <div style="margin-top:16px;border-top:1px solid #2c3338;padding-top:10px">
+      <button class="nav-item" id="sidebar-collapse" onclick="toggleWpCollapse()"><span class="nav-icon" id="collapse-icon">⇤</span><span class="nav-label">طي القائمة</span></button>
+      <div class="nav-group" style="text-align:center">عروض أونلاين · 3rde.online</div>
+    </div>
   </nav>
   <div class="admin-main">
   <div id="default-pass-banner" class="warn-banner" style="display:none">⚠️ كلمة مرور لوحة التحكم ما زالت الافتراضية (<b>admin</b>). غيّرها الآن من تبويب «الإعدادات والإعلانات» ← «تغيير كلمة مرور لوحة التحكم». <button class="btn-ghost" onclick="showTab(event,'tab-settings')">تغيير كلمة المرور</button></div>
@@ -205,6 +263,20 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
       <p class="hint">زر «مزامنة الآن» يرسل أحدث بيانات الشيت إلى خدمة المزامنة على الخادم، فتحدّث كل المنتجات والواجهة وتنشر الموقع فوراً. إن لم تكن الخدمة مربوطة بعد، يكتفي الزر بتسجيل طلب في سجل المزامنة (انظر تبويب «الإعداد والربط»).</p>
       <h3>بلاغات أسعار خاطئة</h3><div id="reports-list" class="table-scroll">—</div>
       <h3>طلبات منتجات غير موجودة</h3><div id="requests-list" class="table-scroll">—</div>
+    </div>
+    <div class="wp-widgets">
+      <div class="card"><h2>✍️ مسودة سريعة — خبر جديد</h2>
+        <label for="qd-title">العنوان</label>
+        <input type="text" id="qd-title" placeholder="مثال: خصم قوي على OPPO A6 لفترة محدودة">
+        <label for="qd-body">نص الخبر (اختياري)</label>
+        <textarea id="qd-body" placeholder="اكتب نصاً قصيراً…"></textarea>
+        <p><button class="btn" onclick="saveQuickDraft()">حفظ كمسودة خبر</button> <span id="qd-msg" class="hint"></span></p>
+        <p class="hint">تُحفظ كمسودة في تبويب الأخبار (بلا سعر في العنوان) — راجعها وانشرها من هناك.</p>
+      </div>
+      <div class="card"><h2>📉 رادار الانخفاضات — أهم 5</h2>
+        <div id="dash-drops">—</div>
+        <p><button class="btn-ghost" onclick="navTo('tab-logs')">عرض الرادار الكامل ←</button></p>
+      </div>
     </div>
     <div class="card"><h2>كوبونات تنتهي قريباً ⏰</h2>
       <p class="hint">الكوبونات المفعّلة التي تنتهي خلال 7 أيام أو انتهت بالفعل — جدّدها أو أوقفها قبل أن يجرّب الزوار كوداً لا يعمل.</p>
@@ -619,6 +691,7 @@ function setAdminTheme(v){ try{ localStorage.setItem("r3de_admin_theme", v || ""
   <button id="mobile-sync-fab" class="btn" onclick="syncNow()">⟳ مزامنة الآن</button>
 </div>
 </main>
+<footer class="wp-footer">شكراً لك على استخدام منصة عروض أونلاين · 3rde.online — لوحة التحكم</footer>
 <div id="toast"></div>
 
 <script>
@@ -637,6 +710,54 @@ function showTab(ev,id){ activateTab(id); } // kept for the password banner + ol
 function navTo(id){ activateTab(id); }
 function toggleSidebar(){ document.body.classList.toggle("sidebar-open"); }
 function closeSidebar(){ document.body.classList.remove("sidebar-open"); }
+/* ---- WordPress-style: collapsible menu, menu badges, dashboard widgets ---- */
+function toggleWpCollapse(){
+  var c = document.body.classList.toggle("wp-collapsed");
+  try{ localStorage.setItem("r3de_wp_collapsed", c ? "1" : ""); }catch(e){}
+  var ic = document.getElementById("collapse-icon"); if(ic) ic.textContent = c ? "⇥" : "⇤";
+}
+(function(){ try{ if(localStorage.getItem("r3de_wp_collapsed") === "1"){ document.body.classList.add("wp-collapsed"); var ic = document.getElementById("collapse-icon"); if(ic) ic.textContent = "⇥"; } }catch(e){} })();
+var WP_BADGES = {inbox: 0, coupons: 0};
+function updateMenuBadges(inbox, coupons){
+  if(typeof inbox === "number") WP_BADGES.inbox = inbox;
+  if(typeof coupons === "number") WP_BADGES.coupons = coupons;
+  var b = document.getElementById("badge-inbox");
+  if(b){ b.style.display = WP_BADGES.inbox > 0 ? "" : "none"; b.textContent = WP_BADGES.inbox; }
+  var c = document.getElementById("badge-coupons");
+  if(c){ c.style.display = WP_BADGES.coupons > 0 ? "" : "none"; c.textContent = WP_BADGES.coupons; }
+}
+async function loadDashboardRadar(){
+  var el = document.getElementById("dash-drops"); if(!el) return;
+  try{
+    var d = await api("priceDrops", null, {days: 30, sort: "pct"});
+    var drops = (d.drops || []).slice(0, 5);
+    el.innerHTML = drops.length ?
+      "<table><tr><th>الموديل</th><th>الانخفاض</th></tr>" + drops.map(function(x){
+        return "<tr><td>" + esc(x.name) + "</td><td><b>−" + fmtEGP(x.diff) + " جنيه (" + esc(x.pct) + "%)</b></td></tr>";
+      }).join("") + "</table>" : "لا توجد انخفاضات ≥ 5% خلال آخر 30 يوماً.";
+  }catch(e){ el.innerHTML = "—"; }
+}
+async function saveQuickDraft(){
+  var t = (document.getElementById("qd-title").value || "").trim();
+  var b = (document.getElementById("qd-body").value || "").trim();
+  var msg = document.getElementById("qd-msg");
+  if(!t){ msg.textContent = "اكتب عنواناً أولاً."; return; }
+  var now = new Date();
+  var today = now.toISOString().slice(0, 10);
+  var stamp = now.toISOString().replace(/[-:T]/g, "").slice(0, 12);
+  var slug = slugifyTitle(t) || ("news-" + stamp);
+  var n = {slug: slug, title: t, description: b ? b.slice(0, 160) : t, body: b, model_slug: "", author: "فريق عروض أونلاين",
+    date_published: today, is_example: false, publish_at: "", image: "", image_alt: "", keyword: "",
+    meta_title: t + " | عروض أونلاين", meta_desc: b ? b.slice(0, 160) : t, tags: "", category: ""};
+  try{
+    await api("saveNews", {news: n});
+    msg.textContent = "تم حفظ المسودة في تبويب الأخبار.";
+    toast("تم حفظ المسودة");
+    document.getElementById("qd-title").value = "";
+    document.getElementById("qd-body").value = "";
+    loadNews();
+  }catch(err){ msg.textContent = err.message; }
+}
 
 function getAppsScriptUrl(){
   var s = "";
@@ -879,6 +1000,8 @@ async function loadOverview(){
           "<p class='ok'>لا توجد كوبونات تنتهي خلال 7 أيام.</p>";
       }
     }catch(e2){ var cel2 = document.getElementById("coupon-expiry-list"); if(cel2) cel2.innerHTML = "—"; }
+    updateMenuBadges((pendingReq || 0) + (pendingRep || 0), (soon || []).length);
+    loadDashboardRadar();
   }catch(err){document.getElementById("overview-stats").innerHTML='<span class="error">'+err.message+"</span>"}
 }
 /* ---------------- instant sync (webhook) ---------------- */
@@ -1011,6 +1134,9 @@ async function loadInbox(){
     var rq = await api("requests"); var rp = await api("reports");
     INBOX_DATA.requests = rq.rows || []; INBOX_DATA.reports = rp.rows || [];
     renderInbox();
+    var pend = (INBOX_DATA.requests || []).filter(function(r){ return !isHandled("req", r); }).length
+             + (INBOX_DATA.reports || []).filter(function(r){ return !isHandled("rep", r); }).length;
+    updateMenuBadges(pend, undefined);
   }catch(err){
     document.getElementById("inbox-requests").innerHTML = '<span class="error">' + esc(err.message) + '</span>';
   }
