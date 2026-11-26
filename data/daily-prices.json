@@ -1,35 +1,35 @@
 {
  "topics": {
   "usd": {
-   "date": "2026-11-25",
-   "fetched_at": "2026-11-25 20:13",
+   "date": "2026-11-26",
+   "fetched_at": "2026-11-26 08:25",
    "source_name": "سعر السوق العالمي (ExchangeRate-API)",
    "source_url": "https://api.exchangerate-api.com/v4/latest/USD",
    "prices": {
-    "rate": 54.23
+    "rate": 54.66
    }
   },
   "gold": {
-   "date": "2026-11-25",
-   "fetched_at": "2026-11-25 20:13",
+   "date": "2026-11-26",
+   "fetched_at": "2026-11-26 08:25",
    "source_name": "آي صاغة",
    "source_url": "https://market.isagha.com/",
    "prices": {
     "24": {
-     "buy": 6314,
-     "sell": 6372
+     "buy": 6383,
+     "sell": 6440
     },
     "21": {
-     "buy": 5525,
-     "sell": 5575
+     "buy": 5585,
+     "sell": 5635
     },
     "18": {
-     "buy": 4736,
-     "sell": 4778
+     "buy": 4787,
+     "sell": 4830
     },
     "pound": {
-     "buy": 44200,
-     "sell": 44600
+     "buy": 44680,
+     "sell": 45080
     }
    }
   }
